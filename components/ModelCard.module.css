@@ -1,0 +1,218 @@
+.card {
+  background: #fff;
+  border: 1px solid oklch(90% 0.01 75);
+  border-radius: 4px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.sourceBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sourceDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sourceLive {
+  background: oklch(90% 0.1 150 / 0.35);
+  color: oklch(35% 0.1 150);
+}
+
+.sourceLive .sourceDot {
+  background: oklch(55% 0.16 150);
+}
+
+.sourceArchived {
+  background: oklch(85% 0 0 / 0.5);
+  color: oklch(40% 0 0);
+}
+
+.sourceArchived .sourceDot {
+  background: oklch(60% 0 0);
+}
+
+.modelTag {
+  font-size: 9px;
+  color: oklch(60% 0.02 75);
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+.combo {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.versionSelect {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: oklch(45% 0.02 75);
+  background: oklch(97% 0.005 75);
+  border: 1px solid oklch(88% 0.01 75);
+  border-radius: 999px;
+  padding: 3px 10px;
+  max-width: 100%;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.versionSelect:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.comboCaret {
+  width: 10px;
+  height: 10px;
+  color: oklch(45% 0.02 75);
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+/* Anchored to the trigger's bottom edge only — it must never grow upward
+   over the card's radar chart / description above it. Height is clamped
+   from JS to the space actually left below the trigger, so it scrolls
+   instead of overflowing the viewport too. */
+.comboPanel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 100%;
+  max-width: 220px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid oklch(88% 0.01 75);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px oklch(20% 0.02 75 / 0.18);
+  z-index: 30;
+}
+
+.comboOption {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: oklch(35% 0.02 75);
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.comboOption:hover {
+  background: oklch(95% 0.01 75);
+}
+
+.comboOptionSelected {
+  background: oklch(92% 0.06 75);
+  color: oklch(15% 0 0);
+  font-weight: 700;
+}
+
+.comboOptionMajor {
+  font-weight: 700;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.monogram {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  color: oklch(22% 0.02 75);
+}
+
+.oneLiner {
+  font-size: 11px;
+  line-height: 1.4;
+  color: oklch(50% 0.02 75);
+  text-align: center;
+  width: 100%;
+  height: calc(1.4em * 3);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.radar {
+  width: 100%;
+  max-width: 150px;
+  height: auto;
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .monogram {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .headerText {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .radar {
+    max-width: 180px;
+  }
+}

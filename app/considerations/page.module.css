@@ -1,0 +1,48 @@
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.back {
+  font-size: 13px;
+  color: oklch(45% 0.02 75);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 24px;
+  color: oklch(22% 0.02 75);
+  margin: 0;
+}
+
+.intro {
+  font-size: 13px;
+  font-style: italic;
+  color: oklch(50% 0.02 75);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.body p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: oklch(30% 0.02 75);
+  margin: 0;
+}

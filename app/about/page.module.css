@@ -1,0 +1,93 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.back {
+  font-size: 13px;
+  color: oklch(45% 0.02 75);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.monogram {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: oklch(62% 0.14 265);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 22px;
+  color: oklch(22% 0.02 75);
+  margin: 0 0 4px;
+}
+
+.tagline {
+  font-size: 13px;
+  color: oklch(45% 0.02 75);
+  margin: 0 0 6px;
+}
+
+.email {
+  font-size: 13px;
+  color: oklch(50% 0.14 265);
+  text-decoration: none;
+}
+
+.email:hover {
+  text-decoration: underline;
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 16px;
+  color: oklch(22% 0.02 75);
+  margin: 0;
+}
+
+.about p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: oklch(30% 0.02 75);
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .author {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+}

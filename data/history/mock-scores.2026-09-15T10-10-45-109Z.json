@@ -1,0 +1,109 @@
+[
+  {
+    "name": "ChatGPT",
+    "monogram": "GPT",
+    "hue": 165,
+    "scores": [
+      86,
+      25,
+      52,
+      85,
+      81,
+      70
+    ],
+    "margin": [
+      4,
+      6,
+      5,
+      3,
+      3,
+      5
+    ],
+    "oneLiner": "Methodical and helpful, with a touch of caution.",
+    "dominant": "Honesty-Humility",
+    "source": "live",
+    "model": "gpt-5.6-luna"	
+  },
+  {
+    "name": "Gemini",
+    "monogram": "GM",
+    "hue": 230,
+    "scores": [
+      92,
+      25,
+      63,
+      92,
+      88,
+      75
+    ],
+    "margin": [
+      3,
+      6,
+      5,
+      2,
+      3,
+      5
+    ],
+    "oneLiner": "Open and collaborative, detail-oriented.",
+    "dominant": "Honesty-Humility",
+    "source": "live",
+    "model": "gemini-3.6-flash"
+  },
+  {
+    "name": "Claude",
+    "monogram": "CL",
+    "hue": 40,
+    "scores": [
+      81,
+      47,
+      65,
+      71,
+      75,
+      70
+    ],
+    "margin": [
+      3,
+      3,
+      3,
+      2,
+      2,
+      3
+    ],
+    "oneLiner": "Thoughtful and honest, very patient.",
+    "dominant": "Honesty-Humility",
+    "source": "live",
+    "model": "claude-sonnet-5"	
+  },
+  {
+    "name": "Grok",
+    "monogram": "GR",
+    "hue": 320,
+    "scores": [
+      48,
+      34,
+      88,
+      52,
+      64,
+      72
+    ],
+    "oneLiner": "Direct and witty, enjoys verbal risk-taking.",
+    "dominant": "Extraversion",
+    "source": "fake"
+  },
+  {
+    "name": "DeepSeek",
+    "monogram": "DS",
+    "hue": 100,
+    "scores": [
+      66,
+      40,
+      60,
+      68,
+      86,
+      74
+    ],
+    "oneLiner": "Precise and efficient, measured in tone.",
+    "dominant": "Conscientiousness",
+    "source": "fake"
+  }
+]
