@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { resolveLocale } from "@/lib/i18n/locale";
 import { dict } from "@/lib/i18n/dictionaries";
+import { buildMetadata } from "@/lib/seo";
 import styles from "./page.module.css";
 
 export function generateMetadata(): Metadata {
   const t = dict(resolveLocale(headers().get("accept-language"))).about;
-  return { title: t.metaTitle, description: t.metaDescription };
+  return buildMetadata({ title: t.metaTitle, description: t.metaDescription, path: "/about" });
 }
 
 export default function About() {

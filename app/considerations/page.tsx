@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { resolveLocale, Locale } from "@/lib/i18n/locale";
+import { buildMetadata } from "@/lib/seo";
 import styles from "./page.module.css";
 
 const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: string; title: string; body: React.ReactNode }> = {
@@ -71,7 +72,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
 
 export function generateMetadata(): Metadata {
   const t = TEXT[resolveLocale(headers().get("accept-language"))];
-  return { title: t.metaTitle, description: t.metaDescription };
+  return buildMetadata({ title: t.metaTitle, description: t.metaDescription, path: "/considerations" });
 }
 
 export default function Considerations() {

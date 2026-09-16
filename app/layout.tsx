@@ -4,6 +4,8 @@ import { Space_Grotesk, IBM_Plex_Sans } from "next/font/google";
 import { resolveLocale } from "@/lib/i18n/locale";
 import { LocaleProvider } from "@/lib/i18n/context";
 import { dict } from "@/lib/i18n/dictionaries";
+import { buildMetadata } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -21,7 +23,10 @@ const ibmPlexSans = IBM_Plex_Sans({
 export function generateMetadata(): Metadata {
   const locale = resolveLocale(headers().get("accept-language"));
   const { metaTitle, metaDescription } = dict(locale).home;
-  return { title: metaTitle, description: metaDescription };
+  return {
+    metadataBase: new URL(SITE_URL),
+    ...buildMetadata({ title: metaTitle, description: metaDescription, path: "/" }),
+  };
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
