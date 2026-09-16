@@ -3,9 +3,10 @@ import { Locale } from "./locale";
 export const dictionaries = {
   en: {
     home: {
-      metaTitle: "LLM Personality Board",
-      metaDescription: "A grid of cards showing each LLM's HEXACO personality profile.",
-      title: "Model Personality — HEXACO Profile",
+      metaTitle: "LLM Personality Board — AI Personality Tests (HEXACO)",
+      metaDescription:
+        "We give ChatGPT, Claude, Gemini and Grok the same HEXACO personality test humans take, and compare their results side by side — updated as the models change.",
+      title: "AI Model Personality — HEXACO Profiles",
       subtitle:
         "H Honesty-Humility · E Emotionality · X Extraversion · A Agreeableness · C Conscientiousness · O Openness",
       legend: "band = confidence interval (mean ± error across N administrations), solid line = mean",
@@ -20,8 +21,9 @@ export const dictionaries = {
       versionAriaLabel: (name: string) => `Version of ${name}`,
     },
     about: {
-      metaTitle: "About this idea — LLM Personality Board",
-      metaDescription: "The author and the idea behind LLM Personality Board.",
+      metaTitle: "About LLM Personality Board — Why Test AI Personality",
+      metaDescription:
+        "The idea and the person behind LLM Personality Board: administering a real psychometric test to language models to see if they have a stable character.",
       back: "← Back to the grid",
       name: "il tennico",
       tagline: "Philosophy of science graduate, software developer for over 20 years.",
@@ -46,9 +48,10 @@ export const dictionaries = {
   },
   it: {
     home: {
-      metaTitle: "LLM Personality Board",
-      metaDescription: "Una griglia di card che mostra il profilo di personalità HEXACO di ogni LLM.",
-      title: "Personalità dei modelli — Profilo HEXACO",
+      metaTitle: "LLM Personality Board — Test di Personalità per l'IA (HEXACO)",
+      metaDescription:
+        "Sottoponiamo ChatGPT, Claude, Gemini e Grok allo stesso test di personalità HEXACO usato per le persone, confrontando i risultati fianco a fianco — aggiornato nel tempo.",
+      title: "Personalità dei Modelli IA — Profili HEXACO",
       subtitle:
         "H Onestà-Umiltà · E Emotività · X Estroversione · A Gradevolezza · C Coscienziosità · O Apertura",
       legend: "banda = intervallo di confidenza (media ± errore su N somministrazioni), linea piena = media",
@@ -63,8 +66,9 @@ export const dictionaries = {
       versionAriaLabel: (name: string) => `Versione di ${name}`,
     },
     about: {
-      metaTitle: "Riguardo a questa idea — LLM Personality Board",
-      metaDescription: "L'autore e l'idea dietro LLM Personality Board.",
+      metaTitle: "Riguardo a LLM Personality Board — Perché Testare la Personalità dell'IA",
+      metaDescription:
+        "L'idea e la persona dietro LLM Personality Board: somministrare un vero test psicometrico ai modelli linguistici per vedere se hanno un carattere stabile.",
       back: "← Torna alla griglia",
       name: "il tennico",
       tagline: "Laureato in filosofia della scienza, sviluppatore software da oltre 20 anni.",

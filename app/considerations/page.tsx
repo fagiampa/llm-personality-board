@@ -7,10 +7,11 @@ import styles from "./page.module.css";
 
 const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: string; title: string; body: React.ReactNode }> = {
   en: {
-    metaTitle: "Further considerations — LLM Personality Board",
-    metaDescription: "Some honest doubts about what this experiment does, and doesn't, mean.",
+    metaTitle: "Does AI Have a Personality? — Further Considerations",
+    metaDescription:
+      "Honest doubts about what it means — and doesn't — to say a language model has a personality, and why it might still matter for agentic AI.",
     back: "← Back to the grid",
-    title: "Further considerations",
+    title: "Does AI Really Have a Personality?",
     body: (
       <>
         <p>
@@ -38,10 +39,11 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
     ),
   },
   it: {
-    metaTitle: "Ulteriori considerazioni — LLM Personality Board",
-    metaDescription: "Alcuni dubbi onesti su cosa significhi, e non significhi, questo esperimento.",
+    metaTitle: "L'IA Ha Davvero una Personalità? — Ulteriori Considerazioni",
+    metaDescription:
+      "Dubbi onesti su cosa significhi, e non significhi, dire che un modello linguistico ha una personalità, e perché potrebbe comunque contare per l'IA agentica.",
     back: "← Torna alla griglia",
-    title: "Ulteriori considerazioni",
+    title: "L'IA ha davvero una personalità?",
     body: (
       <>
         <p>

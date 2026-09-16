@@ -12,10 +12,11 @@ interface Section {
 
 const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: string; title: string; sections: Section[] }> = {
   en: {
-    metaTitle: "Methodology — LLM Personality Board",
-    metaDescription: "How the HEXACO tests are administered to the models, and why.",
+    metaTitle: "Methodology — HEXACO Personality Testing for LLMs",
+    metaDescription:
+      "How we administer the 240-item HEXACO-PI-R personality inventory to AI models via API, score the results, and why HEXACO instead of Big Five.",
     back: "← Back to the grid",
-    title: "Methodology notes",
+    title: "Methodology: HEXACO Personality Testing for LLMs",
     sections: [
       {
         title: "Why HEXACO instead of Big Five",
@@ -152,10 +153,11 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
     ],
   },
   it: {
-    metaTitle: "Metodologia — LLM Personality Board",
-    metaDescription: "Come vengono somministrati i test HEXACO ai modelli, e perché.",
+    metaTitle: "Metodologia — Test di Personalità HEXACO per gli LLM",
+    metaDescription:
+      "Come somministriamo il questionario HEXACO-PI-R di 240 item ai modelli via API, come calcoliamo i punteggi, e perché HEXACO invece di Big Five.",
     back: "← Torna alla griglia",
-    title: "Approfondimento metodologico",
+    title: "Metodologia: test di personalità HEXACO per gli LLM",
     sections: [
       {
         title: "Perché HEXACO e non Big Five",
