@@ -4,6 +4,7 @@ import { ModelGrid } from "@/components/ModelGrid";
 import { getHomeData } from "@/lib/db.mjs";
 import { resolveLocale } from "@/lib/i18n/locale";
 import { dict } from "@/lib/i18n/dictionaries";
+import { GITHUB_URL } from "@/lib/site";
 import styles from "./page.module.css";
 
 // Server Component: reads the latest run per model, plus every model's
@@ -39,6 +40,9 @@ export default async function Home() {
           <Link href="/considerations" className={styles.aboutLink}>
             {t.considerationsLink}
           </Link>
+          <a href={GITHUB_URL} target="_blank" rel="noreferrer" className={styles.aboutLink}>
+            {t.githubLink}
+          </a>
         </div>
       </div>
 

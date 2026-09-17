@@ -9,3 +9,5 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://llm-person
 );
 
 export const SITE_NAME = "LLM Personality Board";
+
+export const GITHUB_URL = "https://github.com/fagiampa/llm-personality-board";
