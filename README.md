@@ -4,6 +4,8 @@ A grid of cards showing each LLM's personality profile on the **HEXACO** model �
 
 ChatGPT, Claude, Gemini, Grok and DeepSeek all take the exact same 240-item instrument, scored the same way, tracked version by version over time.
 
+**Live demo**: https://progetto-psycochat.vercel.app
+
 ## Features
 
 - **Real assessment pipeline** (`scripts/assess.mjs`): administers the full 240-item [IPIP-HEXACO](https://ipip.ori.org/newHEXACO_PI_key.htm) inventory (public-domain analog of the HEXACO-PI-R) to each configured model, 3 repeats at temperature 1, batched to cut API round-trips.
@@ -24,8 +26,8 @@ ChatGPT, Claude, Gemini, Grok and DeepSeek all take the exact same 240-item inst
 ## Getting started
 
 ```bash
-git clone <this-repo>
-cd progetto-psycochat
+git clone https://github.com/fagiampa/llm-personality-board.git
+cd llm-personality-board
 npm install
 cp .env.example .env   # fill in the API keys for the providers you want to assess
 npm run dev
@@ -48,7 +50,7 @@ Useful `assess` overrides (see `.env.example`): `ASSESS_ONLY=Gemini` to (re)asse
 
 ## Contributing
 
-Issues and pull requests are welcome — this is meant to be a community-run instrument, not a one-off demo. See [`LICENSE`](./LICENSE) for the terms contributions are accepted under.
+Issues and pull requests are welcome — this is meant to be a community-run instrument, not a one-off demo. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to contribute, including AI-assisted contributions, and [`LICENSE`](./LICENSE) for the terms.
 
 ## Licenza
 
