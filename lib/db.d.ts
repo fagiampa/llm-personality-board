@@ -24,6 +24,7 @@ export interface AssessmentRecord {
   scores: ModelScore["scores"];
   margin?: ModelScore["margin"];
   oneLiner: string;
+  oneLinerIt?: string | null;
   dominant: string;
   source: ModelScore["source"];
   itemMeans?: ItemMean[];
@@ -41,3 +42,4 @@ export function listLatestPerModel(): Promise<ModelScore[]>;
 export function getLatest(modelName: string): Promise<ModelScore | undefined>;
 export function listVersions(modelName: string): Promise<VersionOption[]>;
 export function getAssessment(modelName: string, assessedAt: string | null): Promise<ModelScore | undefined>;
+export function recomputeIsCurrentForModel(modelName: string): Promise<void>;
