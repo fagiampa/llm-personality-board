@@ -25,16 +25,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Pre-DB JSON history (superseded, kept untracked — see data/psychochat.sqlite below)
+# Generated data (not source): the SQLite DB and the pre-DB JSON history it
+# superseded. Not tracked here even though Vercel deploys still need the DB
+# — see .vercelignore, which deliberately does NOT exclude it, so `vercel
+# --prod` (reads the local filesystem directly, not this repo) still ships
+# it. Updating live data: run `npm run assess` locally, then `vercel --prod`
+# again — no git commit needed for the DB itself anymore.
+/data/psychochat.sqlite
 /data/mock-scores.json
 /data/history/
-
-# data/psychochat.sqlite is intentionally TRACKED (not ignored), despite
-# being generated data: Vercel's serverless functions have no persistent
-# writable filesystem, so this committed file is what actually ships as the
-# live site's data. Stopgap until this moves to a real hosted DB — until
-# then, updating live data means: run `npm run assess` locally, then
-# `git add data/psychochat.sqlite` + commit + push to redeploy.
 
 .vercel
 .env*

@@ -1,0 +1,23 @@
+# Mirrors .gitignore, EXCEPT data/psychochat.sqlite is deliberately NOT
+# listed here: Vercel has no persistent writable filesystem, so this file
+# has to ship as part of the deployment (see next.config.mjs /
+# outputFileTracingIncludes and lib/db.mjs). Keeping it out of .gitignore
+# instead would put it back in the public git history — this file (read
+# directly from the local disk by `vercel --prod`, independent of git)
+# is how it stays local-only while still reaching the deployed site.
+/node_modules
+/.next/
+/out/
+/build
+.DS_Store
+*.pem
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env*.local
+*.tsbuildinfo
+/data/mock-scores.json
+/data/history/
+.vercel
+img/
