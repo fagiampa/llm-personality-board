@@ -25,8 +25,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# generated assessment DB and its pre-DB JSON history (regenerated/appended
-# by npm run db:import / npm run assess, not source)
-/data/psychochat.sqlite
+# Pre-DB JSON history (superseded, kept untracked — see data/psychochat.sqlite below)
 /data/mock-scores.json
 /data/history/
+
+# data/psychochat.sqlite is intentionally TRACKED (not ignored), despite
+# being generated data: Vercel's serverless functions have no persistent
+# writable filesystem, so this committed file is what actually ships as the
+# live site's data. Stopgap until this moves to a real hosted DB — until
+# then, updating live data means: run `npm run assess` locally, then
+# `git add data/psychochat.sqlite` + commit + push to redeploy.
