@@ -14,7 +14,7 @@ export const dictionaries = {
       methodologyLink: "methodology & references →",
       questionnaireLink: "the questionnaire →",
       considerationsLink: "further considerations →",
-      githubLink: "source on GitHub →",
+      githubLink: "View source on GitHub",
     },
     card: {
       live: "live",
@@ -61,7 +61,7 @@ export const dictionaries = {
       methodologyLink: "metodologia e riferimenti →",
       questionnaireLink: "il questionario →",
       considerationsLink: "ulteriori considerazioni →",
-      githubLink: "codice su GitHub →",
+      githubLink: "Vedi il codice su GitHub",
     },
     card: {
       live: "attuale",

@@ -79,6 +79,27 @@
   gap: 16px;
 }
 
+.footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid oklch(90% 0.01 75);
+}
+
+.githubLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: oklch(45% 0.02 75);
+  text-decoration: none;
+}
+
+.githubLink:hover {
+  color: oklch(22% 0.02 75);
+}
+
 @media (max-width: 640px) {
   .page {
     padding: 20px 16px;
