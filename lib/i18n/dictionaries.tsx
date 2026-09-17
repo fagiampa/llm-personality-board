@@ -12,6 +12,7 @@ export const dictionaries = {
       legend: "band = confidence interval (mean ± error across N administrations), solid line = mean",
       aboutLink: "about this idea →",
       methodologyLink: "methodology & references →",
+      questionnaireLink: "the questionnaire →",
       considerationsLink: "further considerations →",
     },
     card: {
@@ -57,6 +58,7 @@ export const dictionaries = {
       legend: "banda = intervallo di confidenza (media ± errore su N somministrazioni), linea piena = media",
       aboutLink: "riguardo a questa idea →",
       methodologyLink: "metodologia e riferimenti →",
+      questionnaireLink: "il questionario →",
       considerationsLink: "ulteriori considerazioni →",
     },
     card: {

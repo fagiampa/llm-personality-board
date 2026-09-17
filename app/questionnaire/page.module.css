@@ -1,0 +1,87 @@
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.back {
+  font-size: 13px;
+  color: oklch(45% 0.02 75);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 24px;
+  color: oklch(22% 0.02 75);
+  margin: 0;
+}
+
+.intro {
+  font-size: 13px;
+  font-style: italic;
+  color: oklch(50% 0.02 75);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.domain {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+  border-top: 1px solid oklch(90% 0.01 75);
+}
+
+.domainTitle {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 19px;
+  color: oklch(22% 0.02 75);
+  margin: 0;
+}
+
+.facet {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.facetTitle {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+  color: oklch(35% 0.02 75);
+  margin: 0;
+}
+
+.items {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.items li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: oklch(30% 0.02 75);
+}
+
+.reverseTag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: oklch(55% 0.14 30);
+  margin-left: 6px;
+}

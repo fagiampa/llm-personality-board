@@ -31,6 +31,9 @@ export default async function Home() {
           <Link href="/methodology" className={styles.aboutLink}>
             {t.methodologyLink}
           </Link>
+          <Link href="/questionnaire" className={styles.aboutLink}>
+            {t.questionnaireLink}
+          </Link>
           <Link href="/considerations" className={styles.aboutLink}>
             {t.considerationsLink}
           </Link>
