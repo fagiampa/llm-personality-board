@@ -473,6 +473,16 @@ async function translateToItalian(config, englishText, callBatch) {
   }
 }
 
+// Some provider model ids carry a trailing release-date stamp
+// (e.g. "claude-opus-4-5-20251101") that's needed to call the API but is
+// dead weight once shown in the per-card version combo — it doesn't add
+// information over the "4-5" already in the name and just makes the combo
+// wider. Stripped only for what's stored/displayed (model_version); the
+// real dated id (config.model) is always what's actually sent to the API.
+function displayModelVersion(model) {
+  return model.replace(/-\d{8}$/, "");
+}
+
 async function main() {
   const itemsRaw = JSON.parse(await readFile(path.resolve(ITEMS_PATH), "utf8"));
   const items = itemsRaw.items;
@@ -514,7 +524,7 @@ async function main() {
       await upsertAssessment({
         modelName: base.name,
         assessedAt,
-        modelVersion: config.model,
+        modelVersion: displayModelVersion(config.model),
         monogram: base.monogram,
         hue: base.hue,
         scores,
