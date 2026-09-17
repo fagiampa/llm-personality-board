@@ -35,3 +35,6 @@ next-env.d.ts
 # live site's data. Stopgap until this moves to a real hosted DB — until
 # then, updating live data means: run `npm run assess` locally, then
 # `git add data/psychochat.sqlite` + commit + push to redeploy.
+
+.vercel
+.env*
