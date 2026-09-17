@@ -10,11 +10,17 @@ import styles from "@/app/page.module.css";
 // meant re-selecting an already-viewed version could show data from before a
 // since-made edit — DB rows here get edited directly fairly often during
 // development, so "always fresh" wins over the extra round trip).
-export function ModelGrid({ initialModels }: { initialModels: ModelScore[] }) {
+interface ModelGridProps {
+  initialModels: ModelScore[];
+  /** Every model's version list, prefetched server-side (see app/page.tsx's getHomeData) so the first combo open of the session doesn't wait on a cold DB open. */
+  initialVersions: Record<string, VersionOption[]>;
+}
+
+export function ModelGrid({ initialModels, initialVersions }: ModelGridProps) {
   const [dataByModel, setDataByModel] = useState<Record<string, ModelScore>>(() =>
     Object.fromEntries(initialModels.map((m) => [m.name, m]))
   );
-  const [versionsByModel, setVersionsByModel] = useState<Record<string, VersionOption[]>>({});
+  const [versionsByModel, setVersionsByModel] = useState<Record<string, VersionOption[]>>(initialVersions);
   const [selectedKeyByModel, setSelectedKeyByModel] = useState<Record<string, string>>(() =>
     Object.fromEntries(initialModels.map((m) => [m.name, versionKey({ assessedAt: m.assessedAt ?? null })]))
   );
