@@ -15,6 +15,20 @@ const nextConfig = {
       "/": ["./node_modules/sql.js/dist/*.wasm"],
     },
   },
+  // Funnel the old Vercel-assigned production alias to the real domain.
+  // Scoped to that exact hostname (not a *.vercel.app wildcard) so preview
+  // deployment URLs (progetto-psycochat-<hash>-<team>.vercel.app) still load
+  // directly instead of bouncing to production.
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "progetto-psycochat.vercel.app" }],
+        destination: "https://aipersonality.org/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

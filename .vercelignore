@@ -19,5 +19,6 @@ yarn-error.log*
 *.tsbuildinfo
 /data/mock-scores.json
 /data/history/
+/data/logs/
 .vercel
 img/

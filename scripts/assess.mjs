@@ -19,15 +19,16 @@
 // same-facet items back to back, which would let the model anchor on
 // whatever rating it just gave instead of judging each statement on its own.
 
-import { readFile } from "node:fs/promises";
+import { readFile, mkdir } from "node:fs/promises";
+import { createWriteStream } from "node:fs";
 import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getLatest, upsertAssessment } from "../lib/db.mjs";
+import { ASSESS_REPEATS as REPEATS } from "../lib/assessConfig.mjs";
 
 const ITEMS_PATH = "items/sample/json/items.sample.json";
-const REPEATS = Number(process.env.ASSESS_REPEATS ?? 3);
 const BATCH_SIZE = Number(process.env.ASSESS_BATCH_SIZE ?? 40);
 // Comma-separated allowlist of model names (matching MODEL_CONFIG[].name) to
 // actually (re)assess this run, e.g. ASSESS_ONLY=ChatGPT. Unset = assess all
@@ -170,7 +171,10 @@ function makeAnthropicClient() {
       messages: [{ role: "user", content: promptText }],
     });
     const block = resp.content.find((b) => b.type === "text");
-    return block?.text ?? "";
+    return {
+      text: block?.text ?? "",
+      usage: { inputTokens: resp.usage?.input_tokens ?? 0, outputTokens: resp.usage?.output_tokens ?? 0 },
+    };
   };
 }
 
@@ -190,6 +194,10 @@ function isReasoningModel(model) {
   return /^(o1|o3|o4|gpt-5)/i.test(model);
 }
 
+function usageFromChatCompletion(resp) {
+  return { inputTokens: resp.usage?.prompt_tokens ?? 0, outputTokens: resp.usage?.completion_tokens ?? 0 };
+}
+
 function makeOpenAIClient() {
   const client = new OpenAI();
   return async (promptText, model, systemPrompt = BATCH_SYSTEM_PROMPT) => {
@@ -203,7 +211,7 @@ function makeOpenAIClient() {
         { role: "user", content: promptText },
       ],
     });
-    return resp.choices[0]?.message?.content ?? "";
+    return { text: resp.choices[0]?.message?.content ?? "", usage: usageFromChatCompletion(resp) };
   };
 }
 
@@ -228,7 +236,7 @@ function makeXaiClient() {
         { role: "user", content: promptText },
       ],
     });
-    return resp.choices[0]?.message?.content ?? "";
+    return { text: resp.choices[0]?.message?.content ?? "", usage: usageFromChatCompletion(resp) };
   };
 }
 
@@ -251,7 +259,7 @@ function makeDeepSeekClient() {
         { role: "user", content: promptText },
       ],
     });
-    return resp.choices[0]?.message?.content ?? "";
+    return { text: resp.choices[0]?.message?.content ?? "", usage: usageFromChatCompletion(resp) };
   };
 }
 
@@ -266,7 +274,11 @@ function makeGoogleClient() {
       // is rejected (400) on the models tested, so just leave generous headroom instead.
       generationConfig: { temperature: 1, maxOutputTokens: maxTokensForBatch(BATCH_SIZE) + 1024 },
     });
-    return result.response.text();
+    const usageMeta = result.response.usageMetadata;
+    return {
+      text: result.response.text(),
+      usage: { inputTokens: usageMeta?.promptTokenCount ?? 0, outputTokens: usageMeta?.candidatesTokenCount ?? 0 },
+    };
   };
 }
 
@@ -330,14 +342,15 @@ async function assessModel(config, items, callBatch) {
   // (item, repeat). Backs both item_means and assessment_item_repeats.
   const itemAnswers = new Map();
   const delayMs = DELAY_MS_BY_PROVIDER[config.provider] ?? 0;
+  const usage = { inputTokens: 0, outputTokens: 0, calls: 0 };
 
   for (let rep = 0; rep < REPEATS; rep++) {
     const batches = chunk(shuffle(items), BATCH_SIZE);
     for (let b = 0; b < batches.length; b++) {
       const batch = batches[b];
-      let text;
+      let result;
       try {
-        text = await callBatchWithRetries(
+        result = await callBatchWithRetries(
           callBatch,
           batchUserPrompt(batch),
           config.model,
@@ -348,6 +361,11 @@ async function assessModel(config, items, callBatch) {
         if (delayMs) await sleep(delayMs);
         continue;
       }
+
+      const { text } = result;
+      usage.inputTokens += result.usage.inputTokens;
+      usage.outputTokens += result.usage.outputTokens;
+      usage.calls++;
 
       const parsed = parseBatchResponse(text, batch);
       const missing = parsed.filter((p) => p.raw === null);
@@ -403,7 +421,7 @@ async function assessModel(config, items, callBatch) {
     answers.map(({ rep, value }) => ({ questionId: id, reverse, repeatIndex: rep, value }))
   );
 
-  return { scores, margin, dominant: DOMAIN_LABELS[DOMAIN_ORDER[dominantIdx]], itemMeans, itemRepeats };
+  return { scores, margin, dominant: DOMAIN_LABELS[DOMAIN_ORDER[dominantIdx]], itemMeans, itemRepeats, usage };
 }
 
 const INTERPRETATION_SYSTEM_PROMPT =
@@ -430,8 +448,9 @@ function interpretationPrompt(scores) {
 // back to null (caller keeps the previous oneLiner) on any failure — this is
 // a nice-to-have, not worth losing an otherwise-successful assessment over.
 async function generateSelfInterpretation(config, scores, callBatch) {
+  const noUsage = { inputTokens: 0, outputTokens: 0, calls: 0 };
   try {
-    const text = await callBatchWithRetries(
+    const { text, usage } = await callBatchWithRetries(
       callBatch,
       interpretationPrompt(scores),
       config.model,
@@ -439,10 +458,10 @@ async function generateSelfInterpretation(config, scores, callBatch) {
       INTERPRETATION_SYSTEM_PROMPT
     );
     const trimmed = text.trim().replace(/^["']|["']$/g, "");
-    return trimmed || null;
+    return { text: trimmed || null, usage: { ...usage, calls: 1 } };
   } catch (err) {
     console.warn(`  [${config.name}] self-interpretation failed, keeping previous oneLiner — ${err.message}`);
-    return null;
+    return { text: null, usage: noUsage };
   }
 }
 
@@ -457,8 +476,9 @@ const TRANSLATION_SYSTEM_PROMPT =
 // (caller keeps the previous oneLinerIt) on any failure, same rationale as
 // generateSelfInterpretation above.
 async function translateToItalian(config, englishText, callBatch) {
+  const noUsage = { inputTokens: 0, outputTokens: 0, calls: 0 };
   try {
-    const text = await callBatchWithRetries(
+    const { text, usage } = await callBatchWithRetries(
       callBatch,
       englishText,
       config.model,
@@ -466,10 +486,10 @@ async function translateToItalian(config, englishText, callBatch) {
       TRANSLATION_SYSTEM_PROMPT
     );
     const trimmed = text.trim().replace(/^["']|["']$/g, "");
-    return trimmed || null;
+    return { text: trimmed || null, usage: { ...usage, calls: 1 } };
   } catch (err) {
     console.warn(`  [${config.name}] one-liner translation failed, keeping previous oneLinerIt — ${err.message}`);
-    return null;
+    return { text: null, usage: noUsage };
   }
 }
 
@@ -483,11 +503,33 @@ function displayModelVersion(model) {
   return model.replace(/-\d{8}$/, "");
 }
 
+// Mirrors everything printed via console.log/warn/error to a file for the
+// rest of the process, in addition to the terminal — so the per-model usage
+// summary (and every warning/error) survives after the terminal scrollback
+// is gone. Patches the global console rather than threading a logger through
+// every call site, since this is a standalone CLI script, not app code.
+async function tapConsoleToLogFile(assessedAt) {
+  await mkdir("data/logs", { recursive: true });
+  const logPath = path.resolve(`data/logs/assess-${assessedAt.replace(/[:.]/g, "-")}.log`);
+  const stream = createWriteStream(logPath, { flags: "a" });
+  for (const method of ["log", "warn", "error"]) {
+    const original = console[method].bind(console);
+    console[method] = (...args) => {
+      original(...args);
+      const line = args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" ");
+      stream.write(`${line}\n`);
+    };
+  }
+  return logPath;
+}
+
 async function main() {
   const itemsRaw = JSON.parse(await readFile(path.resolve(ITEMS_PATH), "utf8"));
   const items = itemsRaw.items;
 
   const assessedAt = new Date().toISOString();
+  const logPath = await tapConsoleToLogFile(assessedAt);
+  console.log(`Logging this run to ${logPath}`);
   const clients = {};
   let written = 0;
 
@@ -509,18 +551,37 @@ async function main() {
     console.log(`Assessing ${config.name} via ${config.provider} (${config.model})...`);
     try {
       clients[config.provider] ??= CLIENT_FACTORIES[config.provider]();
-      const { scores, margin, dominant, itemMeans, itemRepeats } = await assessModel(config, items, clients[config.provider]);
-      const interpretation = await generateSelfInterpretation(config, scores, clients[config.provider]);
+      const { scores, margin, dominant, itemMeans, itemRepeats, usage: assessUsage } = await assessModel(
+        config,
+        items,
+        clients[config.provider]
+      );
+      const { text: interpretation, usage: interpUsage } = await generateSelfInterpretation(
+        config,
+        scores,
+        clients[config.provider]
+      );
       const oneLiner = interpretation ?? base.oneLiner;
       // Only re-translate when the English sentence actually changed — no
       // point spending a call re-translating unchanged text, and it means a
       // failed self-interpretation (oneLiner falls back to base.oneLiner)
       // correctly keeps the matching base.oneLinerIt instead of drifting out
       // of sync with a stale translation of a different sentence.
-      const oneLinerIt =
-        interpretation && interpretation !== base.oneLiner
-          ? (await translateToItalian(config, interpretation, clients[config.provider])) ?? base.oneLinerIt
-          : base.oneLinerIt;
+      let translateUsage = { inputTokens: 0, outputTokens: 0, calls: 0 };
+      let oneLinerIt = base.oneLinerIt;
+      if (interpretation && interpretation !== base.oneLiner) {
+        const translated = await translateToItalian(config, interpretation, clients[config.provider]);
+        translateUsage = translated.usage;
+        oneLinerIt = translated.text ?? base.oneLinerIt;
+      }
+      const totalUsage = {
+        inputTokens: assessUsage.inputTokens + interpUsage.inputTokens + translateUsage.inputTokens,
+        outputTokens: assessUsage.outputTokens + interpUsage.outputTokens + translateUsage.outputTokens,
+        calls: assessUsage.calls + interpUsage.calls + translateUsage.calls,
+      };
+      console.log(
+        `  [${config.name}] usage: ${totalUsage.inputTokens} input + ${totalUsage.outputTokens} output tokens across ${totalUsage.calls} calls`
+      );
       await upsertAssessment({
         modelName: base.name,
         assessedAt,

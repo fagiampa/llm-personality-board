@@ -9,7 +9,8 @@ export const dictionaries = {
       title: "AI Model Personality — HEXACO Profiles",
       subtitle:
         "H Honesty-Humility · E Emotionality · X Extraversion · A Agreeableness · C Conscientiousness · O Openness",
-      legend: "band = confidence interval (mean ± error across N administrations), solid line = mean",
+      legend: (repeats: number) =>
+        `band = confidence interval (mean ± error across ${repeats} administrations), solid line = mean`,
       aboutLink: "about this idea →",
       methodologyLink: "methodology & references →",
       questionnaireLink: "the questionnaire →",
@@ -56,7 +57,8 @@ export const dictionaries = {
       title: "Personalità dei Modelli IA — Profili HEXACO",
       subtitle:
         "H Onestà-Umiltà · E Emotività · X Estroversione · A Gradevolezza · C Coscienziosità · O Apertura",
-      legend: "banda = intervallo di confidenza (media ± errore su N somministrazioni), linea piena = media",
+      legend: (repeats: number) =>
+        `banda = intervallo di confidenza (media ± errore su ${repeats} somministrazioni), linea piena = media`,
       aboutLink: "riguardo a questa idea →",
       methodologyLink: "metodologia e riferimenti →",
       questionnaireLink: "il questionario →",

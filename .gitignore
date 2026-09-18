@@ -35,5 +35,10 @@ next-env.d.ts
 /data/mock-scores.json
 /data/history/
 
+# Per-run console output from `npm run assess` (see tapConsoleToLogFile in
+# scripts/assess.mjs) — diagnostic/local only, not needed by the deployed
+# app, so also excluded from .vercelignore.
+/data/logs/
+
 .vercel
 .env*
