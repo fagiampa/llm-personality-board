@@ -26,16 +26,13 @@ import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getLatest, upsertAssessment } from "../lib/db.mjs";
-import { ASSESS_REPEATS as REPEATS } from "../lib/assessConfig.mjs";
+import {
+  ASSESS_REPEATS as REPEATS,
+  ASSESS_MIN_SUCCESS_RATIO as MIN_SUCCESS_RATIO,
+} from "../lib/assessConfig.mjs";
 
 const ITEMS_PATH = "items/sample/json/items.sample.json";
 const BATCH_SIZE = Number(process.env.ASSESS_BATCH_SIZE ?? 40);
-// Below this fraction of expected (item × repeat) samples successfully
-// collected, a run is too sparse to trust — discard it instead of writing it
-// to the DB, so a bad run (provider outage mid-run, etc.) can't silently
-// replace a solid previous run with a noisy one. The model's existing
-// is_current row (from the last run that did clear the bar) stays live.
-const MIN_SUCCESS_RATIO = Number(process.env.ASSESS_MIN_SUCCESS_RATIO ?? 0.8);
 // Comma-separated allowlist of model names (matching MODEL_CONFIG[].name) to
 // actually (re)assess this run, e.g. ASSESS_ONLY=ChatGPT. Unset = assess all
 // configured models, same as before. Models left out keep their existing

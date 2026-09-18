@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { resolveLocale, Locale } from "@/lib/i18n/locale";
 import { buildMetadata } from "@/lib/seo";
+import { ASSESS_REPEATS, ASSESS_MIN_SUCCESS_RATIO } from "@/lib/assessConfig.mjs";
 import styles from "./page.module.css";
+
+const MIN_SUCCESS_PERCENT = Math.round(ASSESS_MIN_SUCCESS_RATIO * 100);
 
 interface Section {
   title: string;
@@ -89,14 +92,27 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         ),
       },
       {
-        title: "Three rounds per administration",
+        title: "Repeated administration, at temperature 1",
         body: (
           <p>
-            Each model answers the full 240-item bank <strong>three times</strong> (at temperature 1, to avoid
-            suppressing the natural variability of the answers). The spread across the three repeats for each
-            domain is what generates the uncertainty band shown on the radar chart (± 1.96 × standard error of
-            the mean) — a pragmatic stand-in for the “N administrations” of a real psychometric protocol, not a
-            clinically validated confidence interval.
+            Each model answers the full 240-item bank <strong>{ASSESS_REPEATS} times</strong> per run (at
+            temperature 1, to avoid suppressing the natural variability of the answers). The spread across those{" "}
+            {ASSESS_REPEATS} repeats for each domain is what generates the uncertainty band shown on the radar
+            chart (± 1.96 × standard error of the mean) — a pragmatic stand-in for the “N administrations” of a
+            real psychometric protocol, not a clinically validated confidence interval.
+          </p>
+        ),
+      },
+      {
+        title: "Discarding low-yield runs",
+        body: (
+          <p>
+            Not every one of those repeated calls succeeds — providers occasionally return errors or unparseable
+            responses mid-run. If a run ends up collecting fewer than <strong>{MIN_SUCCESS_PERCENT}%</strong> of
+            the item × repeat samples it was supposed to (a provider outage partway through, for instance), the
+            whole run is discarded rather than published: no card update, no self-generated description, no new
+            entry in the version combo. The board keeps showing whichever previous run last cleared that bar, so
+            a bad run can’t silently replace good data with a noisier, under-sampled score.
           </p>
         ),
       },
@@ -232,14 +248,29 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         ),
       },
       {
-        title: "Tre round per somministrazione",
+        title: "Somministrazione ripetuta, a temperatura 1",
         body: (
           <p>
-            Ogni modello risponde all’intera banca di 240 item <strong>tre volte</strong> (a temperatura 1, per
-            non sopprimere la variabilità naturale delle risposte). Lo spread tra le tre ripetizioni per ciascun
-            dominio è quello che genera la banda di incertezza mostrata nel radar chart (± 1.96 × errore standard
-            della media) — uno stand-in pragmatico per le “N somministrazioni” di un vero protocollo psicometrico,
-            non un vero e proprio intervallo di confidenza clinicamente validato.
+            Ogni modello risponde all’intera banca di 240 item <strong>{ASSESS_REPEATS} volte</strong> per run (a
+            temperatura 1, per non sopprimere la variabilità naturale delle risposte). Lo spread tra quelle{" "}
+            {ASSESS_REPEATS} ripetizioni per ciascun dominio è quello che genera la banda di incertezza mostrata
+            nel radar chart (± 1.96 × errore standard della media) — uno stand-in pragmatico per le “N
+            somministrazioni” di un vero protocollo psicometrico, non un vero e proprio intervallo di confidenza
+            clinicamente validato.
+          </p>
+        ),
+      },
+      {
+        title: "Scarto delle run poco riuscite",
+        body: (
+          <p>
+            Non tutte le chiamate ripetute vanno a buon fine — i provider a volte restituiscono errori o risposte
+            non interpretabili durante una run. Se una run raccoglie meno dell’<strong>{MIN_SUCCESS_PERCENT}%</strong>{" "}
+            dei campioni item × ripetizione previsti (ad esempio per un’interruzione del provider a metà corsa),
+            l’intera run viene scartata invece di essere pubblicata: nessun aggiornamento della card, nessuna
+            descrizione auto-generata, nessuna nuova voce nel combo delle versioni. La board continua a mostrare
+            l’ultima run precedente che aveva superato quella soglia, così una run andata male non può sostituire
+            silenziosamente dati buoni con un punteggio più rumoroso e sotto-campionato.
           </p>
         ),
       },

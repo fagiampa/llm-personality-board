@@ -25,9 +25,10 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         <p>
           In the age of agentic AI, moreover, a not-fully-deterministic conceptual process, typical of natural
           language, can correspond to actions that lead to real events (concrete, not simulated). If an AI has
-          no character, it can simulate one, and act concretely on that basis. Monitoring the emergence of a
-          given simulated personality downstream of an LLM’s production process — rather than upstream — might
-          therefore not be such a foolish idea.
+          no character, it can simulate one, and act concretely on that basis. Monitoring, downstream of an
+          LLM’s production process, the emergence of a given simulated personality (and not just its advance in
+          semantic and cognitive capabilities) might not be such a foolish idea — also in relation to alignment
+          problems.
         </p>
         <p>
           Most likely, tests like these will need to be adapted for LLMs to understand what tendencies they have
@@ -58,8 +59,9 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
           Nell’era dell’AI agentica, poi, a un’elaborazione concettuale non totalmente deterministica, tipica
           del linguaggio naturale, possono corrispondere azioni che portano a eventi reali (concreti e non
           simulati). Se l’AI non ha un carattere, può simularne uno, e sulla base di questo agire concretamente.
-          Controllare a valle del processo di produzione di un LLM — e non a monte — l’emergere di una
-          determinata personalità simulata potrebbe perciò non essere un’idea così stupida.
+          Controllare, a valle del processo di produzione di un LLM, l’emergere di una determinata personalità
+          simulata (e non solo l’avanzamento dal punto di vista delle capacità semantiche e cognitive) potrebbe
+          non essere un’idea così assurda anche in relazione ai problemi di allineamento.
         </p>
         <p>
           Molto probabilmente questi tipi di test andranno adattati agli LLM per capire che tendenze hanno nei
