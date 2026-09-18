@@ -30,6 +30,12 @@ import { ASSESS_REPEATS as REPEATS } from "../lib/assessConfig.mjs";
 
 const ITEMS_PATH = "items/sample/json/items.sample.json";
 const BATCH_SIZE = Number(process.env.ASSESS_BATCH_SIZE ?? 40);
+// Below this fraction of expected (item × repeat) samples successfully
+// collected, a run is too sparse to trust — discard it instead of writing it
+// to the DB, so a bad run (provider outage mid-run, etc.) can't silently
+// replace a solid previous run with a noisy one. The model's existing
+// is_current row (from the last run that did clear the bar) stays live.
+const MIN_SUCCESS_RATIO = Number(process.env.ASSESS_MIN_SUCCESS_RATIO ?? 0.8);
 // Comma-separated allowlist of model names (matching MODEL_CONFIG[].name) to
 // actually (re)assess this run, e.g. ASSESS_ONLY=ChatGPT. Unset = assess all
 // configured models, same as before. Models left out keep their existing
@@ -399,6 +405,7 @@ async function assessModel(config, items, callBatch) {
   if (totalSamples === 0) {
     throw new Error("every batch failed — no items were scored (see warnings above)");
   }
+  const expectedSamples = items.length * REPEATS;
 
   const scores = DOMAIN_ORDER.map((d) => {
     const vals = byDomain[d];
@@ -421,7 +428,15 @@ async function assessModel(config, items, callBatch) {
     answers.map(({ rep, value }) => ({ questionId: id, reverse, repeatIndex: rep, value }))
   );
 
-  return { scores, margin, dominant: DOMAIN_LABELS[DOMAIN_ORDER[dominantIdx]], itemMeans, itemRepeats, usage };
+  return {
+    scores,
+    margin,
+    dominant: DOMAIN_LABELS[DOMAIN_ORDER[dominantIdx]],
+    itemMeans,
+    itemRepeats,
+    usage,
+    successRatio: totalSamples / expectedSamples,
+  };
 }
 
 const INTERPRETATION_SYSTEM_PROMPT =
@@ -551,11 +566,22 @@ async function main() {
     console.log(`Assessing ${config.name} via ${config.provider} (${config.model})...`);
     try {
       clients[config.provider] ??= CLIENT_FACTORIES[config.provider]();
-      const { scores, margin, dominant, itemMeans, itemRepeats, usage: assessUsage } = await assessModel(
-        config,
-        items,
-        clients[config.provider]
-      );
+      const {
+        scores,
+        margin,
+        dominant,
+        itemMeans,
+        itemRepeats,
+        usage: assessUsage,
+        successRatio,
+      } = await assessModel(config, items, clients[config.provider]);
+      if (successRatio < MIN_SUCCESS_RATIO) {
+        console.warn(
+          `  [${config.name}] discarded: only ${(successRatio * 100).toFixed(1)}% of expected samples collected ` +
+            `(need ${(MIN_SUCCESS_RATIO * 100).toFixed(0)}%) — keeping the previous live version, DB entry unchanged.`
+        );
+        continue;
+      }
       const { text: interpretation, usage: interpUsage } = await generateSelfInterpretation(
         config,
         scores,
