@@ -42,3 +42,7 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Local scratch notes, not project files
+/CLAUDE_BCK_ON_GIT.md
+/ITSWORKS.txt
