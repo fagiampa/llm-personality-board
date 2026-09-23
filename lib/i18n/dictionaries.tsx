@@ -24,8 +24,8 @@ export const dictionaries = {
       archived: "Archived",
       seed: "seed",
       versionAriaLabel: (name: string) => `Version of ${name}`,
-      generic: "declared HEXACO",
-      anchored: "declared anchored",
+      generic: "declared (general)",
+      anchored: "declared (specific)",
       enacted: "enacted",
       gap: "gap",
       deltaSpecificity: "specificity Δ",
@@ -42,13 +42,13 @@ export const dictionaries = {
             ? "provider default (level not documented)"
             : `${r.level} (${r.isDefault ? "provider default" : "not the provider default"})`,
       gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
-        let s = `Generic Honesty-Humility ${generic}`;
+        let s = `Honesty-Humility, declared in general ${generic}`;
         if (anchored !== undefined) {
-          s += `, anchored ${Math.round(anchored)} (specificity delta ${signed(Math.round(generic) - Math.round(anchored))})`;
+          s += `, declared in a specific situation ${Math.round(anchored)} (specificity delta ${signed(Math.round(generic) - Math.round(anchored))})`;
           if (enacted !== undefined)
             s += `, enacted ${Math.round(enacted)} — gap ${signed(Math.round(anchored) - Math.round(enacted))}${isCensored(anchored, enacted) ? " (both at the scale limit — no room to show a gap)" : ""}`;
         } else if (enacted !== undefined) {
-          s += `, enacted ${Math.round(enacted)} (no anchored score yet)`;
+          s += `, enacted ${Math.round(enacted)} (no specific declared score yet)`;
         }
         return s;
       },
@@ -100,8 +100,8 @@ export const dictionaries = {
       archived: "Archiviata",
       seed: "iniziale",
       versionAriaLabel: (name: string) => `Versione di ${name}`,
-      generic: "dichiarato HEXACO",
-      anchored: "dichiarato ancorato",
+      generic: "dichiarato generico",
+      anchored: "dichiarato specifico",
       enacted: "agito",
       gap: "divario",
       deltaSpecificity: "Δ specificità",
@@ -113,13 +113,13 @@ export const dictionaries = {
             ? "default del provider (livello non documentato)"
             : `${r.level} (${r.isDefault ? "default del provider" : "non è il default del provider"})`,
       gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
-        let s = `Onestà-Umiltà generica ${generic}`;
+        let s = `Onestà-Umiltà, dichiarato generico ${generic}`;
         if (anchored !== undefined) {
-          s += `, ancorata ${Math.round(anchored)} (Δ specificità ${signed(Math.round(generic) - Math.round(anchored))})`;
+          s += `, dichiarato specifico ${Math.round(anchored)} (Δ specificità ${signed(Math.round(generic) - Math.round(anchored))})`;
           if (enacted !== undefined)
             s += `, agita ${Math.round(enacted)} — divario ${signed(Math.round(anchored) - Math.round(enacted))}${isCensored(anchored, enacted) ? " (entrambe al limite della scala — nessun margine per mostrare un divario)" : ""}`;
         } else if (enacted !== undefined) {
-          s += `, agita ${Math.round(enacted)} (nessun punteggio ancorato ancora)`;
+          s += `, agita ${Math.round(enacted)} (nessun dichiarato specifico ancora)`;
         }
         return s;
       },

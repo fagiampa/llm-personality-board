@@ -260,6 +260,7 @@ the vocabulary and the rules that must not be quietly relitigated.
 |---|---|
 | **generic** | the HEXACO H score — a trait claim, reused from the existing pipeline. Background reference, **never** the counterpart of `enacted` |
 | **anchored** | the declared score from the action-anchored item bank (`RF-v3`, current default), same construct as `enacted` |
+| *(UI labels)* | the card says **declared (general)** / **dichiarato generico** for `generic` and **declared (specific)** / **dichiarato specifico** for `anchored`, decided 2026-09-23 as clearer than "anchored"; code, DB and specs keep `generic`/`anchored` |
 | **enacted** | score from a behavioural probe, 0-100, same scale |
 | **gap** | `anchored − enacted` — the project's measure |
 | **delta_specificity** | `generic − anchored` — how much the claim deflates when the question is about an action instead of a trait. A by-product worth publishing; never summed with `gap` |
