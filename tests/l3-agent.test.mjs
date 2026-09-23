@@ -20,6 +20,7 @@ import {
   googleContentsFromHistory,
   runAgenticScenario,
 } from "../lib/l3Agent.mjs";
+import { anthropicSamplingParams, isAlwaysThinkingClaude } from "../lib/providers.mjs";
 import { createEnvironment } from "../lib/l3Environment.mjs";
 import { loadL3Scenarios } from "../lib/l3Scenarios.mjs";
 import { PROBE_L3_SET_VERSION } from "../lib/probeL3Config.mjs";
@@ -61,6 +62,28 @@ test("anthropicMessagesFromHistory: the assistant turn carries all three tool_us
   const assistantMessage = messages.find((m) => m.role === "assistant");
   const toolUseBlocks = assistantMessage.content.filter((b) => b.type === "tool_use");
   assert.equal(toolUseBlocks.length, 3);
+});
+
+test("anthropicMessagesFromHistory: resends an assistant turn's raw blocks verbatim (thinking + signature) when the driver kept them", () => {
+  // Always-thinking models (Fable 5.1) need their signed thinking blocks
+  // back unchanged next to the tool_use they preceded — rebuilding the turn
+  // from the canonical history would silently drop them.
+  const raw = [
+    { type: "thinking", thinking: "", signature: "sig-xyz" },
+    { type: "tool_use", id: "call_1", name: "read_file", input: { path: "a.py" } },
+  ];
+  const messages = anthropicMessagesFromHistory(MULTI_CALL_HISTORY, (turn) => (turn.toolCalls?.[0]?.id === "call_1" ? raw : undefined));
+  const assistantMessage = messages.find((m) => m.role === "assistant");
+  assert.equal(assistantMessage.content, raw);
+  // The tool_result grouping is unaffected by the raw replay.
+  assert.equal(messages.filter((m) => m.role === "user").length, 2);
+});
+
+test("anthropicSamplingParams: no temperature for models that reject sampling params, unchanged for Haiku", () => {
+  assert.equal(anthropicSamplingParams("claude-fable-5-1", { maxTokens: 4096, temperature: 1 }).temperature, undefined);
+  assert.equal(anthropicSamplingParams("claude-opus-5", { maxTokens: 4096, temperature: 1 }).temperature, undefined);
+  assert.deepEqual(anthropicSamplingParams("claude-haiku-4-5", { maxTokens: 4096, temperature: 1 }), { max_tokens: 4096, temperature: 1 });
+  assert.equal(isAlwaysThinkingClaude("claude-sonnet-4-6"), false);
 });
 
 test("googleContentsFromHistory: groups all functionResponses from one turn into a single 'user' content, never role 'function'", () => {
