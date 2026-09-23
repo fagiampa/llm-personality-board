@@ -380,8 +380,12 @@ files' comments and in `tests/l3-agent.test.mjs`'s regression tests.
   level"), recorded per run and shown on the card. Adding a model to the
   lineup means adding its documented default there, with the source. Grok
   and gpt-5-family models used to be forced to `low`/`none`; that's gone.
-  `gpt-6-astra` can't do L3 at its default on Chat Completions (needs the
-  Responses API). The judge passes `reasoning: false` and is never pinned.
+  The OpenAI L3 driver is on the Responses API because `gpt-6-astra` refuses
+  tools + reasoning on Chat Completions. The judge passes `reasoning: false`
+  and is never pinned.
+- **Token usage and a cost estimate are logged per L3 run**
+  (`lib/pricing.mjs` — verified list prices only, source per entry).
+  `gpt-6-astra` is $10/$50 per Mtok, same tier as Fable: budget accordingly.
 - **Always-thinking Claude models (Fable 5.1, Opus 4.7+/5.x, Sonnet 5)**:
   `temperature` other than 1 is a 400 (so it's omitted for them), thinking
   eats `max_tokens` (headroom added), and the L3 driver must resend each

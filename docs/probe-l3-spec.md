@@ -240,10 +240,15 @@ only where the code history establishes it: Grok's declared runs were `low`,
 omission as exactly `high`. Grok's L3 runs stay unrecorded — when the L3
 driver's own `low` override landed can't be established.
 
-Known gap: `gpt-6-astra` rejects function tools together with a reasoning
-effort on `/v1/chat/completions` (400: "use /v1/responses or set
-reasoning_effort to 'none'"), so ChatGPT can't run L3 at its default until
-the OpenAI driver moves to the Responses API.
+`gpt-6-astra` rejects function tools on `/v1/chat/completions` whenever it
+reasons (400: "use /v1/responses or set reasoning_effort to 'none'"), so the
+OpenAI L3 driver uses the Responses API (stateless, reasoning items replayed
+verbatim) — verified live 2026-09-23 at its default level. xAI and DeepSeek
+stay on Chat Completions.
+
+Every run logs its token usage (per conversation in the JSONL, per model and
+for the judge in the run log) with a list-price estimate (`lib/pricing.mjs`,
+verified prices only). Tokens spent on a retried attempt aren't counted.
 
 ## Numerosity and cost
 

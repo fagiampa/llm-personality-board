@@ -22,6 +22,7 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { getLatest, upsertL3ProbeRun } from "../lib/db.mjs";
 import { reasoningRecord, describeReasoning } from "../lib/reasoningConfig.mjs";
+import { emptyUsage, addUsage, describeUsage } from "../lib/pricing.mjs";
 import { loadL3Scenarios, validateL3Scenario, validateL3ScenarioSet } from "../lib/l3Scenarios.mjs";
 import { createEnvironment } from "../lib/l3Environment.mjs";
 import { runAgenticScenario } from "../lib/l3Agent.mjs";
@@ -82,8 +83,8 @@ async function judgeFinalMessage(judgeCallModel, transcript, finalText, testFile
   // already defaults to 1, which every provider accepts.
   // reasoning: false — the judge is part of the instrument and never picks
   // up lib/reasoningConfig.mjs's pinning or a REASONING_LEVEL override.
-  const { text } = await judgeCallModel(prompt, PROBE_L3_JUDGE_MODEL, { maxTokens: 300, reasoning: false });
-  return parseJudgeResponse(text);
+  const { text, usage } = await judgeCallModel(prompt, PROBE_L3_JUDGE_MODEL, { maxTokens: 300, reasoning: false });
+  return { ...parseJudgeResponse(text), usage };
 }
 
 // A scenario whose own calls fail this often is excluded from the pooled
@@ -106,6 +107,8 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
   const enactedByScenarioFailing = scenarios.map(() => []);
   const tamperedByScenarioFailing = scenarios.map(() => []);
   let apiFailures = 0;
+  const agentUsage = emptyUsage();
+  const judgeUsage = emptyUsage();
   let validCount = 0;
   let totalRuns = 0;
   let survivingScenarioCount = 0;
@@ -163,6 +166,7 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
           continue;
         }
 
+        addUsage(agentUsage, run.usage);
         let axisALabel = null;
         let axisAQuote = null;
         let invalidReason = run.invalidReason;
@@ -171,6 +175,7 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
             const judged = await judgeFinalMessage(judgeCallModel, run.transcript, run.finalText, testFilePathsFor(scenario, condition));
             axisALabel = judged.label;
             axisAQuote = judged.quote;
+            addUsage(judgeUsage, judged.usage);
             validCount++;
             scenarioLabelsByCondition[condition].push(axisALabel);
             if (condition === PUBLISHED_L3_CONDITION) {
@@ -220,6 +225,7 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
             axisAQuote,
             judge: { provider: PROBE_L3_JUDGE_PROVIDER, model: PROBE_L3_JUDGE_MODEL },
             reasoning: reasoningRecord(config.model),
+            usage: run.usage,
             transcript: run.transcript,
             finalText: run.finalText,
           }) + "\n"
@@ -255,6 +261,8 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
     validCount,
     totalRuns,
     survivingScenarioCount,
+    agentUsage,
+    judgeUsage,
   };
 }
 
@@ -325,7 +333,10 @@ async function main() {
         validCount,
         totalRuns,
         survivingScenarioCount,
+        agentUsage,
+        judgeUsage,
       } = await probeModel(config, scenarios, judgeCallModel, rawLogPath);
+      console.log(`  [${config.name}] usage — agent: ${describeUsage(config.model, agentUsage)}; judge: ${describeUsage(PROBE_L3_JUDGE_MODEL, judgeUsage)}`);
 
       // No whole-model discard here anymore — probeModel already excludes,
       // per scenario, any scenario whose own failure rate crossed

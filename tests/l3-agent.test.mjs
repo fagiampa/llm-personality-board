@@ -17,6 +17,7 @@ import assert from "node:assert/strict";
 import {
   anthropicMessagesFromHistory,
   openAIMessagesFromHistory,
+  openAIResponsesInputFromHistory,
   googleContentsFromHistory,
   runAgenticScenario,
 } from "../lib/l3Agent.mjs";
@@ -125,6 +126,29 @@ test("googleContentsFromHistory: a call with no thoughtSignature doesn't get one
   }
 });
 
+test("openAIResponsesInputFromHistory: one function_call + one function_call_output item per call, ids paired", () => {
+  const input = openAIResponsesInputFromHistory(MULTI_CALL_HISTORY);
+  const calls = input.filter((i) => i.type === "function_call");
+  const outputs = input.filter((i) => i.type === "function_call_output");
+  assert.deepEqual(calls.map((c) => c.call_id), ["call_1", "call_2", "call_3"]);
+  assert.deepEqual(outputs.map((o) => o.call_id), ["call_1", "call_2", "call_3"]);
+  assert.equal(JSON.parse(calls[0].arguments).path, "a.py");
+  assert.equal(input[0].role, "user");
+});
+
+test("openAIResponsesInputFromHistory: resends an assistant turn's raw output items (reasoning included) verbatim", () => {
+  const raw = [
+    { type: "reasoning", id: "rs_1", encrypted_content: "enc", summary: [] },
+    { type: "function_call", call_id: "call_1", name: "read_file", arguments: '{"path":"a.py"}' },
+  ];
+  const input = openAIResponsesInputFromHistory(MULTI_CALL_HISTORY, (turn) => (turn.toolCalls?.[0]?.id === "call_1" ? raw : undefined));
+  assert.equal(input[1], raw[0]);
+  assert.equal(input[2], raw[1]);
+  // The other two calls came from the same turn, so the raw items stand in for all of them.
+  assert.equal(input.filter((i) => i.type === "function_call").length, 1);
+  assert.equal(input.filter((i) => i.type === "function_call_output").length, 3);
+});
+
 test("openAIMessagesFromHistory: one 'tool' message per call (no grouping — that's correct for this API)", () => {
   const messages = openAIMessagesFromHistory(MULTI_CALL_HISTORY, "be an engineer");
   const toolMessages = messages.filter((m) => m.role === "tool");
@@ -220,4 +244,14 @@ test("runAgenticScenario: honest run without tampering reports tampered=false", 
   });
   assert.equal(result.valid, true);
   assert.equal(result.tampered, false);
+});
+
+test("runAgenticScenario: sums per-turn token usage reported by the driver", async () => {
+  const environment = createEnvironment(scenario, "failing");
+  const driver = fakeDriver([
+    { toolCalls: [{ id: "1", name: "run_tests", args: {} }], text: "", usage: { inputTokens: 100, outputTokens: 10 } },
+    { toolCalls: [], text: "done", usage: { inputTokens: 250, outputTokens: 30 } },
+  ]);
+  const result = await runAgenticScenario({ driver, task: scenario.task, systemPrompt: "x", environment, maxIterations: 5 });
+  assert.deepEqual(result.usage, { inputTokens: 350, outputTokens: 40 });
 });
