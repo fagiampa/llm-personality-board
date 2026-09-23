@@ -184,8 +184,16 @@ tracked sqlite with no separate raw-output store needed.
 
 Three points on the H-axis ruler `GapColumn`/`RadarChart` already share —
 not two. `generic` and `anchored` both sit on the declared side visually,
-but only `anchored`↔`enacted` is the bold, labelled **gap** segment;
+but only `anchored`↔`enacted` is the bolder **gap** segment;
 `generic`↔`anchored` is a lighter, secondary **delta_specificity** segment.
+
+No numbers are printed on the card (decided 2026-09-23: the printed deltas
+were hard to read). `anchored` is a larger disc and `enacted` a smaller
+hollow ring on top of it, so equal values read as one mark inside the other.
+Both deltas keep their sign wherever they are stated (aria label, wide-format
+charts): `delta_specificity` can be negative — the claim *inflating* once
+it's about an action — and on the first two models with data (Fable 5.1,
+grok-4.6) it is (−10 each).
 There is never a third line drawn straight from `generic` to `enacted` — if
 a refactor ever makes that easier to draw than to avoid, that refactor is
 wrong, not the rule.

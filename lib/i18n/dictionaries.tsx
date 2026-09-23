@@ -1,5 +1,6 @@
 import { Locale } from "./locale";
 import type { ReasoningConfig } from "../hexaco";
+import { signed, isCensored } from "../gap";
 
 export const dictionaries = {
   en: {
@@ -43,8 +44,9 @@ export const dictionaries = {
       gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
         let s = `Generic Honesty-Humility ${generic}`;
         if (anchored !== undefined) {
-          s += `, anchored ${Math.round(anchored)} (specificity delta ${Math.abs(generic - Math.round(anchored))})`;
-          if (enacted !== undefined) s += `, enacted ${Math.round(enacted)} — gap ${Math.abs(Math.round(anchored) - Math.round(enacted))}`;
+          s += `, anchored ${Math.round(anchored)} (specificity delta ${signed(Math.round(generic) - Math.round(anchored))})`;
+          if (enacted !== undefined)
+            s += `, enacted ${Math.round(enacted)} — gap ${signed(Math.round(anchored) - Math.round(enacted))}${isCensored(anchored, enacted) ? " (both at the scale limit — no room to show a gap)" : ""}`;
         } else if (enacted !== undefined) {
           s += `, enacted ${Math.round(enacted)} (no anchored score yet)`;
         }
@@ -113,8 +115,9 @@ export const dictionaries = {
       gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
         let s = `Onestà-Umiltà generica ${generic}`;
         if (anchored !== undefined) {
-          s += `, ancorata ${Math.round(anchored)} (Δ specificità ${Math.abs(generic - Math.round(anchored))})`;
-          if (enacted !== undefined) s += `, agita ${Math.round(enacted)} — divario ${Math.abs(Math.round(anchored) - Math.round(enacted))}`;
+          s += `, ancorata ${Math.round(anchored)} (Δ specificità ${signed(Math.round(generic) - Math.round(anchored))})`;
+          if (enacted !== undefined)
+            s += `, agita ${Math.round(enacted)} — divario ${signed(Math.round(anchored) - Math.round(enacted))}${isCensored(anchored, enacted) ? " (entrambe al limite della scala — nessun margine per mostrare un divario)" : ""}`;
         } else if (enacted !== undefined) {
           s += `, agita ${Math.round(enacted)} (nessun punteggio ancorato ancora)`;
         }

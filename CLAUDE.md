@@ -144,8 +144,9 @@ didn't write it):
 
 - `probe_runs` / `probe_call_repeats` (L2): `p_neutral`, `p_mild`,
   `p_strong`, the enacted 0-100 score, the drop, and interval bounds;
-  repeats hold the boolean outcome and a hash of the output. Built, never
-  run live yet (0 rows).
+  repeats hold the boolean outcome and a hash of the output. Has live rows
+  from 2026-09-20 (gpt-6-astra, gpt-4o, claude-fable-5-1) — a card with no
+  L3 run shows its L2 `enacted` as the fallback.
 - `probe_l3_runs` / `probe_l3_call_repeats` (L3): a per-condition axis-A
   label distribution (accurate/vague/false), the enacted score, a
   tampering rate, a validity rate, interval bounds, and the axis-A judge
@@ -501,7 +502,7 @@ research.
 /lib/providers.mjs               # shared LLM client factories (plain completions) for assess/declared/probe.mjs
 /lib/reasoningConfig.mjs         # per-model reasoning level (provider default, pinned + recorded)
 /scenarios/L3-v1/                # primary probe scenarios + their scripted environments (3/3 pilot, live data)
-/scenarios/L2-v1/                # control probe scenarios — 3, not 20 (never run live)
+/scenarios/L2-v1/                # control probe scenarios — 5 on disk, target 3-5, not 20
 /items/report-fidelity/RF-v1.json, RF-v2.json, RF-v3.json # action-anchored item banks, 12-item pilots — RF-v1/RF-v2 frozen/superseded, RF-v3 current
 /docs/declared-spec.md           # declared side + the three-level output record
 /docs/probe-l3-spec.md           # primary probe spec, enacted side
@@ -536,7 +537,10 @@ columns into one card.
 
 `GapColumn` draws **at most two segments**, never a third: `delta_specificity`
 (`generic`↔`anchored`, thin/secondary) and `gap` (`anchored`↔`enacted`,
-bold, labelled — the project's measure). There is **never** a segment from
+bolder — the project's measure). No numbers on the card: `anchored` is a
+larger disc, `enacted` a smaller hollow ring drawn on top, so equal values
+read as one inside the other; exact signed values live in the aria label
+(`lib/gap.ts`). There is **never** a segment from
 `generic` straight to `enacted` — if `anchored` hasn't run yet, an
 `enacted` point renders as an isolated dot with no connector at all, which
 is the correct rendering of "no anchored score yet," not a bug to fix by
@@ -569,10 +573,12 @@ a layout refactor: **if you touch card rendering, this is the regression
 test.**
 
 The price of the shared scale is still resolution, just less of one than
-before the H-to-A remap — a 21-point gap is now ~25px instead of ~12. That's
-why the number stays printed next to the segment: on the card the chart
-orients, the numeral measures. The wide-format dumbbell (post, paper) is
-where the gap gets the full page width.
+before the H-to-A remap — a 21-point gap is now ~25px instead of ~12. The
+card used to print the numbers next to the segments; removed 2026-09-23 as
+hard to read (per direct instruction). On the card the chart only orients;
+the wide-format dumbbell (post, paper) is where the gap gets measured, with
+the full page width and signed values. Known cost: a double ceiling (both
+at 100) now looks like perfect agreement on the card.
 
 ## Deployment (Vercel)
 

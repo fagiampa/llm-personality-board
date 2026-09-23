@@ -2,11 +2,14 @@ import { CY, MAX_R } from "./RadarChart";
 
 const VIEW_WIDTH = 70;
 const AXIS_X = 42;
-// One shared radius for all three points.
+// No numbers on the card (per direct instruction, 2026-09-23: the printed
+// deltas were hard to read) — the dots alone carry it. `anchored` is drawn
+// larger than the other two so that when it and `enacted` sit at the same
+// value (e.g. both at 100), the hollow enacted ring lands visibly *inside*
+// the anchored disc instead of hiding it. The exact values stay in the
+// aria-label.
 const DOT_R = 4;
-// Two number labels sitting closer than this get pushed apart (keeping
-// their relative order) instead of overlapping — see the render body.
-const LABEL_MIN_GAP = 10;
+const ANCHORED_R = 7;
 
 // This ruler's top (100) sits exactly where RadarChart.tsx's H vertex sits
 // (CY - MAX_R) and its bottom (0) sits exactly where the opposite vertex,
@@ -52,11 +55,12 @@ interface GapColumnProps {
 //
 // All three points are circles on one ordinal ramp of the model's own hue —
 // generic at RadarChart's own polygon-stroke lightness (55%), anchored
-// lighter (75%), enacted darker (35%) — identity comes from shape *and*
-// shade together, not a fixed cross-model accent. This drops the earlier
+// lighter (75%), enacted darker (35%) and hollow (white fill, ring in that
+// color) — identity comes from fill *and* shade together, not a fixed
+// cross-model accent. This drops the earlier
 // "enacted is always the same orange on every card" convention on purpose,
 // per direct instruction: read the per-card triad first, compare cards by
-// their gap number (already printed) rather than by hunting one fixed hue.
+// the length of their gap segment rather than by hunting one fixed hue.
 export function GapColumn({ generic, anchored, enacted, hue, className, ariaLabel }: GapColumnProps) {
   if (anchored === undefined && enacted === undefined) return null;
 
@@ -66,23 +70,6 @@ export function GapColumn({ generic, anchored, enacted, hue, className, ariaLabe
   const genericColor = `oklch(55% 0.14 ${hue})`;
   const anchoredColor = `oklch(75% 0.13 ${hue})`;
   const enactedColor = `oklch(35% 0.15 ${hue})`;
-
-  const deltaSpecificity = anchored !== undefined ? Math.round(Math.abs(generic - anchored)) : undefined;
-  const gap = anchored !== undefined && enacted !== undefined ? Math.round(Math.abs(anchored - enacted)) : undefined;
-
-  // Each label sits at its own reference dot's height (never at a segment's
-  // midpoint) and in that dot's color — delta_specificity reads off
-  // `anchored` (the point it lands on), gap reads off `enacted` (same
-  // reasoning). Pushed apart, preserving order, if that would put them
-  // closer together than LABEL_MIN_GAP.
-  let deltaLabelY = yAnchored !== undefined ? yAnchored + 3 : undefined;
-  let gapLabelY = yEnacted !== undefined ? yEnacted + 3 : undefined;
-  if (deltaLabelY !== undefined && gapLabelY !== undefined && Math.abs(gapLabelY - deltaLabelY) < LABEL_MIN_GAP) {
-    const mid = (gapLabelY + deltaLabelY) / 2;
-    const dir = gapLabelY >= deltaLabelY ? 1 : -1; // keep whichever was lower still lower
-    deltaLabelY = mid - (dir * LABEL_MIN_GAP) / 2;
-    gapLabelY = mid + (dir * LABEL_MIN_GAP) / 2;
-  }
 
   return (
     <svg viewBox={`0 0 ${VIEW_WIDTH} 160`} className={className} role="img" aria-label={ariaLabel}>
@@ -107,37 +94,29 @@ export function GapColumn({ generic, anchored, enacted, hue, className, ariaLabe
         />
       ))}
 
+      {/* delta_specificity: generic<->anchored, thin and secondary. */}
+      {yAnchored !== undefined && (
+        <line x1={AXIS_X} y1={yGeneric} x2={AXIS_X} y2={yAnchored} stroke="oklch(75% 0.015 75)" strokeWidth={1} strokeDasharray="2 1.5" />
+      )}
+      {/* gap: anchored<->enacted, the bolder segment — the project's measure. */}
+      {yAnchored !== undefined && yEnacted !== undefined && (
+        <line x1={AXIS_X} y1={yAnchored} x2={AXIS_X} y2={yEnacted} stroke="oklch(45% 0.02 75)" strokeWidth={1.5} />
+      )}
+
+      {/* Draw order: the large anchored disc first, so both smaller points
+          stay visible on top of it when they coincide with it. */}
+      {yAnchored !== undefined && <circle cx={AXIS_X} cy={yAnchored} r={ANCHORED_R} fill={anchoredColor} />}
+
       {/* generic: no projection line any more — RadarChart.tsx now draws
           the matching dot directly on its own H vertex, which is the
           bridge back to this point instead of a leader line. */}
       <circle cx={AXIS_X} cy={yGeneric} r={DOT_R} fill={genericColor} />
 
-      {/* delta_specificity: generic<->anchored, thin and secondary. */}
-      {yAnchored !== undefined && (
-        <>
-          <line x1={AXIS_X} y1={yGeneric} x2={AXIS_X} y2={yAnchored} stroke="oklch(75% 0.015 75)" strokeWidth={1} strokeDasharray="2 1.5" />
-          <circle cx={AXIS_X} cy={yAnchored} r={DOT_R} fill={anchoredColor} />
-          {deltaSpecificity !== undefined && (
-            <text x={AXIS_X + 7} y={deltaLabelY} fontSize={9} fontWeight={600} fill={anchoredColor}>
-              {deltaSpecificity}
-            </text>
-          )}
-        </>
-      )}
-
-      {/* gap: anchored<->enacted, bold and labelled — the project's measure. */}
+      {/* enacted: hollow (white fill, ring in its own color) — per direct
+          instruction, so it never reads as the same kind of mark as the two
+          declared points, and sits inside the anchored disc when equal. */}
       {yEnacted !== undefined && (
-        <>
-          {yAnchored !== undefined && (
-            <line x1={AXIS_X} y1={yAnchored} x2={AXIS_X} y2={yEnacted} stroke="oklch(45% 0.02 75)" strokeWidth={1.5} />
-          )}
-          <circle cx={AXIS_X} cy={yEnacted} r={DOT_R} fill={enactedColor} />
-          {gap !== undefined && (
-            <text x={AXIS_X + 7} y={gapLabelY} fontSize={11} fontWeight={700} fill={enactedColor}>
-              {gap}
-            </text>
-          )}
-        </>
+        <circle cx={AXIS_X} cy={yEnacted} r={DOT_R} fill="white" stroke={enactedColor} strokeWidth={1.5} />
       )}
     </svg>
   );

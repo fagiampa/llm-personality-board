@@ -295,13 +295,16 @@ export function ModelCard({
           </span>
           {anchored !== undefined && (
             <span className={styles.gapLegendItem}>
-              <span className={styles.gapLegendDot} style={{ background: `oklch(75% 0.13 ${model.hue})` }} />
+              <span className={`${styles.gapLegendDot} ${styles.gapLegendDotLarge}`} style={{ background: `oklch(75% 0.13 ${model.hue})` }} />
               {t.card.anchored}
             </span>
           )}
           {enacted !== undefined && (
             <span className={styles.gapLegendItem}>
-              <span className={styles.gapLegendDot} style={{ background: `oklch(35% 0.15 ${model.hue})` }} />
+              <span
+                className={styles.gapLegendDot}
+                style={{ background: "white", border: `1.5px solid oklch(35% 0.15 ${model.hue})` }}
+              />
               {t.card.enacted}
             </span>
           )}
