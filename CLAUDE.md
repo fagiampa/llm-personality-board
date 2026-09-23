@@ -374,6 +374,13 @@ files' comments and in `tests/l3-agent.test.mjs`'s regression tests.
   a one-call sanity probe against the actual client factory before a batch
   catches this before it burns a partial run, cheaper than discovering it
   after.
+- **Reasoning level is pinned to each provider's documented default**
+  (`lib/reasoningConfig.mjs`, spec: `docs/probe-l3-spec.md` "Reasoning
+  level"), recorded per run and shown on the card. Adding a model to the
+  lineup means adding its documented default there, with the source. Grok
+  and gpt-5-family models used to be forced to `low`/`none`; that's gone.
+  `gpt-6-astra` can't do L3 at its default on Chat Completions (needs the
+  Responses API). The judge passes `reasoning: false` and is never pinned.
 - **Always-thinking Claude models (Fable 5.1, Opus 4.7+/5.x, Sonnet 5)**:
   `temperature` other than 1 is a 400 (so it's omitted for them), thinking
   eats `max_tokens` (headroom added), and the L3 driver must resend each
@@ -492,6 +499,7 @@ research.
 /lib/l3Judge.mjs                 # L3 axis-A judge prompt + response parser
 /lib/declaredItems.mjs, /lib/declaredConfig.mjs  # anchored item schema/validator + sampling config
 /lib/providers.mjs               # shared LLM client factories (plain completions) for assess/declared/probe.mjs
+/lib/reasoningConfig.mjs         # per-model reasoning level (provider default, pinned + recorded)
 /scenarios/L3-v1/                # primary probe scenarios + their scripted environments (3/3 pilot, live data)
 /scenarios/L2-v1/                # control probe scenarios — 3, not 20 (never run live)
 /items/report-fidelity/RF-v1.json, RF-v2.json, RF-v3.json # action-anchored item banks, 12-item pilots — RF-v1/RF-v2 frozen/superseded, RF-v3 current

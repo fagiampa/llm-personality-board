@@ -89,6 +89,17 @@ export interface ProbeScore {
  * L3ProbeScore) instead of taking a pre-joined shape. `generic` is never
  * connected directly to `enacted` in any chart or formula (CLAUDE.md).
  */
+/**
+ * Reasoning level a model ran at for one run (lib/reasoningConfig.mjs).
+ * `level: null` = provider default whose value the provider doesn't
+ * document (parameter omitted). The field itself is absent on runs from
+ * before it was recorded (pre 2026-09-23).
+ */
+export interface ReasoningConfig {
+  level: string | null;
+  isDefault: boolean;
+}
+
 export interface AnchoredScore {
   modelName: string;
   /** Provider model string of the administered run, matched against ModelScore.model. */
@@ -103,6 +114,7 @@ export interface AnchoredScore {
   anchoredMargin?: number;
   repeatCount: number;
   source: "live" | "fake";
+  reasoning?: ReasoningConfig;
 }
 
 /** One condition's axis-A label distribution (docs/probe-l3-spec.md). Probabilities sum to ~1; `n` is the count of *valid* runs the distribution is over. */
@@ -149,5 +161,6 @@ export interface L3ProbeScore {
   source: "live" | "fake";
   /** The model that scored axis A — part of the instrument; runs with different judges aren't directly comparable. Absent for runs from before it was recorded (pre 2026-09-23). */
   judge?: { provider: string; model: string };
+  reasoning?: ReasoningConfig;
 }
 

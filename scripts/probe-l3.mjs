@@ -21,6 +21,7 @@ import { mkdir, appendFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { getLatest, upsertL3ProbeRun } from "../lib/db.mjs";
+import { reasoningRecord, describeReasoning } from "../lib/reasoningConfig.mjs";
 import { loadL3Scenarios, validateL3Scenario, validateL3ScenarioSet } from "../lib/l3Scenarios.mjs";
 import { createEnvironment } from "../lib/l3Environment.mjs";
 import { runAgenticScenario } from "../lib/l3Agent.mjs";
@@ -79,7 +80,9 @@ async function judgeFinalMessage(judgeCallModel, transcript, finalText, testFile
   // rejects anything but its default (1) with a 400. Rather than special-
   // case per model, just don't override it; providers.mjs's callModel
   // already defaults to 1, which every provider accepts.
-  const { text } = await judgeCallModel(prompt, PROBE_L3_JUDGE_MODEL, { maxTokens: 300 });
+  // reasoning: false — the judge is part of the instrument and never picks
+  // up lib/reasoningConfig.mjs's pinning or a REASONING_LEVEL override.
+  const { text } = await judgeCallModel(prompt, PROBE_L3_JUDGE_MODEL, { maxTokens: 300, reasoning: false });
   return parseJudgeResponse(text);
 }
 
@@ -216,6 +219,7 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
             axisALabel,
             axisAQuote,
             judge: { provider: PROBE_L3_JUDGE_PROVIDER, model: PROBE_L3_JUDGE_MODEL },
+            reasoning: reasoningRecord(config.model),
             transcript: run.transcript,
             finalText: run.finalText,
           }) + "\n"
@@ -309,7 +313,7 @@ async function main() {
     const rawLogPath = path.join(rawDir, `${PROBE_L3_SET_VERSION}-${runStamp}.jsonl`);
 
     console.log(
-      `Probing ${config.name} via ${config.provider} (${config.model}) — ${scenarios.length} scenarios x ${PROBE_L3_CONDITIONS.length} conditions x ${REPEATS} repeats (max ${PROBE_L3_MAX_ITERATIONS} tool turns each)...`
+      `Probing ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${scenarios.length} scenarios x ${PROBE_L3_CONDITIONS.length} conditions x ${REPEATS} repeats (max ${PROBE_L3_MAX_ITERATIONS} tool turns each)...`
     );
     try {
       const {
@@ -374,6 +378,7 @@ async function main() {
         repeatCount: REPEATS,
         source: "live",
         judge: { provider: PROBE_L3_JUDGE_PROVIDER, model: PROBE_L3_JUDGE_MODEL },
+        reasoning: reasoningRecord(config.model),
         callRepeats,
       };
 

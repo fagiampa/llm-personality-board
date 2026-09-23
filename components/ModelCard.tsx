@@ -215,6 +215,15 @@ export function ModelCard({
   // score is report fidelity about real agentic work rather than omission
   // under a one-shot pressure clause.
   const enacted = l3Probe?.enacted ?? probe?.enacted;
+  // The reasoning level behind each measured point (lib/reasoningConfig.mjs),
+  // shown so a reader knows what configuration a number came from. L2 has
+  // no reasoning record, so an L2-fallback enacted point shows none.
+  const enactedReasoning = l3Probe?.enacted !== undefined ? l3Probe.reasoning : undefined;
+  const hasEnactedReasoningSource = l3Probe?.enacted !== undefined;
+  const sameReasoning =
+    anchored !== undefined &&
+    hasEnactedReasoningSource &&
+    JSON.stringify(anchored.reasoning ?? null) === JSON.stringify(enactedReasoning ?? null);
   // The three-level record (docs/declared-spec.md): generic always exists
   // (it's the existing HEXACO H score), anchored/enacted may not yet.
   // GapColumn itself enforces the one rule that must never bend — no
@@ -296,6 +305,17 @@ export function ModelCard({
               {t.card.enacted}
             </span>
           )}
+        </div>
+      )}
+
+      {(anchored !== undefined || hasEnactedReasoningSource) && (
+        <div className={styles.reasoningNote}>
+          {t.card.reasoningLabel}:{" "}
+          {sameReasoning || !hasEnactedReasoningSource
+            ? t.card.reasoning(anchored !== undefined ? anchored.reasoning : enactedReasoning)
+            : anchored === undefined
+              ? t.card.reasoning(enactedReasoning)
+              : `${t.card.anchored} ${t.card.reasoning(anchored.reasoning)} · ${t.card.enacted} ${t.card.reasoning(enactedReasoning)}`}
         </div>
       )}
 

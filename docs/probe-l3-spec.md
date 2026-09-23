@@ -212,6 +212,39 @@ The re-judge also gives a first self-consistency figure for the judge at its
 default sampling (~1 flip in 182, on a borderline report). It does **not**
 replace the 50-message human calibration above.
 
+## Reasoning level
+
+Decided 2026-09-23: every model under test runs at **its provider's default
+reasoning level** — the model as a caller actually gets it. Deeper or
+shallower reasoning is a legitimate study, but a separate one, never mixed
+into the default series.
+
+The default is **sent explicitly**, not omitted (`lib/reasoningConfig.mjs`):
+what gets recorded is then guaranteed to be what ran, and a provider changing
+its default can't silently shift the time series under the same model string
+(same logic as fixed anchors). Defaults are taken from each provider's
+documentation, with the source recorded next to the value. A model whose
+default isn't documented (`gpt-6-astra`) keeps the parameter omitted and is
+recorded as "provider default, level not documented" — never a guessed value.
+
+Every run stores `reasoning_level`/`reasoning_is_default`, and the card shows
+it. `REASONING_LEVEL=<level>` runs at a non-default level, recorded as such.
+The axis-A judge is excluded from all of this: it runs at its own default,
+always, with no override.
+
+Before 2026-09-23 Grok ran at a forced `"low"` and gpt-5-family models at
+`"none"` (to keep reasoning tokens from eating a tight output budget; token
+headroom replaces that now). What's known about older runs is backfilled
+only where the code history establishes it: Grok's declared runs were `low`,
+`claude-fable-5-1` never had an effort parameter sent and Anthropic documents
+omission as exactly `high`. Grok's L3 runs stay unrecorded — when the L3
+driver's own `low` override landed can't be established.
+
+Known gap: `gpt-6-astra` rejects function tools together with a reasoning
+effort on `/v1/chat/completions` (400: "use /v1/responses or set
+reasoning_effort to 'none'"), so ChatGPT can't run L3 at its default until
+the OpenAI driver moves to the Responses API.
+
 ## Numerosity and cost
 
 30 scenarios × 3 conditions × 8 repeats ≈ 720 runs per model, each a

@@ -232,6 +232,13 @@
   gap: 4px;
 }
 
+.reasoningNote {
+  margin-top: -4px;
+  text-align: center;
+  font-size: 9px;
+  color: oklch(50% 0.02 75);
+}
+
 .gapLegendDot {
   width: 6px;
   height: 6px;

@@ -1,4 +1,5 @@
 import { Locale } from "./locale";
+import type { ReasoningConfig } from "../hexaco";
 
 export const dictionaries = {
   en: {
@@ -30,6 +31,15 @@ export const dictionaries = {
       // docs/declared-spec.md's three-level record: generic always exists;
       // anchored/enacted may not yet, so the sentence only claims what it
       // actually has — never a gap between generic and enacted directly.
+      // Which reasoning level the model ran at (lib/reasoningConfig.mjs).
+      // `undefined` = a run from before this was recorded.
+      reasoningLabel: "reasoning",
+      reasoning: (r: ReasoningConfig | undefined) =>
+        r === undefined
+          ? "not recorded"
+          : r.level === null
+            ? "provider default (level not documented)"
+            : `${r.level} (${r.isDefault ? "provider default" : "not the provider default"})`,
       gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
         let s = `Generic Honesty-Humility ${generic}`;
         if (anchored !== undefined) {
@@ -93,6 +103,13 @@ export const dictionaries = {
       enacted: "agito",
       gap: "divario",
       deltaSpecificity: "Δ specificità",
+      reasoningLabel: "ragionamento",
+      reasoning: (r: ReasoningConfig | undefined) =>
+        r === undefined
+          ? "non registrato"
+          : r.level === null
+            ? "default del provider (livello non documentato)"
+            : `${r.level} (${r.isDefault ? "default del provider" : "non è il default del provider"})`,
       gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
         let s = `Onestà-Umiltà generica ${generic}`;
         if (anchored !== undefined) {

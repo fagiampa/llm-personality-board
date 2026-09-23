@@ -17,6 +17,7 @@
 // just skipped with a warning.
 
 import { getLatest, upsertDeclaredAnchoredRun } from "../lib/db.mjs";
+import { reasoningRecord, describeReasoning } from "../lib/reasoningConfig.mjs";
 import { loadDeclaredItems, validateDeclaredItem, validateDeclaredItemSet } from "../lib/declaredItems.mjs";
 import {
   DECLARED_REPEATS as REPEATS,
@@ -207,7 +208,7 @@ async function main() {
       continue;
     }
 
-    console.log(`Administering ${DECLARED_ITEM_SET_VERSION} to ${config.name} via ${config.provider} (${config.model}) — ${items.length} items x ${REPEATS} repeats...`);
+    console.log(`Administering ${DECLARED_ITEM_SET_VERSION} to ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${items.length} items x ${REPEATS} repeats...`);
     try {
       const callBatch = CLIENT_FACTORIES[config.provider]();
       const { anchored, anchoredMargin, itemMeans, itemRepeats, successRatio } = await administerToModel(config, items, callBatch);
@@ -230,6 +231,7 @@ async function main() {
         itemMeans,
         repeatCount: REPEATS,
         source: "live",
+        reasoning: reasoningRecord(config.model),
         itemRepeats,
       };
 

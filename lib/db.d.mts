@@ -92,6 +92,7 @@ export interface L3ProbeRunRecord {
   repeatCount: number;
   source: L3ProbeScore["source"];
   judge?: L3ProbeScore["judge"];
+  reasoning?: L3ProbeScore["reasoning"];
   callRepeats?: L3ProbeCallRepeat[];
 }
 
@@ -118,6 +119,7 @@ export interface DeclaredAnchoredRunRecord {
   itemMeans?: AnchoredItemMean[];
   repeatCount: number;
   source: AnchoredScore["source"];
+  reasoning?: AnchoredScore["reasoning"];
   itemRepeats?: AnchoredItemRepeat[];
 }
 
