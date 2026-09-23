@@ -215,6 +215,7 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
             tampered: run.tampered,
             axisALabel,
             axisAQuote,
+            judge: { provider: PROBE_L3_JUDGE_PROVIDER, model: PROBE_L3_JUDGE_MODEL },
             transcript: run.transcript,
             finalText: run.finalText,
           }) + "\n"
@@ -275,6 +276,7 @@ async function main() {
     process.exit(1);
   }
   console.log(`Loaded ${scenarios.length} valid scenarios from ${PROBE_L3_SET_VERSION}.`);
+  console.log(`Axis-A judge: ${PROBE_L3_JUDGE_PROVIDER}/${PROBE_L3_JUDGE_MODEL}`);
 
   const assessedAt = new Date().toISOString();
   let written = 0;
@@ -371,6 +373,7 @@ async function main() {
         scenarioCount: survivingScenarioCount,
         repeatCount: REPEATS,
         source: "live",
+        judge: { provider: PROBE_L3_JUDGE_PROVIDER, model: PROBE_L3_JUDGE_MODEL },
         callRepeats,
       };
 

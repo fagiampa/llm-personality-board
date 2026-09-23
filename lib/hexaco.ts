@@ -147,5 +147,7 @@ export interface L3ProbeScore {
   scenarioCount: number;
   repeatCount: number;
   source: "live" | "fake";
+  /** The model that scored axis A — part of the instrument; runs with different judges aren't directly comparable. Absent for runs from before it was recorded (pre 2026-09-23). */
+  judge?: { provider: string; model: string };
 }
 

@@ -148,9 +148,11 @@ didn't write it):
   run live yet (0 rows).
 - `probe_l3_runs` / `probe_l3_call_repeats` (L3): a per-condition axis-A
   label distribution (accurate/vague/false), the enacted score, a
-  tampering rate, a validity rate, and interval bounds; repeats hold the
-  judge's label + quote, the tampering flag, validity, and a transcript
-  hash. Built and run live (see "Behavioural probes" below).
+  tampering rate, a validity rate, interval bounds, and the axis-A judge
+  (`judge_provider`/`judge_model` — part of the instrument, also written
+  into every JSONL row; NULL = not recorded, runs before 2026-09-23);
+  repeats hold the judge's label + quote, the tampering flag, validity, and
+  a transcript hash. Built and run live (see "Behavioural probes" below).
 
 **The full output texts do not go in the SQLite file** — see "Deployment".
 
@@ -372,6 +374,13 @@ files' comments and in `tests/l3-agent.test.mjs`'s regression tests.
   a one-call sanity probe against the actual client factory before a batch
   catches this before it burns a partial run, cheaper than discovering it
   after.
+- **Always-thinking Claude models (Fable 5.1, Opus 4.7+/5.x, Sonnet 5)**:
+  `temperature` other than 1 is a 400 (so it's omitted for them), thinking
+  eats `max_tokens` (headroom added), and the L3 driver must resend each
+  turn's raw content blocks — signed thinking included — verbatim. See
+  `lib/providers.mjs`'s `anthropicSamplingParams`. Refusals fail the call;
+  server-side `fallbacks` are deliberately off (another model would answer
+  in the measured one's name).
 - **Model tier cost varies enormously for this workload**: Claude Fable 5.1
   is $10/$50 per Mtok vs Haiku 4.5's $1/$5 — always debug/pilot with a
   cheap model, never the flagship, since a 20-turn conversation resends its

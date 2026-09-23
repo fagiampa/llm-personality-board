@@ -91,6 +91,7 @@ export interface L3ProbeRunRecord {
   scenarioCount: number;
   repeatCount: number;
   source: L3ProbeScore["source"];
+  judge?: L3ProbeScore["judge"];
   callRepeats?: L3ProbeCallRepeat[];
 }
 
