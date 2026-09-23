@@ -2,8 +2,13 @@ import { HEXACO_CODES } from "@/lib/hexaco";
 
 const ANGLES = [-90, -30, 30, 90, 150, 210];
 const CX = 80;
-const CY = 80;
-const MAX_R = 60;
+// Exported so GapColumn.tsx can plot the same H value on the identical
+// pixel scale ("the column is the radar's own ruler, turned upright" — see
+// CLAUDE.md's "Model cards and the shared scale"): H sits at angle -90
+// (straight up), so its radius maps to height as CY - MAX_R * (val / 100),
+// same formula either component uses.
+export const CY = 80;
+export const MAX_R = 60;
 // Placeholder illustrative spread around the mean; in production this
 // becomes the real statistical margin (e.g. 1.96 x SEM) from the scoring
 // pipeline.
@@ -83,6 +88,19 @@ export function RadarChart({ scores, hue, margin = DEFAULT_MARGIN, className }: 
         stroke="none"
       />
       <polygon points={points} fill="none" stroke={`oklch(55% 0.14 ${hue})`} strokeWidth={2} />
+
+      {/* The model's actual H value, marked on the real polygon vertex —
+          same formula every other axis uses (centre = 0, this vertex =
+          100), so the dot always sits exactly on the polygon's own edge.
+          Same color as GapColumn's "generic" dot, but not generally the
+          same pixel height: GapColumn's own frame is stretched to span
+          this radar's full H-to-A height (see its yFor), so only the
+          frame's two endpoints (0 and 100) line up with A's and H's fixed
+          vertices — a value in between reads at a different height in each
+          component. The color is the bridge; the position isn't, except
+          at the extremes. No other vertex gets this dot — H is the only
+          axis with a declared/anchored/enacted story. */}
+      <circle cx={CX} cy={CY - MAX_R * (scores[0] / 100)} r={4} fill={`oklch(55% 0.14 ${hue})`} />
 
       {HEXACO_CODES.map((code) => (
         <text

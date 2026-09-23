@@ -186,10 +186,57 @@
   text-overflow: ellipsis;
 }
 
-.radar {
+/* Both children are sized by HEIGHT, not width: RadarChart's viewBox is
+   square (160x160) but GapColumn's is narrow (70x160), so constraining
+   each by its own width would scale them by different factors and break
+   pixel alignment between the radar's H-to-A span and the column's own
+   (GapColumn.tsx's `yFor` maps its 0/100 to the radar's A/H vertices
+   directly) — this is the regression test from CLAUDE.md's "Model cards
+   and the shared scale". Fixing the row's height and letting both SVGs
+   size off it (width: auto preserves each one's own aspect ratio) keeps
+   1 viewBox unit worth the same number of screen pixels in both, so the
+   column's top and bottom land exactly on the radar's H and A vertices. */
+.radarRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   width: 100%;
+  height: 150px;
+}
+
+.radar {
+  height: 100%;
+  width: auto;
   max-width: 150px;
-  height: auto;
+}
+
+.gapColumn {
+  height: 100%;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.gapLegend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 9px;
+  color: oklch(50% 0.02 75);
+}
+
+.gapLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gapLegendDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 @media (max-width: 640px) {
@@ -210,6 +257,10 @@
   .headerText {
     align-items: flex-start;
     text-align: left;
+  }
+
+  .radarRow {
+    height: 180px;
   }
 
   .radar {

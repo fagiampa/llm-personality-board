@@ -22,6 +22,24 @@ export const dictionaries = {
       archived: "Archived",
       seed: "seed",
       versionAriaLabel: (name: string) => `Version of ${name}`,
+      generic: "declared HEXACO",
+      anchored: "declared anchored",
+      enacted: "enacted",
+      gap: "gap",
+      deltaSpecificity: "specificity Δ",
+      // docs/declared-spec.md's three-level record: generic always exists;
+      // anchored/enacted may not yet, so the sentence only claims what it
+      // actually has — never a gap between generic and enacted directly.
+      gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
+        let s = `Generic Honesty-Humility ${generic}`;
+        if (anchored !== undefined) {
+          s += `, anchored ${Math.round(anchored)} (specificity delta ${Math.abs(generic - Math.round(anchored))})`;
+          if (enacted !== undefined) s += `, enacted ${Math.round(enacted)} — gap ${Math.abs(Math.round(anchored) - Math.round(enacted))}`;
+        } else if (enacted !== undefined) {
+          s += `, enacted ${Math.round(enacted)} (no anchored score yet)`;
+        }
+        return s;
+      },
     },
     about: {
       metaTitle: "About LLM Personality Board — Why Test AI Personality",
@@ -70,6 +88,21 @@ export const dictionaries = {
       archived: "Archiviata",
       seed: "iniziale",
       versionAriaLabel: (name: string) => `Versione di ${name}`,
+      generic: "dichiarato HEXACO",
+      anchored: "dichiarato ancorato",
+      enacted: "agito",
+      gap: "divario",
+      deltaSpecificity: "Δ specificità",
+      gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
+        let s = `Onestà-Umiltà generica ${generic}`;
+        if (anchored !== undefined) {
+          s += `, ancorata ${Math.round(anchored)} (Δ specificità ${Math.abs(generic - Math.round(anchored))})`;
+          if (enacted !== undefined) s += `, agita ${Math.round(enacted)} — divario ${Math.abs(Math.round(anchored) - Math.round(enacted))}`;
+        } else if (enacted !== undefined) {
+          s += `, agita ${Math.round(enacted)} (nessun punteggio ancorato ancora)`;
+        }
+        return s;
+      },
     },
     about: {
       metaTitle: "Riguardo a LLM Personality Board — Perché Testare la Personalità dell'IA",

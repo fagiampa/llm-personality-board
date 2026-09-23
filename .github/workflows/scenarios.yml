@@ -1,0 +1,47 @@
+name: Validate scenarios & items
+
+on:
+  pull_request:
+    paths:
+      - "scenarios/**"
+      - "items/report-fidelity/**"
+      - "lib/scenarios.mjs"
+      - "lib/probeConfig.mjs"
+      - "lib/l3Scenarios.mjs"
+      - "lib/probeL3Config.mjs"
+      - "lib/l3Environment.mjs"
+      - "lib/l3Judge.mjs"
+      - "lib/declaredItems.mjs"
+      - "lib/declaredConfig.mjs"
+      - "tests/**"
+  push:
+    branches: [master]
+    paths:
+      - "scenarios/**"
+      - "items/report-fidelity/**"
+      - "lib/scenarios.mjs"
+      - "lib/probeConfig.mjs"
+      - "lib/l3Scenarios.mjs"
+      - "lib/probeL3Config.mjs"
+      - "lib/l3Environment.mjs"
+      - "lib/l3Judge.mjs"
+      - "lib/declaredItems.mjs"
+      - "lib/declaredConfig.mjs"
+      - "tests/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Runs the whole tests/ directory (npm test), not just one file — a
+      # hardcoded single-file `node --test tests/scenarios.test.mjs` here is
+      # exactly what let tests/l3-scenarios.test.mjs go unenforced in CI
+      # despite CLAUDE.md's stated contract that a scenario contribution is
+      # gated by "a CI test validating the rules above" (found in code
+      # review, 2026-09-21, before an invalid L3 scenario ever merged).
+      # Same reasoning covers tests/declared-items.test.mjs for RF-v1.
+      - run: npm test

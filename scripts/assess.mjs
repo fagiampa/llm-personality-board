@@ -22,14 +22,19 @@
 import { readFile, mkdir } from "node:fs/promises";
 import { createWriteStream } from "node:fs";
 import path from "node:path";
-import Anthropic from "@anthropic-ai/sdk";
-import OpenAI from "openai";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getLatest, upsertAssessment } from "../lib/db.mjs";
 import {
   ASSESS_REPEATS as REPEATS,
   ASSESS_MIN_SUCCESS_RATIO as MIN_SUCCESS_RATIO,
 } from "../lib/assessConfig.mjs";
+import {
+  MODEL_CONFIG,
+  CLIENT_FACTORIES,
+  DELAY_MS_BY_PROVIDER,
+  withRetries,
+  displayModelVersion,
+  sleep,
+} from "../lib/providers.mjs";
 
 const ITEMS_PATH = "items/sample/json/items.sample.json";
 const BATCH_SIZE = Number(process.env.ASSESS_BATCH_SIZE ?? 40);
@@ -49,17 +54,6 @@ const DOMAIN_LABELS = {
   C: "Conscientiousness",
   O: "Openness",
 };
-
-// Which of the mock models to actually (re)assess, and with what provider.
-// A model here without a matching API key in .env falls back to keeping its
-// existing entry in data/mock-scores.json untouched (see main()).
-const MODEL_CONFIG = [
-  { name: "ChatGPT", provider: "openai", model: process.env.OPENAI_MODEL ?? "gpt-4o-mini" },
-  { name: "Gemini", provider: "google", model: process.env.GOOGLE_MODEL ?? "gemini-3.5-flash-lite" },
-  { name: "Claude", provider: "anthropic", model: process.env.ANTHROPIC_MODEL ?? "claude-haiku-4-5" },
-  { name: "Grok", provider: "xai", model: process.env.GROK_MODEL ?? "grok-4.6" },
-  { name: "DeepSeek", provider: "deepseek", model: process.env.DEEPSEEK_MODEL ?? "deepseek-chat" },
-];
 
 const BATCH_SYSTEM_PROMPT =
   "You are completing a personality self-assessment about yourself. " +
@@ -147,195 +141,13 @@ function maxTokensForBatch(batchSize) {
   return Math.max(1000, batchSize * 60);
 }
 
-// --- Provider clients -------------------------------------------------
-// Each factory returns callBatch(promptText, model, systemPrompt?) => raw
-// response text. systemPrompt defaults to BATCH_SYSTEM_PROMPT (the rating
-// task); the end-of-run self-interpretation call passes its own instead.
-
-// The OpenAI SDK silently falls back to OPENAI_API_KEY when the `apiKey` you
-// pass it is undefined — so an unset DEEPSEEK_API_KEY/GROK_API_KEY doesn't
-// fail loudly, it quietly sends your OpenAI key to a different provider's
-// endpoint, which then rejects it with a confusing "invalid key" 401 that
-// gives no hint the real problem is a missing env var. Fail fast instead.
-function requireEnv(name) {
-  const value = process.env[name];
-  if (!value) throw new Error(`${name} is not set in .env`);
-  return value;
-}
-
-function makeAnthropicClient() {
-  const client = new Anthropic();
-  return async (promptText, model, systemPrompt = BATCH_SYSTEM_PROMPT) => {
-    const resp = await client.messages.create({
-      model,
-      max_tokens: maxTokensForBatch(BATCH_SIZE),
-      temperature: 1,
-      system: systemPrompt,
-      messages: [{ role: "user", content: promptText }],
-    });
-    const block = resp.content.find((b) => b.type === "text");
-    return {
-      text: block?.text ?? "",
-      usage: { inputTokens: resp.usage?.input_tokens ?? 0, outputTokens: resp.usage?.output_tokens ?? 0 },
-    };
-  };
-}
-
-// o1/o3/o4/gpt-5-family "reasoning" models spend part of max_completion_tokens
-// on hidden reasoning tokens before writing any visible output — on a bulk
-// rating task like this, that reasoning is pure overhead and was eating the
-// entire budget, leaving empty/near-empty responses (hence near-total
-// missing/unparseable items). reasoning_effort:"none" tells the model to
-// skip it entirely. Only send it for models that actually support it —
-// non-reasoning models (gpt-4o-mini, etc.) reject unknown parameters.
-// NOTE: the accepted value set is inconsistent across gpt-5.x sub-versions —
-// "minimal" (valid on gpt-5) got rejected by gpt-5.2 with a 400 listing
-// 'none'|'low'|'medium'|'high'|'xhigh' as the only options. If OPENAI_MODEL
-// moves to yet another sub-version and this starts 400-ing again, check the
-// error message for that model's actual accepted list.
-function isReasoningModel(model) {
-  return /^(o1|o3|o4|gpt-5)/i.test(model);
-}
-
-function usageFromChatCompletion(resp) {
-  return { inputTokens: resp.usage?.prompt_tokens ?? 0, outputTokens: resp.usage?.completion_tokens ?? 0 };
-}
-
-function makeOpenAIClient() {
-  const client = new OpenAI();
-  return async (promptText, model, systemPrompt = BATCH_SYSTEM_PROMPT) => {
-    const resp = await client.chat.completions.create({
-      model,
-      temperature: 1,
-      max_completion_tokens: maxTokensForBatch(BATCH_SIZE),
-      ...(isReasoningModel(model) ? { reasoning_effort: "none" } : {}),
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: promptText },
-      ],
-    });
-    return { text: resp.choices[0]?.message?.content ?? "", usage: usageFromChatCompletion(resp) };
-  };
-}
-
-// xAI's Grok API is OpenAI-compatible (same Chat Completions request/response
-// shape), just a different base URL/key and its own model lineup — reuse the
-// OpenAI SDK instead of adding another dependency. grok-4.6 defaults to
-// reasoning_effort "high", which is exactly what caused the gpt-5 disaster
-// (reasoning tokens eating the whole batch's token budget before any visible
-// output); start it at "low" instead. Older grok-4 doesn't support tuning
-// reasoning effort at all and will reject this field — if you point
-// GROK_MODEL at one of those, drop this option.
-function makeXaiClient() {
-  const client = new OpenAI({ apiKey: requireEnv("GROK_API_KEY"), baseURL: "https://api.x.ai/v1" });
-  return async (promptText, model, systemPrompt = BATCH_SYSTEM_PROMPT) => {
-    const resp = await client.chat.completions.create({
-      model,
-      temperature: 1,
-      max_completion_tokens: maxTokensForBatch(BATCH_SIZE),
-      reasoning_effort: "low",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: promptText },
-      ],
-    });
-    return { text: resp.choices[0]?.message?.content ?? "", usage: usageFromChatCompletion(resp) };
-  };
-}
-
-// DeepSeek's API is also OpenAI-compatible. Default model is "deepseek-chat"
-// (non-reasoning) specifically to sidestep the gpt-5/Grok reasoning-budget
-// trap by construction — there's no reliably documented reasoning_effort
-// equivalent for DeepSeek to dial down, so if you switch DEEPSEEK_MODEL to
-// "deepseek-reasoner" watch for the same empty/truncated-response symptoms
-// (see isReasoningModel's comment above) and be ready to raise
-// maxTokensForBatch or otherwise budget for hidden reasoning tokens.
-function makeDeepSeekClient() {
-  const client = new OpenAI({ apiKey: requireEnv("DEEPSEEK_API_KEY"), baseURL: "https://api.deepseek.com/v1" });
-  return async (promptText, model, systemPrompt = BATCH_SYSTEM_PROMPT) => {
-    const resp = await client.chat.completions.create({
-      model,
-      temperature: 1,
-      max_completion_tokens: maxTokensForBatch(BATCH_SIZE),
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: promptText },
-      ],
-    });
-    return { text: resp.choices[0]?.message?.content ?? "", usage: usageFromChatCompletion(resp) };
-  };
-}
-
-function makeGoogleClient() {
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-  return async (promptText, model, systemPrompt = BATCH_SYSTEM_PROMPT) => {
-    const generativeModel = genAI.getGenerativeModel({ model, systemInstruction: systemPrompt });
-    const result = await generativeModel.generateContent({
-      contents: [{ role: "user", parts: [{ text: promptText }] }],
-      // gemini-3.x "thinking" models can spend part of maxOutputTokens on
-      // internal reasoning before the visible answer; thinkingConfig.thinkingBudget:0
-      // is rejected (400) on the models tested, so just leave generous headroom instead.
-      generationConfig: { temperature: 1, maxOutputTokens: maxTokensForBatch(BATCH_SIZE) + 1024 },
-    });
-    const usageMeta = result.response.usageMetadata;
-    return {
-      text: result.response.text(),
-      usage: { inputTokens: usageMeta?.promptTokenCount ?? 0, outputTokens: usageMeta?.candidatesTokenCount ?? 0 },
-    };
-  };
-}
-
-const CLIENT_FACTORIES = {
-  anthropic: makeAnthropicClient,
-  openai: makeOpenAIClient,
-  google: makeGoogleClient,
-  xai: makeXaiClient,
-  deepseek: makeDeepSeekClient,
-};
-
 // --- Assessment ---------------------------------------------------------
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+async function callBatchWithRetries(callBatch, promptText, model, label, systemPrompt = BATCH_SYSTEM_PROMPT) {
+  return withRetries(() => callBatch(promptText, model, { systemPrompt, maxTokens: maxTokensForBatch(BATCH_SIZE) }), {
+    label,
+  });
 }
-
-// Transient provider hiccups (rate limits, "currently overloaded"/"high
-// demand" 503s) are common enough under batching that dropping the whole
-// batch on the first failure loses a meaningful chunk of the run. Retry
-// those specifically, with backoff; anything else (bad API key, malformed
-// request, etc.) fails immediately since retrying it would just waste time.
-function isTransientError(err) {
-  const msg = String(err?.message ?? err);
-  return /\b(429|503)\b/.test(msg) || /overloaded|high demand|service unavailable|rate limit/i.test(msg);
-}
-
-async function callBatchWithRetries(callBatch, promptText, model, label, systemPrompt) {
-  const attempts = 3;
-  for (let i = 0; i < attempts; i++) {
-    try {
-      return await callBatch(promptText, model, systemPrompt);
-    } catch (err) {
-      const isLastAttempt = i === attempts - 1;
-      if (!isTransientError(err) || isLastAttempt) throw err;
-      const backoffMs = 2000 * 2 ** i;
-      console.warn(`  ${label}: transient error (${err.message}), retrying in ${Math.round(backoffMs / 1000)}s...`);
-      await sleep(backoffMs);
-    }
-  }
-}
-
-// Free tiers rate-limit per minute (e.g. Gemini's default flash-lite quota
-// is 15 req/min); pace calls per-provider so a run doesn't blow through the
-// quota partway in. Now that each call covers a whole batch instead of one
-// item, this matters much less in practice (REPEATS * 240/BATCH_SIZE calls
-// total per model), but the pacing stays as a safety margin. 0 = no throttling.
-const DELAY_MS_BY_PROVIDER = {
-  google: Number(process.env.GOOGLE_DELAY_MS ?? 0),
-  openai: Number(process.env.OPENAI_DELAY_MS ?? 0),
-  anthropic: Number(process.env.ANTHROPIC_DELAY_MS ?? 0),
-  xai: Number(process.env.GROK_DELAY_MS ?? 0),
-  deepseek: Number(process.env.DEEPSEEK_DELAY_MS ?? 0),
-};
 
 async function assessModel(config, items, callBatch) {
   // domain -> array of 0-100 scores, one per (item, repeat)
@@ -503,16 +315,6 @@ async function translateToItalian(config, englishText, callBatch) {
     console.warn(`  [${config.name}] one-liner translation failed, keeping previous oneLinerIt — ${err.message}`);
     return { text: null, usage: noUsage };
   }
-}
-
-// Some provider model ids carry a trailing release-date stamp
-// (e.g. "claude-opus-4-5-20251101") that's needed to call the API but is
-// dead weight once shown in the per-card version combo — it doesn't add
-// information over the "4-5" already in the name and just makes the combo
-// wider. Stripped only for what's stored/displayed (model_version); the
-// real dated id (config.model) is always what's actually sent to the API.
-function displayModelVersion(model) {
-  return model.replace(/-\d{8}$/, "");
 }
 
 // Mirrors everything printed via console.log/warn/error to a file for the

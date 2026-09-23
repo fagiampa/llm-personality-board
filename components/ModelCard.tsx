@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ModelScore } from "@/lib/hexaco";
+import { ModelScore, ProbeScore, L3ProbeScore, AnchoredScore } from "@/lib/hexaco";
 import { useLocale } from "@/lib/i18n/context";
 import { dateLocale, Locale } from "@/lib/i18n/locale";
 import { dict } from "@/lib/i18n/dictionaries";
 import { RadarChart } from "./RadarChart";
+import { GapColumn } from "./GapColumn";
 import styles from "./ModelCard.module.css";
 
 export interface VersionOption {
@@ -179,6 +180,12 @@ function VersionCombo({ options, currentKey, hue, disabled, ariaLabel, onOpen, o
 
 interface ModelCardProps {
   model: ModelScore;
+  /** The L2 (control) probe's enacted score for this same model_version, if one has been run yet — a model can have a declared profile with no enacted one. */
+  probe?: ProbeScore;
+  /** The L3 (primary) probe's enacted score for this same model_version. Wins over `probe` when both exist — see the note below the props. */
+  l3Probe?: L3ProbeScore;
+  /** The declared side's anchored score (RF-v1, docs/declared-spec.md) for this same model_version, if administered yet. */
+  anchored?: AnchoredScore;
   /** Available (model, timestamp) versions for the combo; undefined while not yet loaded. */
   versions?: VersionOption[];
   selectedKey?: string;
@@ -190,6 +197,9 @@ interface ModelCardProps {
 
 export function ModelCard({
   model,
+  probe,
+  l3Probe,
+  anchored,
   versions,
   selectedKey,
   isLoadingVersion,
@@ -198,6 +208,18 @@ export function ModelCard({
 }: ModelCardProps) {
   const locale = useLocale();
   const t = dict(locale);
+
+  // One card, one gap column (CLAUDE.md, "Model cards and the shared
+  // scale") — when a model has both probes' data, L3 wins: it's the primary
+  // probe (docs/probe-l3-spec.md), L2 is only a control, and L3's enacted
+  // score is report fidelity about real agentic work rather than omission
+  // under a one-shot pressure clause.
+  const enacted = l3Probe?.enacted ?? probe?.enacted;
+  // The three-level record (docs/declared-spec.md): generic always exists
+  // (it's the existing HEXACO H score), anchored/enacted may not yet.
+  // GapColumn itself enforces the one rule that must never bend — no
+  // segment drawn straight from generic to enacted.
+  const generic = model.scores[0];
 
   // Badge reflects recency, not provenance: whichever version ranks highest
   // for this model is "live", every other one is "Archived" — regardless of
@@ -237,12 +259,45 @@ export function ModelCard({
 
       <div className={styles.oneLiner}>{oneLiner}</div>
 
-      <RadarChart
-        scores={model.scores}
-        hue={model.hue}
-        margin={model.margin}
-        className={styles.radar}
-      />
+      <div className={styles.radarRow}>
+        <RadarChart
+          scores={model.scores}
+          hue={model.hue}
+          margin={model.margin}
+          className={styles.radar}
+        />
+        {(anchored !== undefined || enacted !== undefined) && (
+          <GapColumn
+            generic={generic}
+            anchored={anchored?.anchored}
+            enacted={enacted}
+            hue={model.hue}
+            className={styles.gapColumn}
+            ariaLabel={t.card.gapAriaLabel(generic, anchored?.anchored, enacted)}
+          />
+        )}
+      </div>
+
+      {(anchored !== undefined || enacted !== undefined) && (
+        <div className={styles.gapLegend}>
+          <span className={styles.gapLegendItem}>
+            <span className={styles.gapLegendDot} style={{ background: `oklch(55% 0.14 ${model.hue})` }} />
+            {t.card.generic}
+          </span>
+          {anchored !== undefined && (
+            <span className={styles.gapLegendItem}>
+              <span className={styles.gapLegendDot} style={{ background: `oklch(75% 0.13 ${model.hue})` }} />
+              {t.card.anchored}
+            </span>
+          )}
+          {enacted !== undefined && (
+            <span className={styles.gapLegendItem}>
+              <span className={styles.gapLegendDot} style={{ background: `oklch(35% 0.15 ${model.hue})` }} />
+              {t.card.enacted}
+            </span>
+          )}
+        </div>
+      )}
 
       {onSelectVersion ? (
         <VersionCombo

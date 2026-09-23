@@ -14,7 +14,7 @@ import styles from "./page.module.css";
 // single DB read (see getHomeData). Switching versions afterwards happens
 // client-side (see ModelGrid) without re-hitting this route.
 export default async function Home() {
-  const { models, versionsByModel } = await getHomeData();
+  const { models, versionsByModel, probeByModel, l3ProbeByModel, anchoredByModel } = await getHomeData();
   const t = dict(resolveLocale(headers().get("accept-language"))).home;
 
   return (
@@ -44,7 +44,13 @@ export default async function Home() {
         </div>
       </div>
 
-      <ModelGrid initialModels={models} initialVersions={versionsByModel} />
+      <ModelGrid
+        initialModels={models}
+        initialVersions={versionsByModel}
+        initialProbes={probeByModel}
+        initialL3Probes={l3ProbeByModel}
+        initialAnchored={anchoredByModel}
+      />
 
       <footer className={styles.footer}>
         <a href={GITHUB_URL} target="_blank" rel="noreferrer" className={styles.githubLink}>

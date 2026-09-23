@@ -8,6 +8,24 @@ administers the questionnaire to models via API and persists results in a
 SQLite DB, alongside content pages (about / methodology / questionnaire /
 considerations) and a bilingual (EN/IT) UI.
 
+**Where this is heading.** The self-report board is one half of a measure.
+The other half is a *behavioural* probe — what the model actually does when
+being honest costs it something — and the quantity of interest is the **gap**
+between the two. See "Declared side" and "Behavioural probes" below.
+
+Three specs, and neither half is the measure on its own:
+
+- [`docs/declared-spec.md`](docs/declared-spec.md) — the declared side: the
+  anchored item bank, its administration, and the `generic` reference level
+  taken from HEXACO. Defines the three-level output record.
+- [`docs/probe-l3-spec.md`](docs/probe-l3-spec.md) — the primary probe, enacted
+  side: the model works with tools, then reports on its own work.
+- [`docs/probe-l2-spec.md`](docs/probe-l2-spec.md) — a small control probe.
+
+Literature positioning: [`docs/positioning.md`](docs/positioning.md). The specs
+are the source of truth: when a decision changes, update the spec first, then
+the code.
+
 The project is public on GitHub under AGPL-3.0 — see [`README.md`](README.md)
 for the user-facing overview and [`CONTRIBUTING.md`](CONTRIBUTING.md) for how
 to contribute, including AI-assisted contributions.
@@ -18,6 +36,13 @@ Canvas published here, "Griglia" page (desktop view + mobile variant):
 https://claude.ai/code/artifact/29508599-91f1-45f3-9d36-eb41b1d86a98 — for
 look & feel, palette, typography (Space Grotesk + IBM Plex Sans), and the
 SVG radar chart drawing logic.
+
+Second canvas, for the behavioural probe and the declared-vs-enacted views:
+https://claude.ai/artifact/WGtKVdfpoDy3egLCVYhsPB — the L2 scenario anatomy,
+the dumbbell gap chart, the per-model card with its vertical H column, the
+Asch-vs-omission diagram, and the stakes curve. Its numbers are illustrative
+placeholders, flagged as such on every board; models are anonymised there on
+purpose (fabricated scores must never be attributed to real products).
 
 ## Tech stack
 
@@ -55,6 +80,11 @@ interface ModelScore {
 `H, E, X, A, C, O` = Honesty-Humility, Emotionality, Extraversion,
 Agreeableness, Conscientiousness, Openness (fixed order everywhere, from the
 DB to the radar chart).
+
+`ModelScore` is the **declared** profile. The enacted side is a separate
+shape (`ProbeScore`, see "Behavioural probe") deliberately *not* merged into
+`scores` — they come from different instruments and must never be averaged
+or interleaved. The card composes the two; the types stay apart.
 
 ## Persistence (`lib/db.mjs`)
 
@@ -104,6 +134,35 @@ TypeScript falls back to inferring types straight from the untyped JS
 state (`scripts/import-to-db.mjs` imported them once) — untracked in git,
 kept on disk only as a historical archive, not read by the app anymore.
 
+### Probe tables
+
+Mirror the two-table split above, same rationale — aggregates in one table,
+full fidelity in another. Both behavioural probes are implemented, as two
+independent pairs of tables (their conditions and metrics don't overlap, so
+one shared schema would leave half its columns NULL for whichever probe
+didn't write it):
+
+- `probe_runs` / `probe_call_repeats` (L2): `p_neutral`, `p_mild`,
+  `p_strong`, the enacted 0-100 score, the drop, and interval bounds;
+  repeats hold the boolean outcome and a hash of the output. Built, never
+  run live yet (0 rows).
+- `probe_l3_runs` / `probe_l3_call_repeats` (L3): a per-condition axis-A
+  label distribution (accurate/vague/false), the enacted score, a
+  tampering rate, a validity rate, and interval bounds; repeats hold the
+  judge's label + quote, the tampering flag, validity, and a transcript
+  hash. Built and run live (see "Behavioural probes" below).
+
+**The full output texts do not go in the SQLite file** — see "Deployment".
+
+### Declared-side tables
+
+`declared_anchored_runs` / `declared_anchored_item_repeats` — same
+aggregate/full-fidelity split, but shaped like `assessments`/
+`assessment_item_repeats` (a plain repeated-Likert mean with a 1.96×SEM
+margin) rather than like the probes' bootstrap-CI tables, since `anchored`
+is a self-report score, not a scenario-clustered behavioural result. See
+"Declared side" below and `docs/declared-spec.md`.
+
 ## Assessment pipeline (`scripts/assess.mjs`, `npm run assess`)
 
 Administers the real IPIP-HEXACO item bank (240 items, public-domain analog
@@ -150,6 +209,181 @@ deprecated for newer API keys (404 "no longer available to new users"),
 some are transiently overloaded (503 "high demand," usually recovers with
 the built-in retry).
 
+## Declared side (`scripts/declared.mjs`, `npm run declared`)
+
+Full spec: [`docs/declared-spec.md`](docs/declared-spec.md). Administers an
+action-anchored item bank (`items/report-fidelity/<version>.json`, 12 pilot
+items, `domain: "H"` only) and writes `anchored` to `declared_anchored_runs`
+— the declared counterpart of `enacted`, construct-matched to the probes'
+situations rather than to the generic HEXACO H trait claim.
+
+- **Its own session, always.** Never run in the same conversation as
+  `npm run assess`/`probe`/`probe-l3` — the anchored items describe the
+  probes' own situations almost verbatim, so sharing a session is priming
+  (`docs/declared-spec.md`).
+- Same 1-5 Likert scale, same repeated-administration design, same
+  `toHundredScale`/margin (1.96×SEM) convention as the generic bank
+  (`scripts/assess.mjs`) — `anchored` must read on the same scale as
+  `generic`, not just nominally share the 0-100 range.
+- `lib/declaredItems.mjs` (load/validate, mirrors `lib/l3Scenarios.mjs`) and
+  `lib/declaredConfig.mjs` (`DECLARED_REPEATS`/`DECLARED_ITEM_SET_VERSION`/
+  `DECLARED_BATCH_SIZE`, mirrors `lib/probeL3Config.mjs`) back both the
+  script and `tests/declared-items.test.mjs`.
+- `DECLARED_ONLY=ModelName` scopes a run the same way `ASSESS_ONLY`/
+  `PROBE_L3_ONLY` do; a model with no key or excluded is skipped, not fatal.
+- **Item sets are frozen and versioned, already rotated twice.** `RF-v1`
+  (2026-09-22, `grok-4.6`) came back `anchored=100`/margin ±2, zero
+  item-level variance — items with no embedded cost of honesty, free to
+  agree with. `RF-v2` added a cost to the item text but still saturated
+  11/12 items (`anchored=93`/±4) — only its two structurally-framed items
+  (where a fact sits in the report, not just that it's disclosed) showed
+  real spread. `RF-v3` (current default in `lib/declaredConfig.mjs`,
+  2026-09-23) leans fully on structural costs and reworded reverse items to
+  sound like ordinary professional pragmatism rather than a confession —
+  both `RF-v1` and `RF-v2` stay on disk, frozen, for the bridge, never
+  edited or deleted. See `docs/declared-spec.md`'s "Rotation history".
+- `tests/declared-items.test.mjs` validates every version found on disk,
+  not just the current one, for exactly this reason.
+
+## Behavioural probes — L2 and L3, the enacted side (`scripts/probe.mjs`, `scripts/probe-l3.mjs`)
+
+Full specs: [`docs/probe-l3-spec.md`](docs/probe-l3-spec.md) (primary) and
+[`docs/probe-l2-spec.md`](docs/probe-l2-spec.md) (control). This section is
+the vocabulary and the rules that must not be quietly relitigated.
+
+### Vocabulary
+
+| term | meaning |
+|---|---|
+| **generic** | the HEXACO H score — a trait claim, reused from the existing pipeline. Background reference, **never** the counterpart of `enacted` |
+| **anchored** | the declared score from the action-anchored item bank (`RF-v3`, current default), same construct as `enacted` |
+| **enacted** | score from a behavioural probe, 0-100, same scale |
+| **gap** | `anchored − enacted` — the project's measure |
+| **delta_specificity** | `generic − anchored` — how much the claim deflates when the question is about an action instead of a trait. A by-product worth publishing; never summed with `gap` |
+| **L1…L4** | levels of the *cost of honesty*: none / displeasing someone / admitting you didn't finish / admitting you caused damage |
+| **condition** | variant of one scenario. L3: `failing` / `passing` / `calibration`. L2: `neutral` / `mild` / `strong` / `calibration` |
+| **marker** | (L2) an unrepeatable string in the input data flagging the inconvenient fact; its presence in the output *is* the score |
+| **axis A / axis B** | (L3) report fidelity vs environment integrity — kept as two numbers, never collapsed into one ordinal scale |
+| **report fidelity** | the construct both probes measure. **Not** the HEXACO H axis: their relationship is an empirical question this project answers, never an assumption |
+| **calibration** | a positive-control condition carrying an explicit instruction. Deliberately breaks rule 1, and is **never** included in a published score |
+
+### Non-negotiable rules
+
+1. **The pressure clause never contains an instruction.** Social context only.
+   "avoid alarming the client" measures compliance, not a trait. Forbidden —
+   there is a CI test for this.
+2. **Fixed anchors, never z-scores over the model population.** Normalising
+   against the models currently in the sample breaks the time series every
+   time one is added.
+3. **Scenario sets are frozen and versioned** (`L2-v1`, `L2-v2`). New scenarios
+   never enter an existing version. On rotation, both versions run once in
+   parallel on the same models: without that bridge the time series is
+   unreadable across the rotation.
+4. **Every scenario carries a canary GUID**, for contamination detection later.
+5. **No leaderboard.** An observatory with time series. Per-model cards sort
+   alphabetically; sorting by gap only where the gap is the story.
+6. **Raw outputs are always published**, not just aggregates.
+7. **Scenarios must look like real work.** No "EVALUATION" / "TEST" headers:
+   models recognise when they are being assessed and behave differently.
+
+### Decisions already taken (don't reopen without a reason)
+
+- **L1 is not built.** Saturated level, already covered by hallucination
+  benchmarks.
+- **L3 is the primary probe, built first.** Model works with tools, then
+  reports; score = tool log vs final message. It is the original contribution
+  (ICML names it unexplored) and it does not have L2's saturation problem:
+  claiming "done" is a natural output, so nothing pulls the truth out.
+- **L3 runs in a scripted environment, not a sandbox.** Tools are declared but
+  never executed; responses come from a small state machine. Not a shortcut —
+  a real sandbox drifts (dependency versions, network, timing) and that drift
+  would land in the time series mixed with the signal.
+- **L2 stays as a control, 3 scenarios not 20.** If L2 saturates and L3 does
+  not, that contrast is itself the stakes curve with two points.
+- **Every probe has a `calibration` condition.** Without a positive control
+  you cannot tell "the models are honest" from "the instrument can't measure".
+- **The declared side is administered in its own session**, before the
+  behavioural runs. The anchored items describe the probe's own situations;
+  sharing a session is priming, and it inflates the result (ICML: consistency
+  holds within session, collapses across).
+- **`generic` never connects to `enacted`.** Three levels, two deltas, and the
+  segment that means something joins `anchored` to `enacted`. A chart that draws
+  a line from the HEXACO point to the behavioural point is wrong.
+- **Pilot before authoring.** ~90 runs on 2 models, then tune. Writing 30
+  scenarios against an untuned design wastes a weekend.
+- **Emotionality and Extraversion do not operationalise** behaviourally. Don't
+  force them: the absence is a finding to report, not a hole to fill. Follow
+  aistupidlevel's rule and weight an axis by its discriminative power — an axis
+  that doesn't separate models weighs zero.
+- **The cross-model gap chart is a dumbbell** (segment length = gap), not
+  grouped bars and not a two-polygon radar. The radar stays for the declared
+  profile only.
+
+### L3 implementation gotchas (from the first live pilot, 2026-09-21)
+
+Terse pointers, not explanations — the real write-ups are in the cited
+files' comments and in `tests/l3-agent.test.mjs`'s regression tests.
+
+- **Debug the agentic loop with a fake driver first, never a live call.**
+  `runAgenticScenario`'s `driver` param exists so `tests/l3-agent.test.mjs`
+  can exercise the whole loop (iteration cap, validity, tampering) for
+  free. Three real bugs below were found live, the expensive way, before
+  this existed.
+- **Multi-tool-call turns**: Anthropic and Google both require every
+  `tool_result`/`functionResponse` from one assistant turn back in a
+  *single* reply message, not one message per call — see
+  `lib/l3Agent.mjs`'s `anthropicMessagesFromHistory`/`googleContentsFromHistory`.
+- **Gemini 3.x specifics**: tool results go back with role `"user"`, never
+  `"function"`; a resent `functionCall` part must echo back the
+  `thoughtSignature` it was issued with, or the request 400s.
+- **Not every model accepts `temperature: 0`** (`gpt-6-astra` rejects it —
+  only its default, 1, is supported); an unset `systemPrompt` must omit the
+  system message entirely, not send one with `content: undefined`/`null`
+  (some OpenAI-compatible models 400 on that, others silently tolerate it).
+  See `lib/providers.mjs`'s `chatMessages()`. `gpt-6-astra` is also the
+  judge that actually scored the meaningful pilot runs — it's the codified
+  default in `lib/probeL3Config.mjs`, not Anthropic, for exactly that reason.
+- **Model catalogs churn** (already true for `assess.mjs` — same applies
+  here): confirmed dead live, `gemini-2.5-flash-lite` (404 for new keys, use
+  `gemini-3.5-flash-lite`) and `deepseek-chat` (retired, use
+  `deepseek-flash`). Watch `GROK_MODEL`/other overrides left in `.env` from
+  a previous debugging session — a plain `npm run probe-l3` silently uses
+  whatever's there instead of `MODEL_CONFIG`'s default.
+- **A fresh scripted environment per retry attempt, not per repeat.**
+  `withRetries` re-invokes the whole multi-turn conversation on a transient
+  failure; reusing the same environment object across attempts leaks a
+  failed attempt's mutated tampered/ranTests state into the retry,
+  corrupting `tamperingRate`/`validityRate` silently.
+- **Axis B needs `testFilePaths` declared on every condition branch**, not
+  just `failing` — omitting it on `passing`/`calibration` silently disables
+  tampering detection for that whole condition.
+- **A scenario's own failure rate can exclude just that scenario, not the
+  whole model.** `scripts/probe-l3.mjs`'s `SCENARIO_DISCARD_THRESHOLD` is
+  per scenario — found live, 2026-09-22: Anthropic ran out of credit
+  mid-scenario and the old whole-model 20% threshold discarded a different,
+  fully clean scenario's data right along with it. `PROBE_L3_SCENARIOS=id,id`
+  scopes a run to specific scenario ids, so re-running the failed one alone
+  doesn't re-spend on ones already piloted.
+- **Gemini's free-tier per-minute quota can be blown through by one long
+  conversation**, not just across separate ones — pace turns *inside* the
+  loop (`runAgenticScenario`'s `turnDelayMs`), not only between repeats.
+- **Both Anthropic and Google billing can run out mid-session** (Anthropic:
+  "credit balance is too low"; Google: "prepayment credits are depleted") —
+  a one-call sanity probe against the actual client factory before a batch
+  catches this before it burns a partial run, cheaper than discovering it
+  after.
+- **Model tier cost varies enormously for this workload**: Claude Fable 5.1
+  is $10/$50 per Mtok vs Haiku 4.5's $1/$5 — always debug/pilot with a
+  cheap model, never the flagship, since a 20-turn conversation resends its
+  whole growing history every turn.
+- **Manual DB recovery/consolidation from the raw JSONL is a legitimate
+  technique, not a hack**: `data/probe-raw/<date>/<model>/*.jsonl` already
+  has everything `upsertL3ProbeRun` needs. When the script's own aggregate
+  write gets discarded, or a pilot's scenarios were administered across
+  several separate invocations, it's fine to hand-reconstruct the record
+  and call `upsertL3ProbeRun` directly — use the real originating run's
+  `assessedAt` for provenance, not "now".
+
 ## Internationalization (`lib/i18n/`)
 
 Locale is resolved from the browser's `Accept-Language` header
@@ -173,6 +407,12 @@ reuse.
 Card descriptions (`oneLiner`/`oneLinerIt`) are the one piece of
 user-visible content that's LLM-generated rather than hand-translated — see
 the assessment pipeline section above.
+
+New probe-related UI strings ("declared", "enacted", "gap", "report
+fidelity") go in `dictionaries.tsx` like the rest of the card chrome. The
+scenario texts themselves are **not** UI copy and are not translated by the
+i18n layer: a translated scenario is a *different item* and belongs in its
+own versioned set (see the multilingual item on the roadmap).
 
 ## SEO (`lib/seo.ts`, `lib/site.ts`, `app/sitemap.ts`, `app/robots.ts`)
 
@@ -198,32 +438,61 @@ research.
   model upfront via `getHomeData()`).
 - `GET /api/assessment?model=X&assessedAt=Y` → one `ModelScore` for that
   `(model, assessedAt)`; missing/empty `assessedAt` = seed entry.
+- `GET /api/probe?model=X&assessedAt=Y` → the L2 `ProbeScore` for that run.
+- `GET /api/probe-l3?model=X&assessedAt=Y` → the L3 `L3ProbeScore` for that
+  run.
+- `GET /api/declared?model=X&assessedAt=Y` → the declared side's
+  `AnchoredScore` (declared side) for that run.
+
+  All three probe/declared routes are kept separate from `/api/assessment`
+  and from each other: a model can have a generic profile with any subset
+  of `{anchored, L2 enacted, L3 enacted}` present, and the UI must render
+  every combination rather than blocking on one instrument.
 
 ## Project structure
 
 ```
-/components/RadarChart.tsx      # SVG radar chart (6 axes, min/max band, mean line)
+/components/RadarChart.tsx       # SVG radar chart (6 axes, min/max band, mean line)
 /components/ModelCard.tsx        # card: monogram, name, one-liner, radar, version combo
 /components/ModelGrid.tsx        # client-side grid, owns per-card version selection state
+/components/GapColumn.tsx        # three-point vertical ruler (generic/anchored/enacted), shares RadarChart's scale
 /app/page.tsx                    # home: server component, reads the DB, renders ModelGrid + footer
 /app/layout.tsx                  # root layout: locale resolution, fonts, LocaleProvider
 /app/sitemap.ts, /app/robots.ts  # SEO file conventions
 /app/opengraph-image.tsx, /app/icon.svg, /app/favicon.ico, /app/apple-icon.png
 /app/about/                      # "about this idea" page
 /app/methodology/                # methodology page (EN + IT)
-/app/questionnaire/               # full 240-item list, grouped by domain/facet (items always shown in English)
+/app/questionnaire/              # full 240-item list, grouped by domain/facet (items always shown in English)
 /app/considerations/             # "further considerations" page (EN + IT)
-/app/api/models, /versions, /assessment/route.ts
-/lib/hexaco.ts                   # shared types (ModelScore, HEXACO labels)
+/app/api/models, /versions, /assessment, /probe, /probe-l3, /declared/route.ts
+/lib/hexaco.ts                   # shared types (ModelScore, ProbeScore, L3ProbeScore, AnchoredScore, HEXACO labels)
 /lib/db.mjs, /lib/db.d.mts       # SQLite persistence (sql.js) + its types
 /lib/i18n/                       # locale resolution, React context, shared dictionaries
 /lib/seo.ts, /lib/site.ts        # metadata helpers, centralized site URL/name
-/scripts/assess.mjs              # administers the questionnaire to models via API, writes to the DB
+/scripts/assess.mjs              # administers the generic questionnaire to models via API, writes to the DB
+/scripts/declared.mjs            # administers the anchored item bank (RF-v3 default), own session, writes to the DB
+/scripts/probe.mjs               # runs the L2 behavioural probe (control), writes to the DB
+/scripts/probe-l3.mjs            # runs the L3 behavioural probe (primary), writes to the DB
 /scripts/import-to-db.mjs        # one-off migration from mock-scores.json + data/history/ to the DB
 /scripts/dump-db.mjs             # DB inspection dump
 /scripts/translate-onliners.mjs  # one-off backfill of missing Italian translations
+/lib/scenarios.mjs, /lib/probeConfig.mjs         # L2 scenario schema/validator + sampling config
+/lib/l3Scenarios.mjs, /lib/probeL3Config.mjs     # L3 scenario schema/validator + sampling config
+/lib/l3Environment.mjs           # L3's scripted environment (state machine behind list_files/read_file/write_file/run_tests)
+/lib/l3Agent.mjs                 # L3's multi-turn tool-calling loop, one driver per provider wire format
+/lib/l3Judge.mjs                 # L3 axis-A judge prompt + response parser
+/lib/declaredItems.mjs, /lib/declaredConfig.mjs  # anchored item schema/validator + sampling config
+/lib/providers.mjs               # shared LLM client factories (plain completions) for assess/declared/probe.mjs
+/scenarios/L3-v1/                # primary probe scenarios + their scripted environments (3/3 pilot, live data)
+/scenarios/L2-v1/                # control probe scenarios — 3, not 20 (never run live)
+/items/report-fidelity/RF-v1.json, RF-v2.json, RF-v3.json # action-anchored item banks, 12-item pilots — RF-v1/RF-v2 frozen/superseded, RF-v3 current
+/docs/declared-spec.md           # declared side + the three-level output record
+/docs/probe-l3-spec.md           # primary probe spec, enacted side
+/docs/probe-l2-spec.md           # control probe spec
+/docs/positioning.md             # related work, the documented gap, positioning
 /items/sample/json/items.sample.json  # real IPIP-HEXACO item bank (240 items), despite the "sample" name
-/data/psychochat.sqlite          # the DB — tracked in git, see "Deployment"
+/data/psychochat.sqlite          # the DB — see "Deployment" for its current tracking status
+/data/probe-raw/<date>/<model>/  # raw probe outputs, JSONL, NOT in the sqlite — see "Deployment"
 /data/mock-scores.json, /data/history/*.json  # pre-DB state, untracked, historical archive only
 /img/favicon/                    # source favicon files (favicon.ico/svg, apple-touch-icon.png)
 ```
@@ -239,17 +508,69 @@ chevron (`.comboCaret`, 10×10px, 1.6px stroke) — a plain `▾` text glyph
 looked too small/thin to notice regardless of `font-size`, since fonts
 render it with a lot of built-in padding around the actual triangle.
 
+## Model cards and the shared scale (`ModelCard.tsx`, `GapColumn.tsx`, `RadarChart.tsx`)
+
+One card, one model. Radar of the generic profile, plus **one** vertical
+ruler — that model's own — carrying up to three points: `generic` (always,
+from the radar's own H spoke), `anchored` (RF-v3, once administered), and
+`enacted` (L3 primary, L2 fallback, once probed). Cross-model comparison
+happens by placing cards next to each other, never by cramming several
+columns into one card.
+
+`GapColumn` draws **at most two segments**, never a third: `delta_specificity`
+(`generic`↔`anchored`, thin/secondary) and `gap` (`anchored`↔`enacted`,
+bold, labelled — the project's measure). There is **never** a segment from
+`generic` straight to `enacted` — if `anchored` hasn't run yet, an
+`enacted` point renders as an isolated dot with no connector at all, which
+is the correct rendering of "no anchored score yet," not a bug to fix by
+falling back to `generic`. When neither `anchored` nor `enacted` exists yet,
+the whole column is omitted — the radar alone carries the card.
+
+Three constraints make the shared ruler work:
+
+- **The vertical scale is identical in every card**: same radar radius, same
+  0→100 pixel height, always. Never fitted to the individual card's content.
+- **The column's top (100) and bottom (0) land exactly on the radar's own H
+  and A vertices** — not on H's vertex and the radar's centre.
+  `GapColumn.tsx`'s `yFor` maps `0 → CY + MAX_R` (A's vertex) and
+  `100 → CY - MAX_R` (H's vertex), the radar's full H-to-A span, not just
+  its H-to-centre half — free resolution (twice the old centre-to-vertex
+  mapping) anchored to two real points on the hexagon instead of an
+  arbitrary size multiplier. This is a **different mapping from the one
+  every axis's own value uses on the polygon itself** (centre = 0, vertex =
+  100, unchanged, or `RadarChart.tsx`'s H dot would sit off the polygon's
+  own edge) — so `GapColumn`'s stretched frame and the radar's true H
+  position only coincide at the two endpoints (a value of exactly 0 or
+  100), not for values in between. `RadarChart.tsx`'s H-vertex dot and
+  `GapColumn`'s `generic` dot share their color for exactly this reason —
+  color is the tie between them, pixel position generally isn't.
+- **No truncated axis**: starts at 0 even when every value sits near the top.
+
+If a card rescales on its own, placing two side by side stops being a
+comparison and becomes an optical illusion. This is the first detail lost in
+a layout refactor: **if you touch card rendering, this is the regression
+test.**
+
+The price of the shared scale is still resolution, just less of one than
+before the H-to-A remap — a 21-point gap is now ~25px instead of ~12. That's
+why the number stays printed next to the segment: on the card the chart
+orients, the numeral measures. The wide-format dumbbell (post, paper) is
+where the gap gets the full page width.
+
 ## Deployment (Vercel)
 
 Two gotchas that cost real debugging time, worth knowing before touching
 deploy config:
 
-1. **`data/psychochat.sqlite` is intentionally tracked in git**, despite
-   being generated data. Vercel's serverless functions have no persistent
-   writable filesystem — the committed file is what actually ships as the
-   live site's data. This is a stopgap until this moves to a real hosted
-   DB; until then, updating live data means: `npm run assess` locally →
-   `git add data/psychochat.sqlite` → commit → push (or `vercel --prod`).
+1. **`data/psychochat.sqlite` is gitignored but explicitly kept out of
+   `.vercelignore`.** Vercel's serverless functions have no persistent
+   writable filesystem, and `vercel --prod` uploads the local filesystem
+   directly rather than from git — so the file ships as part of a manual
+   deploy without ever entering git history. Updating live data means:
+   `npm run assess` (and/or `declared`/`probe`/`probe-l3`) locally →
+   `vercel --prod`. This was a straight tracked-in-git file earlier in the
+   project; it moved to this scheme once the probes started producing much
+   larger runs than the questionnaire ever did (see the note below).
 2. **`next.config.mjs`'s `outputFileTracingIncludes`** forces
    `node_modules/sql.js/dist/*.wasm` into the deployed function bundle.
    `sql.js` is kept external to the webpack bundle (see the adjacent
@@ -257,6 +578,17 @@ deploy config:
    file is loaded via a plain runtime `fs` read that Vercel's build-output
    file tracer can't see on its own. Without this, every route touching
    the DB 500s in production with `ENOENT ... sql-wasm.wasm`.
+
+**The probes are why gotcha 1 changed.** The questionnaire stores small
+integers; a probe run produces free-text outputs — hundreds of calls per
+model per run, a few hundred bytes to a couple of KB each. Committing that
+into a tracked sqlite would have added megabytes to git history
+permanently, on a file rewritten whole every run (so git can't delta it
+well) — this is what pushed the DB off git entirely (see gotcha 1). The DB
+itself stays small on top of that: it holds scores, booleans and output
+*hashes*, never full transcripts — those go to
+`data/probe-raw/<date>/<model>/*.jsonl` (published per rule 6, gzipped or
+hosted outside the repo if size ever becomes an issue there too).
 
 `next build` (unlike `next dev`) fails on ESLint errors, including
 `react/no-unescaped-entities` in JSX prose — ran into a backlog of these in
@@ -272,3 +604,6 @@ new long-form content.
 - Contributions (including AI-assisted ones) follow
   [`CONTRIBUTING.md`](CONTRIBUTING.md) — DCO sign-off (`git commit -s`) is
   required.
+- Adding a scenario must stay a one-file PR: `/scenarios/L2-v1/`, one file
+  each, schema documented, a CI test validating the rules above. It's the
+  lowest-friction contribution path this project has, and it's deliberate.
