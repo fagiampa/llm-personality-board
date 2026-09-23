@@ -515,7 +515,9 @@ research.
 /docs/positioning.md             # related work, the documented gap, positioning
 /items/sample/json/items.sample.json  # real IPIP-HEXACO item bank (240 items), despite the "sample" name
 /data/psychochat.sqlite          # the DB — see "Deployment" for its current tracking status
-/data/probe-raw/<date>/<model>/  # raw probe outputs, JSONL, NOT in the sqlite — see "Deployment"
+/data/probe-raw/<date>/<model>/  # raw probe outputs, JSONL, NOT in the sqlite — tracked in git, see data/README.md
+/data/declared-raw/, /data/assess-raw/  # declared side's raw answers, JSONL, tracked (npm run export-raw for DB-only runs)
+/scripts/export-raw.mjs          # exports declared/assess item answers from the sqlite to JSONL
 /data/mock-scores.json, /data/history/*.json  # pre-DB state, untracked, historical archive only
 /img/favicon/                    # source favicon files (favicon.ico/svg, apple-touch-icon.png)
 ```

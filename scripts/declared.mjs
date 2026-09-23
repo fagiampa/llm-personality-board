@@ -16,6 +16,8 @@
 // key, or excluded via DECLARED_ONLY, doesn't abort the whole run — it's
 // just skipped with a warning.
 
+import { mkdir, appendFile } from "node:fs/promises";
+import path from "node:path";
 import { getLatest, upsertDeclaredAnchoredRun } from "../lib/db.mjs";
 import { reasoningRecord, describeReasoning } from "../lib/reasoningConfig.mjs";
 import { loadDeclaredItems, validateDeclaredItem, validateDeclaredItemSet } from "../lib/declaredItems.mjs";
@@ -120,7 +122,11 @@ async function callBatchWithRetries(callBatch, promptText, model, label) {
   });
 }
 
-async function administerToModel(config, items, callBatch) {
+// Every batch's raw response text is appended to rawLogPath as it arrives
+// (CLAUDE.md, rule 6: raw outputs are always published), with the answers
+// parsed from it — same line shape as scripts/export-raw.mjs's exports of
+// older runs, which only have the parsed answers.
+async function administerToModel(config, items, callBatch, rawLogPath, assessedAt) {
   const scores = []; // 0-100, one per (item, repeat)
   const itemAnswers = new Map(); // item id -> { reverse, answers: [{rep, value}] }
   const delayMs = DELAY_MS_BY_PROVIDER[config.provider] ?? 0;
@@ -144,6 +150,20 @@ async function administerToModel(config, items, callBatch) {
       }
 
       const parsed = parseBatchResponse(result.text, batch);
+      await appendFile(
+        rawLogPath,
+        JSON.stringify({
+          modelVersion: displayModelVersion(config.model),
+          assessedAt,
+          itemSetVersion: DECLARED_ITEM_SET_VERSION,
+          repeatIndex: rep,
+          batchIndex: b,
+          answers: parsed.map(({ item, raw }) => ({ itemId: item.id, reverse: item.reverse, value: raw })),
+          responseText: result.text,
+          reasoning: reasoningRecord(config.model),
+          source: "live",
+        }) + "\n"
+      );
       for (const { item, raw } of parsed) {
         if (raw === null) {
           console.warn(`  [${config.name}] ${item.id} rep ${rep + 1}: missing/unparseable in batch response, skipped`);
@@ -211,7 +231,10 @@ async function main() {
     console.log(`Administering ${DECLARED_ITEM_SET_VERSION} to ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${items.length} items x ${REPEATS} repeats...`);
     try {
       const callBatch = CLIENT_FACTORIES[config.provider]();
-      const { anchored, anchoredMargin, itemMeans, itemRepeats, successRatio } = await administerToModel(config, items, callBatch);
+      const rawDir = path.resolve(`data/declared-raw/${assessedAt.slice(0, 10)}/${config.name}`);
+      await mkdir(rawDir, { recursive: true });
+      const rawLogPath = path.join(rawDir, `${DECLARED_ITEM_SET_VERSION}-${assessedAt.replace(/[:.]/g, "-")}.jsonl`);
+      const { anchored, anchoredMargin, itemMeans, itemRepeats, successRatio } = await administerToModel(config, items, callBatch, rawLogPath, assessedAt);
 
       // Same principle as scripts/probe-l3.mjs's low-yield discard: a run
       // where most calls failed outright isn't a real anchored score, it's

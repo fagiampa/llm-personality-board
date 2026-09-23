@@ -12,6 +12,7 @@
     "probe": "node --env-file=.env scripts/probe.mjs",
     "probe-l3": "node --env-file=.env scripts/probe-l3.mjs",
     "db:import": "node scripts/import-to-db.mjs",
+    "export-raw": "node scripts/export-raw.mjs",
     "translate-onliners": "node --env-file=.env scripts/translate-onliners.mjs",
     "test": "node --test tests/"
   },
