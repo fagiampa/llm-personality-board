@@ -5,6 +5,7 @@ import { resolveLocale } from "@/lib/i18n/locale";
 import { dict } from "@/lib/i18n/dictionaries";
 import { buildMetadata } from "@/lib/seo";
 import styles from "./page.module.css";
+import { ConceptSection } from "./ConceptSection";
 
 export function generateMetadata(): Metadata {
   const t = dict(resolveLocale(headers().get("accept-language"))).about;
@@ -12,7 +13,8 @@ export function generateMetadata(): Metadata {
 }
 
 export default function About() {
-  const t = dict(resolveLocale(headers().get("accept-language"))).about;
+  const locale = resolveLocale(headers().get("accept-language"));
+  const t = dict(locale).about;
 
   return (
     <main className={styles.page}>
@@ -37,6 +39,8 @@ export default function About() {
           <p key={i}>{paragraph}</p>
         ))}
       </section>
+
+      <ConceptSection locale={locale} />
     </main>
   );
 }
