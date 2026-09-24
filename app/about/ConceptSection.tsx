@@ -101,7 +101,8 @@ const TEXT: Record<Locale, Text> = {
     },
     what: {
       heading: "What it measures",
-      exampleLabel: "Real example — grok-4.6, reasoning “low” (not its provider default), 3 scenarios × 5 repeats. Preliminary.",
+      exampleLabel:
+        "Real example — grok-4.6, reasoning “low” (not its provider default), 3 scenarios × 10 repeats. Preliminary. A human check of the judge, run later, found it lenient on this model’s reports: the enacted 59 is probably too high.",
       points: [
         { value: 90, label: "declared, specific", note: "action-anchored items, own session", kind: "specific" },
         { value: 80, label: "declared, general", note: "HEXACO Honesty-Humility — background, not the measure", kind: "generic" },
@@ -217,7 +218,9 @@ const TEXT: Record<Locale, Text> = {
         </>,
         <>
           The numbers are preliminary and stated with their limits: few scenarios, models not all at the same reasoning
-          level (each card says which), and one judge model that is also under test. Every transcript, every answer and
+          level (each card says which), and one judge model that is also under test. The judge was checked against a
+          human rater only after these numbers were first shown: agreement was moderate for the rubric behind them
+          (κ 0.49 on 50 reports) and high for its revision (κ 0.84), which is not yet published. Every transcript, every answer and
           every judge label is published in the repository’s <code>data/</code> folder, so any number here can be
           checked — or disputed.
         </>,
@@ -265,7 +268,7 @@ const TEXT: Record<Locale, Text> = {
     what: {
       heading: "Cosa si misura",
       exampleLabel:
-        "Esempio reale — grok-4.6, ragionamento “low” (non è il default del provider), 3 scenari × 5 ripetizioni. Dati preliminari.",
+        "Esempio reale — grok-4.6, ragionamento “low” (non è il default del provider), 3 scenari × 10 ripetizioni. Dati preliminari. Un controllo umano del giudice, fatto dopo, lo ha trovato indulgente sui report di questo modello: l’agito 59 è probabilmente troppo alto.",
       points: [
         { value: 90, label: "dichiarato specifico", note: "item ancorati a un’azione, sessione separata", kind: "specific" },
         { value: 80, label: "dichiarato generico", note: "HEXACO Onestà-Umiltà — sullo sfondo, non è la misura", kind: "generic" },
@@ -384,7 +387,9 @@ const TEXT: Record<Locale, Text> = {
         </>,
         <>
           I numeri sono preliminari e dichiarati con i loro limiti: pochi scenari, modelli non tutti allo stesso livello di
-          ragionamento (ogni card dice quale), e un modello giudice che è anche fra quelli valutati. Ogni transcript, ogni
+          ragionamento (ogni card dice quale), e un modello giudice che è anche fra quelli valutati. Il giudice è stato
+          confrontato con un valutatore umano solo dopo che questi numeri erano già stati mostrati: accordo moderato con
+          la regola che li ha prodotti (κ 0,49 su 50 report) e alto con la sua revisione (κ 0,84), non ancora pubblicata. Ogni transcript, ogni
           risposta e ogni etichetta del giudice sono pubblicati nella cartella <code>data/</code> del repository, così
           ogni numero qui si può verificare — o contestare.
         </>,
