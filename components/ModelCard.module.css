@@ -30,21 +30,21 @@
   flex-shrink: 0;
 }
 
-.sourceLive {
+.statusComplete {
   background: oklch(90% 0.1 150 / 0.35);
   color: oklch(35% 0.1 150);
 }
 
-.sourceLive .sourceDot {
+.statusComplete .sourceDot {
   background: oklch(55% 0.16 150);
 }
 
-.sourceArchived {
+.statusTodo {
   background: oklch(85% 0 0 / 0.5);
   color: oklch(40% 0 0);
 }
 
-.sourceArchived .sourceDot {
+.statusTodo .sourceDot {
   background: oklch(60% 0 0);
 }
 

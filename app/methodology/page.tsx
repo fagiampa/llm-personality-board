@@ -129,14 +129,13 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         ),
       },
       {
-        title: 'Ongoing re-assessment of "Live" models',
+        title: "What the card badge means",
         body: (
           <p>
-            Versions labeled as current (“live” on the board) get re-administered periodically — the goal is a
-            weekly cadence — even when the model’s version string doesn’t change. The reason: vendors can
-            silently update a model’s behavior behind the same public endpoint/name, with no visible version
-            bump. Repeating the assessment over time on the same nominal version is the only way to notice a
-            behavioral drift that would otherwise stay invisible.
+            A green “complete” badge means that version has had a complete behavioural run: every scenario of the
+            current frozen set. “To do” means it hasn’t yet — it may still have its questionnaire profile. Watching
+            the same version over time, to catch a vendor silently changing a model behind an unchanged name, is
+            worth doing and planned as a project of its own; it is not what the board does today.
           </p>
         ),
       },
@@ -287,15 +286,14 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         ),
       },
       {
-        title: 'Rivalutazione continua dei modelli "Live"',
+        title: "Cosa vuol dire il badge della card",
         body: (
           <p>
-            Le versioni etichettate come correnti (“live” nella board) vengono ri-somministrate periodicamente —
-            l’obiettivo è farlo con cadenza settimanale — anche quando la stringa di versione del modello non
-            cambia. Il motivo: i vendor possono aggiornare silenziosamente il comportamento di un modello dietro
-            lo stesso endpoint/nome pubblico, senza bump di versione visibile. Ripetere l’assessment nel tempo
-            sulla stessa versione nominale è l’unico modo per accorgersi di una deriva comportamentale che
-            altrimenti resterebbe invisibile.
+            Il badge verde “completo” vuol dire che quella versione ha avuto una misura comportamentale completa:
+            tutti gli scenari del set congelato corrente. “Da fare” vuol dire che non l’ha ancora avuta — può
+            comunque avere il suo profilo dal questionario. Seguire la stessa versione nel tempo, per accorgersi di
+            un vendor che cambia un modello di nascosto dietro lo stesso nome, ha senso ed è previsto come progetto
+            a sé; non è quello che la board fa oggi.
           </p>
         ),
       },

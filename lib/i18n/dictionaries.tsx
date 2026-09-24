@@ -20,8 +20,11 @@ export const dictionaries = {
       githubLink: "View source on GitHub",
     },
     card: {
-      live: "live",
-      archived: "Archived",
+      // Badge: has this version had a complete L3 run (every scenario of the
+      // current set)? Not recency — which version shows by default is a
+      // separate thing (ModelScore.isCurrent).
+      complete: "complete",
+      todo: "to do",
       seed: "seed",
       versionAriaLabel: (name: string) => `Version of ${name}`,
       generic: "declared (general)",
@@ -96,8 +99,8 @@ export const dictionaries = {
       githubLink: "Vedi il codice su GitHub",
     },
     card: {
-      live: "attuale",
-      archived: "Archiviata",
+      complete: "completo",
+      todo: "da fare",
       seed: "iniziale",
       versionAriaLabel: (name: string) => `Versione di ${name}`,
       generic: "dichiarato generico",

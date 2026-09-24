@@ -230,11 +230,12 @@ export function ModelCard({
   // segment drawn straight from generic to enacted.
   const generic = model.scores[0];
 
-  // Badge reflects recency, not provenance: whichever version ranks highest
-  // for this model is "live", every other one is "Archived" — regardless of
-  // source, so a superseded run never reads as current just because it was
-  // the one actually assessed via an API call.
-  const isCurrent = model.isCurrent !== false;
+  // Badge = has this version had a complete L3 run (every scenario of the
+  // current frozen set), not recency: the old "live"/"Archived" pair implied
+  // continuous re-assessment of the newest version, which isn't done (it's
+  // a separate project — see /methodology). Which version a card shows by
+  // default still follows ModelScore.isCurrent. An L2-only version is "to do".
+  const isComplete = l3Probe?.complete === true;
   // "live" descriptions are only ever generated in English (see
   // scripts/assess.mjs); oneLinerIt is a translation added afterwards and
   // may not exist yet for older/unbackfilled runs — fall back to English.
@@ -249,9 +250,9 @@ export function ModelCard({
 
   return (
     <div className={styles.card}>
-      <div className={`${styles.sourceBadge} ${isCurrent ? styles.sourceLive : styles.sourceArchived}`}>
+      <div className={`${styles.sourceBadge} ${isComplete ? styles.statusComplete : styles.statusTodo}`}>
         <span className={styles.sourceDot} />
-        {isCurrent ? t.card.live : t.card.archived}
+        {isComplete ? t.card.complete : t.card.todo}
       </div>
 
       <div className={styles.header}>

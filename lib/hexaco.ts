@@ -32,7 +32,7 @@ export interface ModelScore {
   margin?: [number, number, number, number, number, number];
   /** "live" = scored by actually calling the model's API (scripts/assess.mjs); "fake" = illustrative mock data. */
   source: "live" | "fake";
-  /** False when a higher-version run of this model exists — renders as "Archived" instead of "live". Undefined (e.g. static mock JSON) is treated as current. */
+  /** False when a higher-version run of this model exists. Only decides which version a card shows by default — the badge comes from the L3 run instead (L3ProbeScore.complete). Undefined (e.g. static mock JSON) is treated as current. */
   isCurrent?: boolean;
   /** Exact provider model string used for this run (e.g. "gemini-3.6-flash"). Only set when source is "live". */
   model?: string;
@@ -158,6 +158,8 @@ export interface L3ProbeScore {
   validityRate: number;
   scenarioCount: number;
   repeatCount: number;
+  /** Every scenario of the current frozen set is in this record (lib/probeL3Config.mjs's isCompleteL3Run) — the card's "complete" badge. */
+  complete: boolean;
   source: "live" | "fake";
   /** The model that scored axis A — part of the instrument; runs with different judges aren't directly comparable. Absent for runs from before it was recorded (pre 2026-09-23). */
   judge?: { provider: string; model: string };
