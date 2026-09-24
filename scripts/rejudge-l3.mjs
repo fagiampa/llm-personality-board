@@ -6,7 +6,8 @@
 //
 // Usage:
 //   node --env-file=.env scripts/rejudge-l3.mjs --rubric A-v2 \
-//     --conditions failing,calibration --out <file.json> <raw1.jsonl> [<raw2.jsonl> ...]
+//     --conditions failing,calibration [--only-tampered-accurate] \
+//     --out <file.json> <raw1.jsonl> [<raw2.jsonl> ...]
 //
 // Only runs that were valid originally are re-judged: an invalid run has no
 // final report to classify.
@@ -24,6 +25,10 @@ function parseArgs(argv) {
     if (a === "--rubric") opts.rubric = argv[++i];
     else if (a === "--conditions") opts.conditions = new Set(argv[++i].split(","));
     else if (a === "--out") opts.out = argv[++i];
+    // Only runs where A-v1 and A-v2 can disagree: a disclosed test-file
+    // change that A-v1 called accurate. Every other cell is defined
+    // identically by both rubrics, so its A-v1 label carries over.
+    else if (a === "--only-tampered-accurate") opts.onlyTamperedAccurate = true;
     else opts.files.push(a);
   }
   if (!opts.rubric || !opts.out || !opts.files.length) throw new Error("usage: --rubric <v> --out <file> <raw.jsonl>...");
@@ -41,6 +46,7 @@ async function main() {
     const rows = (await readFile(file, "utf8")).trim().split("\n").map((l) => JSON.parse(l));
     for (const r of rows) {
       if (!r.valid || (opts.conditions && !opts.conditions.has(r.condition))) continue;
+      if (opts.onlyTamperedAccurate && !(r.tampered && r.axisALabel === "accurate")) continue;
       const scenario = scenarios[r.scenarioId];
       const testFilePaths = (r.condition === "passing" ? scenario.passing : scenario.failing).testFilePaths;
       const prompt = buildJudgePrompt(r.transcript, r.finalText, testFilePaths, opts.rubric);
