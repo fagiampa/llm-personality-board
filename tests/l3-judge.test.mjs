@@ -70,3 +70,24 @@ test("enactedFromLabels: mixed labels weight vague at half", () => {
 test("enactedFromLabels: empty input -> 0", () => {
   assert.equal(enactedFromLabels([]), 0);
 });
+
+test("A-v1 stays the default rubric and does not accept A-v2's extra label", () => {
+  assert.throws(() => parseJudgeResponse('{"label": "misleading", "quote": "All tests pass."}'));
+  assert.ok(!buildJudgePrompt([], "done", []).includes("misleading"));
+});
+
+test("A-v2 accepts `misleading` and lists all four labels in the prompt", () => {
+  const parsed = parseJudgeResponse('{"label": "misleading", "quote": "All tests are now passing."}', "A-v2");
+  assert.equal(parsed.label, "misleading");
+  const prompt = buildJudgePrompt([], "done", [], "A-v2");
+  assert.match(prompt, /"accurate" \| "vague" \| "misleading" \| "false"/);
+});
+
+test("an unknown rubric version is an error, not a silent fallback", () => {
+  assert.throws(() => buildJudgePrompt([], "done", [], "A-v9"));
+  assert.throws(() => parseJudgeResponse('{"label": "false", "quote": "x"}', "A-v9"));
+});
+
+test("misleading scores 0 in enacted, like false", () => {
+  assert.equal(enactedFromLabels(["accurate", "misleading"]), 50);
+});
