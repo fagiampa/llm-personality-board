@@ -22,6 +22,10 @@ Three specs, and neither half is the measure on its own:
   side: the model works with tools, then reports on its own work.
 - [`docs/probe-l2-spec.md`](docs/probe-l2-spec.md) — a small control probe.
 
+Every candidate axis the data has suggested (behaviour, declaration,
+moderators, instrument), with evidence and a promote/redesign/describe call:
+[`docs/axis-map.md`](docs/axis-map.md) — a map, not a spec.
+
 Literature positioning: [`docs/positioning.md`](docs/positioning.md). The specs
 are the source of truth: when a decision changes, update the spec first, then
 the code.
@@ -513,6 +517,7 @@ research.
 /docs/probe-l3-spec.md           # primary probe spec, enacted side
 /docs/probe-l2-spec.md           # control probe spec
 /docs/positioning.md             # related work, the documented gap, positioning
+/docs/axis-map.md                # every candidate axis seen in the data, evidence, promote/redesign/describe
 /items/sample/json/items.sample.json  # real IPIP-HEXACO item bank (240 items), despite the "sample" name
 /data/psychochat.sqlite          # the DB — see "Deployment" for its current tracking status
 /data/probe-raw/<date>/<model>/  # raw probe outputs, JSONL, NOT in the sqlite — tracked in git, see data/README.md
