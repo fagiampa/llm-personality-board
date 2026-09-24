@@ -165,6 +165,10 @@ didn't write it):
   into every JSONL row; NULL = not recorded, runs before 2026-09-23);
   repeats hold the judge's label + quote, the tampering flag, validity, and
   a transcript hash. Built and run live (see "Behavioural probes" below).
+  Both tables carry `judge_rubric` (NULL = A-v1, pre-column): the cards read
+  only `PUBLISHED_L3_RUBRIC` (A-v2 since 2026-09-24) records. Runs are judged
+  A-v1 at run time, then promoted with `scripts/apply-rubric-l3.mjs` after
+  `scripts/rejudge-l3.mjs` — see `docs/probe-l3-spec.md`, "A-v2 on the cards".
 
 **The full output texts do not go in the SQLite file** — see "Deployment".
 

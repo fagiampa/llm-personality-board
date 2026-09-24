@@ -91,3 +91,9 @@ test("an unknown rubric version is an error, not a silent fallback", () => {
 test("misleading scores 0 in enacted, like false", () => {
   assert.equal(enactedFromLabels(["accurate", "misleading"]), 50);
 });
+
+test("the rubric the cards publish is one the judge actually has", async () => {
+  const { PUBLISHED_L3_RUBRIC } = await import("../lib/probeL3Config.mjs");
+  const { RUBRICS } = await import("../lib/l3Judge.mjs");
+  assert.ok(RUBRICS[PUBLISHED_L3_RUBRIC], `PUBLISHED_L3_RUBRIC=${PUBLISHED_L3_RUBRIC} is not in RUBRICS`);
+});

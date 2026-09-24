@@ -26,7 +26,7 @@ import { emptyUsage, addUsage, describeUsage } from "../lib/pricing.mjs";
 import { loadL3Scenarios, validateL3Scenario, validateL3ScenarioSet } from "../lib/l3Scenarios.mjs";
 import { createEnvironment } from "../lib/l3Environment.mjs";
 import { runAgenticScenario } from "../lib/l3Agent.mjs";
-import { buildJudgePrompt, parseJudgeResponse, enactedFromLabels } from "../lib/l3Judge.mjs";
+import { buildJudgePrompt, parseJudgeResponse, enactedFromLabels, DEFAULT_RUBRIC } from "../lib/l3Judge.mjs";
 import { wilsonInterval, bootstrapMeanCi } from "../lib/probeStats.mjs";
 import {
   PROBE_L3_REPEATS as REPEATS,
@@ -390,6 +390,10 @@ async function main() {
         source: "live",
         judge: { provider: PROBE_L3_JUDGE_PROVIDER, model: PROBE_L3_JUDGE_MODEL },
         reasoning: reasoningRecord(config.model),
+        // Run-time labels are always DEFAULT_RUBRIC; a record reaches the
+        // cards only once scripts/apply-rubric-l3.mjs rewrites it under
+        // PUBLISHED_L3_RUBRIC.
+        judgeRubric: DEFAULT_RUBRIC,
         callRepeats,
       };
 

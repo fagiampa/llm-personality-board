@@ -23,8 +23,8 @@ import styles from "./page.module.css";
 
 // Worked example, fixed as of this date — values from the DB records behind
 // the grok-4.6 card (generic: 2026-09-18 assess; specific: RF-v3, 2026-09-22;
-// enacted: L3-v1, 2026-09-22).
-const EXAMPLE = { generic: 80, specific: 90, enacted: 59, hue: 320 };
+// enacted: L3-v1, 2026-09-22, judge rubric A-v2 — 55.2; it was 59 under A-v1).
+const EXAMPLE = { generic: 80, specific: 90, enacted: 55, hue: 320 };
 
 type Text = {
   title: string;
@@ -102,11 +102,11 @@ const TEXT: Record<Locale, Text> = {
     what: {
       heading: "What it measures",
       exampleLabel:
-        "Real example — grok-4.6, reasoning “low” (not its provider default), 3 scenarios × 10 repeats. Preliminary. A human check of the judge, run later, found it lenient on this model’s reports: the enacted 59 is probably too high.",
+        "Real example — grok-4.6, reasoning “low” (not its provider default), 3 scenarios × 10 repeats. Preliminary. Enacted scored under judge rubric A-v2 (59 under the earlier A-v1); a human check found the judge still lenient on this model’s reports, so 55 is probably too high.",
       points: [
         { value: 90, label: "declared, specific", note: "action-anchored items, own session", kind: "specific" },
         { value: 80, label: "declared, general", note: "HEXACO Honesty-Humility — background, not the measure", kind: "generic" },
-        { value: 59, label: "enacted", note: "tool-call log vs. final message", kind: "enacted" },
+        { value: 55, label: "enacted", note: "tool-call log vs. final message", kind: "enacted" },
       ],
       segment: (
         <>
@@ -128,7 +128,7 @@ const TEXT: Record<Locale, Text> = {
           action instead of a trait. Negative: it went up.
         </>,
         <>
-          <strong>+31</strong> gap (specific − enacted): how far behaviour falls short of that claim.
+          <strong>+35</strong> gap (specific − enacted): how far behaviour falls short of that claim.
         </>,
       ],
       ceiling: (
@@ -220,7 +220,7 @@ const TEXT: Record<Locale, Text> = {
           The numbers are preliminary and stated with their limits: few scenarios, models not all at the same reasoning
           level (each card says which), and one judge model that is also under test. The judge was checked against a
           human rater only after these numbers were first shown: agreement was moderate for the rubric behind them
-          (κ 0.49 on 50 reports) and high for its revision (κ 0.84), which is not yet published. Every transcript, every answer and
+          (κ 0.49 on 50 reports) and high for its revision (κ 0.84), which the cards use from 2026-09-24. Every transcript, every answer and
           every judge label is published in the repository’s <code>data/</code> folder, so any number here can be
           checked — or disputed.
         </>,
@@ -268,11 +268,11 @@ const TEXT: Record<Locale, Text> = {
     what: {
       heading: "Cosa si misura",
       exampleLabel:
-        "Esempio reale — grok-4.6, ragionamento “low” (non è il default del provider), 3 scenari × 10 ripetizioni. Dati preliminari. Un controllo umano del giudice, fatto dopo, lo ha trovato indulgente sui report di questo modello: l’agito 59 è probabilmente troppo alto.",
+        "Esempio reale — grok-4.6, ragionamento “low” (non è il default del provider), 3 scenari × 10 ripetizioni. Dati preliminari. Agito calcolato con la regola A-v2 del giudice (59 con la precedente A-v1); un controllo umano ha trovato il giudice ancora indulgente sui report di questo modello, quindi 55 è probabilmente troppo alto.",
       points: [
         { value: 90, label: "dichiarato specifico", note: "item ancorati a un’azione, sessione separata", kind: "specific" },
         { value: 80, label: "dichiarato generico", note: "HEXACO Onestà-Umiltà — sullo sfondo, non è la misura", kind: "generic" },
-        { value: 59, label: "agito", note: "log delle chiamate contro messaggio finale", kind: "enacted" },
+        { value: 55, label: "agito", note: "log delle chiamate contro messaggio finale", kind: "enacted" },
       ],
       segment: (
         <>
@@ -294,7 +294,7 @@ const TEXT: Record<Locale, Text> = {
           un’azione invece che su un tratto. Negativo: è salita.
         </>,
         <>
-          <strong>+31</strong> divario (specifico − agito): quanto il comportamento resta sotto quella dichiarazione.
+          <strong>+35</strong> divario (specifico − agito): quanto il comportamento resta sotto quella dichiarazione.
         </>,
       ],
       ceiling: (
@@ -389,7 +389,7 @@ const TEXT: Record<Locale, Text> = {
           I numeri sono preliminari e dichiarati con i loro limiti: pochi scenari, modelli non tutti allo stesso livello di
           ragionamento (ogni card dice quale), e un modello giudice che è anche fra quelli valutati. Il giudice è stato
           confrontato con un valutatore umano solo dopo che questi numeri erano già stati mostrati: accordo moderato con
-          la regola che li ha prodotti (κ 0,49 su 50 report) e alto con la sua revisione (κ 0,84), non ancora pubblicata. Ogni transcript, ogni
+          la regola che li ha prodotti (κ 0,49 su 50 report) e alto con la sua revisione (κ 0,84), che le card usano dal 24/09/2026. Ogni transcript, ogni
           risposta e ogni etichetta del giudice sono pubblicati nella cartella <code>data/</code> del repository, così
           ogni numero qui si può verificare — o contestare.
         </>,

@@ -93,6 +93,8 @@ export interface L3ProbeRunRecord {
   source: L3ProbeScore["source"];
   judge?: L3ProbeScore["judge"];
   reasoning?: L3ProbeScore["reasoning"];
+  /** Defaults to lib/l3Judge.mjs DEFAULT_RUBRIC (A-v1) when omitted. */
+  judgeRubric?: string;
   callRepeats?: L3ProbeCallRepeat[];
 }
 

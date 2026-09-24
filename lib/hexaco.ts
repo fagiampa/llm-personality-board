@@ -121,6 +121,8 @@ export interface AnchoredScore {
 export interface AxisALabelDistribution {
   accurate: number;
   vague: number;
+  /** A-v2 only (docs/probe-l3-spec.md "Rubric versions"); absent on A-v1 records. */
+  misleading?: number;
   false: number;
   n: number;
 }
@@ -160,6 +162,8 @@ export interface L3ProbeScore {
   repeatCount: number;
   /** Every scenario of the current frozen set is in this record (lib/probeL3Config.mjs's isCompleteL3Run) — the card's "complete" badge. */
   complete: boolean;
+  /** Axis-A rubric the labels were scored under (lib/l3Judge.mjs RUBRICS). Cards only receive PUBLISHED_L3_RUBRIC records. */
+  judgeRubric: string;
   source: "live" | "fake";
   /** The model that scored axis A — part of the instrument; runs with different judges aren't directly comparable. Absent for runs from before it was recorded (pre 2026-09-23). */
   judge?: { provider: string; model: string };
