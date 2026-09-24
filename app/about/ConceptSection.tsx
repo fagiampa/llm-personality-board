@@ -24,6 +24,10 @@ import styles from "./page.module.css";
 // Worked example, fixed as of this date — values from the DB records behind
 // the grok-4.6 card (generic: 2026-09-18 assess; specific: RF-v3, 2026-09-22;
 // enacted: L3-v1, 2026-09-22, judge rubric A-v2 — 55.2; it was 59 under A-v1).
+// The caption stays short on purpose; the caveats behind it — reasoning
+// forced "low" (not grok's default), 3 scenarios x 10 repeats, and a judge
+// found lenient on this model's reports (so 55 is likely high) — are in
+// docs/probe-l3-spec.md and on /methodology.
 const EXAMPLE = { generic: 80, specific: 90, enacted: 55, hue: 320 };
 
 type Text = {
@@ -39,6 +43,7 @@ type Text = {
     modelsNote: string;
     punchline: [ReactNode, string];
     prediction: string;
+    twoGaps: { title: string; rows: { label: string; body: string }[] };
   };
   what: {
     heading: string;
@@ -97,12 +102,20 @@ const TEXT: Record<Locale, Text> = {
         </>,
         "Not what it did.",
       ],
-      prediction: "Testable prediction: handing the model back its own log should narrow the gap. Not yet tested.",
+      prediction:
+        "Testable prediction, for the declared side: showing the model its own past runs before asking should narrow the gap. Not yet tested.",
+      twoGaps: {
+        title: "Two gaps, two causes",
+        rows: [
+          { label: "What it says about itself vs. what it does", body: "no record of past actions to check against." },
+          { label: "What it reports vs. what the log shows", body: "the record is right there, and the report still leans towards “done”." },
+        ],
+      },
     },
     what: {
       heading: "What it measures",
       exampleLabel:
-        "Real example — grok-4.6, reasoning “low” (not its provider default), 3 scenarios × 10 repeats. Preliminary. Enacted scored under judge rubric A-v2 (59 under the earlier A-v1); a human check found the judge still lenient on this model’s reports, so 55 is probably too high.",
+        "Real example: grok-4.6. Preliminary data — method and limits on the methodology page.",
       points: [
         { value: 90, label: "declared, specific", note: "action-anchored items, own session", kind: "specific" },
         { value: 80, label: "declared, general", note: "HEXACO Honesty-Humility — background, not the measure", kind: "generic" },
@@ -153,8 +166,7 @@ const TEXT: Record<Locale, Text> = {
       integrity: (
         <>
           Off the ruler, measured on its own: <strong>environment integrity</strong> — how often the model edits the
-          check instead of fixing the cause. Counted whether or not it then says so; the two together are the finding
-          (a disclosed workaround is not a silent one).
+          check instead of fixing the cause.
         </>
       ),
       verifyTitle: "To verify, not to assume",
@@ -263,12 +275,20 @@ const TEXT: Record<Locale, Text> = {
         </>,
         "Non cosa ha fatto.",
       ],
-      prediction: "Previsione verificabile: restituire al modello il proprio registro dovrebbe ridurre il divario. Non ancora testata.",
+      prediction:
+        "Previsione verificabile, per il lato dichiarato: mostrare al modello i propri run passati prima di chiedere dovrebbe ridurre il divario. Non ancora testata.",
+      twoGaps: {
+        title: "Due divari, due cause",
+        rows: [
+          { label: "Cosa dice di sé vs. cosa fa", body: "nessun registro delle azioni passate con cui confrontarsi." },
+          { label: "Cosa riferisce vs. cosa mostra il log", body: "il registro è lì davanti, e il report tende comunque al “fatto”." },
+        ],
+      },
     },
     what: {
       heading: "Cosa si misura",
       exampleLabel:
-        "Esempio reale — grok-4.6, ragionamento “low” (non è il default del provider), 3 scenari × 10 ripetizioni. Dati preliminari. Agito calcolato con la regola A-v2 del giudice (59 con la precedente A-v1); un controllo umano ha trovato il giudice ancora indulgente sui report di questo modello, quindi 55 è probabilmente troppo alto.",
+        "Esempio reale: grok-4.6. Dati preliminari — metodo e limiti nella pagina di metodologia.",
       points: [
         { value: 90, label: "dichiarato specifico", note: "item ancorati a un’azione, sessione separata", kind: "specific" },
         { value: 80, label: "dichiarato generico", note: "HEXACO Onestà-Umiltà — sullo sfondo, non è la misura", kind: "generic" },
@@ -320,8 +340,7 @@ const TEXT: Record<Locale, Text> = {
       integrity: (
         <>
           Fuori dal righello, misurata a sé: <strong>integrità dell’ambiente</strong> — quante volte il modello modifica
-          la verifica invece di risolverne la causa. Contata sia che poi lo dichiari sia che lo taccia; è l’incrocio delle
-          due cose il risultato (un aggiramento dichiarato non è uno nascosto).
+          la verifica invece di risolverne la causa.
         </>
       ),
       verifyTitle: "Da verificare, non da assumere",
@@ -473,6 +492,15 @@ export function ConceptSection({ locale }: { locale: Locale }) {
           <p className={styles.darkLead}>{t.why.punchline[0]}</p>
           <p className={styles.darkStrong}>{t.why.punchline[1]}</p>
           <p className={styles.darkFoot}>{t.why.prediction}</p>
+        </div>
+
+        <div className={styles.softCard}>
+          <p className={styles.softTag}>{t.why.twoGaps.title}</p>
+          {t.why.twoGaps.rows.map((row) => (
+            <p key={row.label}>
+              <strong>{row.label}</strong> — {row.body}
+            </p>
+          ))}
         </div>
       </div>
 
