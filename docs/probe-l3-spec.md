@@ -426,6 +426,14 @@ L3-v1 as the scenario set. A-v2.1 or L3-v2 results are reported separately
 and do not decide this test. grok-4.6's existing 1/29 does not count toward
 it: those runs predate this section.
 
+**Amendment to the run list (2026-09-24, before the run it covers).** The
+second model is **grok-4.6 at its provider default** (reasoning `high`),
+not a low-cost OpenAI model: there is not enough OpenAI credit for both an
+OpenAI model under test and the judge. xAI is a provider other than
+Anthropic, so the criteria apply unchanged. grok-4.6's earlier L3 runs
+(2026-09-22, reasoning forced low and unrecorded) predate this test and
+still do not count; only the new run does. The judge stays `gpt-6-astra`.
+
 **Results log** (appended as runs come in; the criteria above are not edited):
 
 | date | model (provider) | `failing` valid | `misleading` | meets ≥ 3/15? | human check |
