@@ -114,7 +114,7 @@ export const dictionaries = {
           ? "non registrato"
           : r.level === null
             ? "default del provider (livello non documentato)"
-            : `${r.level} (${r.isDefault ? "default del provider" : "non è il default del provider"})`,
+            : `${r.level === "off" ? "spento" : r.level} (${r.isDefault ? "default del provider" : "non è il default del provider"})`,
       gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
         let s = `Onestà-Umiltà, dichiarato generico ${generic}`;
         if (anchored !== undefined) {

@@ -22,7 +22,7 @@ test("an undocumented default is omitted and recorded as level null, still the p
 });
 
 test("models outside the table run unpinned (debug/pilot models)", () => {
-  assert.deepEqual(anthropicReasoningParams("claude-haiku-4-5"), {});
+  assert.deepEqual(anthropicReasoningParams("claude-sonnet-4-5"), {});
   assert.deepEqual(openAIReasoningParams("grok-4.3"), {});
   assert.deepEqual(reasoningRecord("grok-4.3"), { level: null, isDefault: true });
 });
@@ -41,4 +41,24 @@ test("REASONING_LEVEL overrides the level and is recorded as not-default unless 
   } finally {
     delete process.env.REASONING_LEVEL;
   }
+});
+
+test("a thinking-off default sends nothing and is recorded as \"off\", not as undocumented", () => {
+  assert.deepEqual(anthropicReasoningParams("claude-haiku-4-5"), {});
+  assert.deepEqual(anthropicReasoningParams("claude-opus-4-5-20251101"), {});
+  assert.deepEqual(reasoningRecord("claude-haiku-4-5"), { level: "off", isDefault: true });
+});
+
+test("turning thinking on for a thinking-off model is refused until budget_tokens is built", () => {
+  process.env.REASONING_LEVEL = "high";
+  try {
+    assert.throws(() => anthropicReasoningParams("claude-haiku-4-5"), /not supported yet/);
+  } finally {
+    delete process.env.REASONING_LEVEL;
+  }
+});
+
+test("the longest base id wins: a dated Opus 5.5 id is not read as Opus 5", () => {
+  assert.deepEqual(reasoningRecord("claude-opus-5-5-20260901"), { level: "medium", isDefault: true });
+  assert.deepEqual(reasoningRecord("claude-opus-5"), { level: "high", isDefault: true });
 });
