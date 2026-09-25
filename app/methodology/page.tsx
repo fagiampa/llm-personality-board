@@ -113,8 +113,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
             Not every one of those repeated calls succeeds — providers occasionally return errors or unparseable
             responses mid-run. If a run ends up collecting fewer than <strong>{MIN_SUCCESS_PERCENT}%</strong> of
             the item × repeat samples it was supposed to (a provider outage partway through, for instance), the
-            whole run is discarded rather than published: no card update, no self-generated description, no new
-            entry in the version combo. The board keeps showing whichever previous run last cleared that bar, so
+            whole run is discarded rather than published: no card update, no new entry in the version combo. The board keeps showing whichever previous run last cleared that bar, so
             a bad run can’t silently replace good data with a noisier, under-sampled score.
           </p>
         ),
@@ -126,7 +125,8 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
             A green “complete” badge means that version has had a complete behavioural run: every scenario of the
             current frozen set. “To do” means it hasn’t yet — it may still have its questionnaire profile. Watching
             the same version over time, to catch a vendor silently changing a model behind an unchanged name, is
-            worth doing and planned as a project of its own; it is not what the board does today.
+            worth doing and planned as a project of its own; it is not what the board does today. For now the grid
+            shows only “complete” versions: a model with none has no card yet.
           </p>
         ),
       },
@@ -284,8 +284,8 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
             Non tutte le chiamate ripetute vanno a buon fine — i provider a volte restituiscono errori o risposte
             non interpretabili durante una run. Se una run raccoglie meno dell’<strong>{MIN_SUCCESS_PERCENT}%</strong>{" "}
             dei campioni item × ripetizione previsti (ad esempio per un’interruzione del provider a metà corsa),
-            l’intera run viene scartata invece di essere pubblicata: nessun aggiornamento della card, nessuna
-            descrizione auto-generata, nessuna nuova voce nel combo delle versioni. La board continua a mostrare
+            l’intera run viene scartata invece di essere pubblicata: nessun aggiornamento della card, nessuna nuova
+            voce nel combo delle versioni. La board continua a mostrare
             l’ultima run precedente che aveva superato quella soglia, così una run andata male non può sostituire
             silenziosamente dati buoni con un punteggio più rumoroso e sotto-campionato.
           </p>
@@ -299,7 +299,8 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
             tutti gli scenari del set congelato corrente. “Da fare” vuol dire che non l’ha ancora avuta — può
             comunque avere il suo profilo dal questionario. Seguire la stessa versione nel tempo, per accorgersi di
             un vendor che cambia un modello di nascosto dietro lo stesso nome, ha senso ed è previsto come progetto
-            a sé; non è quello che la board fa oggi.
+            a sé; non è quello che la board fa oggi. Per ora la griglia mostra solo le versioni “complete”: un
+            modello che non ne ha ancora nessuna non ha una card.
           </p>
         ),
       },

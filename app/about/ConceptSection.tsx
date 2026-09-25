@@ -21,15 +21,16 @@ import styles from "./page.module.css";
 // Long-form rich content stays colocated here rather than in the shared
 // dictionary, same as /methodology and /considerations (CLAUDE.md, i18n).
 
-// Worked example, fixed as of this date — values from the DB records behind
-// the grok-4.6 card (generic: 2026-09-18 assess; specific: RF-v3, 2026-09-22;
-// enacted: L3-v1, 2026-09-22, judge rubric A-v2 — 55.2; it was 59 under A-v1).
-// The caption stays short on purpose; the caveats behind it — reasoning
-// forced "low" (not grok's default), 3 scenarios x 10 repeats, and a judge
-// found lenient on this model's reports (so 55 is likely high) — are in
-// docs/probe-l3-spec.md and on /methodology.
+// Worked example — the values behind the grok-4.6 card as of 2026-09-25:
+// generic: 2026-09-18 assess; specific: RF-v3, 2026-09-24; enacted: L3-v1,
+// 2026-09-24 (the preregistered run), judge rubric A-v2 — 46.7. Both declared
+// (specific) and enacted at grok's provider-default reasoning (high). The
+// caption stays short; the caveats — 3 scenarios x 5 repeats, and a judge
+// found lenient on this model's reports (so 47 is likely high) — are in
+// docs/probe-l3-spec.md and on /methodology. Replaces the earlier 55 (the
+// 2026-09-22 run at a forced "low", no longer the one the card shows).
 // scores: the full HEXACO profile of that same grok-4.6 run (H,E,X,A,C,O).
-const EXAMPLE = { generic: 80, specific: 90, enacted: 55, hue: 320, scores: [80, 25, 73, 80, 85, 82] };
+const EXAMPLE = { generic: 80, specific: 90, enacted: 47, hue: 320, scores: [80, 25, 73, 80, 85, 82] };
 
 // The two declared levels, each with two real items (the second reverse-keyed).
 // general: items.sample.json H_Sinc_01, H_Sinc_03; specific: RF-v3-005, RF-v3-004.
@@ -69,10 +70,6 @@ type Text = {
     exampleLabel: string;
     points: { value: number; label: string; note: string; kind: "specific" | "generic" | "enacted" }[];
     segment: ReactNode;
-    expectation: ReactNode;
-    twoNumbersTitle: string;
-    twoNumbers: [ReactNode, ReactNode];
-    ceiling: ReactNode;
   };
   how: {
     heading: string;
@@ -178,36 +175,13 @@ const TEXT: Record<Locale, Text> = {
       points: [
         { value: 90, label: "declared, specific", note: "action-anchored items, own session", kind: "specific" },
         { value: 80, label: "declared, general", note: "HEXACO Honesty-Humility — background, not the measure", kind: "generic" },
-        { value: 55, label: "enacted", note: "tool-call log vs. final message", kind: "enacted" },
+        { value: 47, label: "enacted", note: "tool-call log vs. final message", kind: "enacted" },
       ],
       segment: (
         <>
           What counts is the <strong>distance between the large disc and the ring</strong> along the H axis: the same
           construct, asked and enacted. The general score stays as a reference point — the tip of the profile, never
           compared straight with the enacted one.
-        </>
-      ),
-      expectation: (
-        <>
-          We expected specificity to <em>deflate</em> the claim — asked about a concrete action instead of a trait, a
-          model would claim less. On the first two models with data it went the other way:{" "}
-          <strong>the claim rose by 10 points on both</strong>.
-        </>
-      ),
-      twoNumbersTitle: "Two numbers, not one",
-      twoNumbers: [
-        <>
-          <strong>−10</strong> specificity Δ (general − specific): how the answer changes when the question is about an
-          action instead of a trait. Negative: it went up.
-        </>,
-        <>
-          <strong>+35</strong> gap (specific − enacted): how far behaviour falls short of that claim.
-        </>,
-      ],
-      ceiling: (
-        <>
-          On claude-fable-5-1 both declared (specific) and enacted sit at 100: a gap of 0 there means the instrument has no
-          room left to show one, not that the two agree. Harder items and scenarios are the next step.
         </>
       ),
     },
@@ -387,37 +361,13 @@ const TEXT: Record<Locale, Text> = {
       points: [
         { value: 90, label: "dichiarato specifico", note: "item ancorati a un’azione, sessione separata", kind: "specific" },
         { value: 80, label: "dichiarato generico", note: "HEXACO Onestà-Umiltà — sullo sfondo, non è la misura", kind: "generic" },
-        { value: 55, label: "agito", note: "log delle chiamate contro messaggio finale", kind: "enacted" },
+        { value: 47, label: "agito", note: "log delle chiamate contro messaggio finale", kind: "enacted" },
       ],
       segment: (
         <>
           Quello che conta è la <strong>distanza fra disco grande e anello</strong> lungo l’asse H: stesso costrutto,
           chiesto e agito. Il generico resta come termine di paragone — la punta del profilo, mai confrontata
           direttamente con l’agito.
-        </>
-      ),
-      expectation: (
-        <>
-          Ci aspettavamo che la specificità <em>sgonfiasse</em> la dichiarazione: chiesto di un’azione concreta invece che
-          di un tratto, un modello avrebbe dichiarato meno. Sui primi due modelli con dati è successo il contrario:{" "}
-          <strong>la dichiarazione è salita di 10 punti in entrambi</strong>.
-        </>
-      ),
-      twoNumbersTitle: "Due numeri, non uno",
-      twoNumbers: [
-        <>
-          <strong>−10</strong> Δ specificità (generico − specifico): quanto cambia la risposta se la domanda è su
-          un’azione invece che su un tratto. Negativo: è salita.
-        </>,
-        <>
-          <strong>+35</strong> divario (specifico − agito): quanto il comportamento resta sotto quella dichiarazione.
-        </>,
-      ],
-      ceiling: (
-        <>
-          Su claude-fable-5-1 dichiarato specifico e agito stanno entrambi a 100: lì un divario di 0 vuol dire che lo
-          strumento non ha margine per mostrarne uno, non che i due coincidano. Il passo successivo sono item e scenari più
-          difficili.
         </>
       ),
     },
@@ -644,13 +594,6 @@ export function ConceptSection({ locale }: { locale: Locale }) {
           </ul>
         </div>
         <p>{t.what.segment}</p>
-        <p>{t.what.expectation}</p>
-        <div className={styles.softCard}>
-          <p className={styles.softTag}>{t.what.twoNumbersTitle}</p>
-          <p>{t.what.twoNumbers[0]}</p>
-          <p>{t.what.twoNumbers[1]}</p>
-        </div>
-        <p className={styles.cNote}>{t.what.ceiling}</p>
       </div>
 
       {/* 3 — how enacted is measured: the L3 probe in outline. The full

@@ -67,7 +67,9 @@ export const dictionaries = {
           test: the same HEXACO questionnaire — six dimensions, Honesty-Humility, Emotionality, Extraversion,
           Agreeableness, Conscientiousness, Openness — is administered directly to the models via API, the
           answers are aggregated into a per-dimension score, and the result lands in a
-          grid of cards with radar charts, comparable model by model and version by version.
+          grid of cards with radar charts, comparable model by model and version by version. On the Honesty-Humility
+          axis each card also shows what the model declares about concrete work situations and what it actually does
+          in an agentic task — the gap between the two is what this project measures.
         </>,
         <>
           The idea started from a simple question: do language models have a recognizable, stable
@@ -136,7 +138,9 @@ export const dictionaries = {
           Estroversione, Gradevolezza, Coscienziosità, Apertura — viene somministrato direttamente ai modelli via
           API, le risposte vengono aggregate in un punteggio per dimensione, e il
           risultato finisce in una griglia di card con radar chart, confrontabili modello per modello e versione
-          per versione.
+          per versione. Sull’asse Onestà-Umiltà ogni card mostra anche cosa il modello dichiara su situazioni di
+          lavoro concrete e cosa fa davvero in un compito agentico: il divario fra i due è quello che questo progetto
+          misura.
         </>,
         <>
           L&apos;idea nasce da una domanda semplice: i modelli linguistici hanno un &quot;carattere&quot;
