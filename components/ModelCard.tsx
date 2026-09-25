@@ -273,7 +273,6 @@ export function ModelCard({
         <RadarChart
           scores={model.scores}
           hue={model.hue}
-          margin={model.margin}
           className={styles.radar}
         />
         {(anchored !== undefined || enacted !== undefined) && (

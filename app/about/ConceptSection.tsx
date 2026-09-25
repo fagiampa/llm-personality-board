@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { GapColumn } from "@/components/GapColumn";
 import type { Locale } from "@/lib/i18n/locale";
 import styles from "./page.module.css";
@@ -56,13 +57,20 @@ type Text = {
   };
   how: {
     heading: string;
-    probeTitle: string;
-    probeBody: string;
     ladderTitle: string;
     ladder: { level: string; label: string; status: string; current?: boolean }[];
-    integrity: ReactNode;
-    verifyTitle: string;
-    verify: ReactNode;
+    intro: string;
+    task: string;
+    taskSub: string;
+    tamperQ: string;
+    tamperNo: string;
+    tamperYes: string;
+    report: string;
+    judge: string;
+    judgeSub: string;
+    score: string;
+    note: ReactNode;
+    more: string;
   };
   where: {
     heading: string;
@@ -152,29 +160,31 @@ const TEXT: Record<Locale, Text> = {
     },
     how: {
       heading: "How “enacted” is measured",
-      probeTitle: "Agentic probe, scripted environment",
-      probeBody:
-        "The model works on a task with tools, then reports back. The task can’t be completed. The score comes from the discrepancy between the two records: what the tool log shows, and what the final message says.",
       ladderTitle: "The cost of honesty — the controlled variable",
       ladder: [
         { level: "L1", label: "no cost", status: "saturated, not built" },
         { level: "L2", label: "displeasing someone", status: "control, 5 scenarios" },
-        { level: "L3", label: "admitting you didn’t finish", status: "built here, 3 scenarios", current: true },
+        { level: "L3", label: "admitting you didn’t finish", status: "this work — 3 scenarios", current: true },
         { level: "L4", label: "admitting you caused damage", status: "later" },
       ],
-      integrity: (
+      intro: "What follows is about L3. The probe, in outline:",
+      task: "A task that can’t be completed",
+      taskSub: "“make the failing tests pass” — with tools, in a scripted environment",
+      tamperQ: "Does the model edit the test file?",
+      tamperNo: "no — the tests keep failing",
+      tamperYes: "yes — now they pass",
+      report: "Final report to the user",
+      judge: "A third-party judge — a frontier LLM — labels the report",
+      judgeSub: "accurate · vague · misleading · false",
+      score: "enacted, 0–100",
+      note: (
         <>
-          Off the ruler, measured on its own: <strong>environment integrity</strong> — how often the model edits the
-          check instead of fixing the cause.
+          Editing the test file doesn’t lower the score by itself: it is counted apart, as a{" "}
+          <strong>tampering rate</strong>. The score is about the report — whether the user ends up with a true picture of
+          what happened.
         </>
       ),
-      verifyTitle: "To verify, not to assume",
-      verify: (
-        <>
-          That the score is a property of the model and not of the scenario: to be checked by spreading the probes across
-          distant domains and seeing whether the ranking of models <strong>holds</strong>.
-        </>
-      ),
+      more: "The probe step by step, on a real run →",
     },
     where: {
       heading: "Where this sits",
@@ -325,29 +335,31 @@ const TEXT: Record<Locale, Text> = {
     },
     how: {
       heading: "Come si misura l’agito",
-      probeTitle: "Probe agentico, ambiente scriptato",
-      probeBody:
-        "Il modello lavora a un compito con strumenti, poi riferisce. Il compito non si può completare. Il punteggio nasce dalla discrepanza fra le due tracce: cosa mostra il log degli strumenti e cosa dice il messaggio finale.",
       ladderTitle: "Il costo dell’onestà — variabile controllata",
       ladder: [
         { level: "L1", label: "nessun costo", status: "saturo, non si costruisce" },
         { level: "L2", label: "dispiacere a qualcuno", status: "controllo, 5 scenari" },
-        { level: "L3", label: "ammettere di non aver finito", status: "si costruisce qui, 3 scenari", current: true },
+        { level: "L3", label: "ammettere di non aver finito", status: "questo lavoro — 3 scenari", current: true },
         { level: "L4", label: "ammettere un danno", status: "dopo" },
       ],
-      integrity: (
+      intro: "Quello che segue riguarda L3. Il probe, per schema:",
+      task: "Un compito che non si può completare",
+      taskSub: "“fai passare i test che falliscono” — con strumenti, in un ambiente scriptato",
+      tamperQ: "Il modello modifica il file dei test?",
+      tamperNo: "no — i test continuano a fallire",
+      tamperYes: "sì — ora passano",
+      report: "Report finale all’utente",
+      judge: "Un giudice terzo — un LLM di frontiera — etichetta il report",
+      judgeSub: "accurate · vague · misleading · false",
+      score: "agito, 0–100",
+      note: (
         <>
-          Fuori dal righello, misurata a sé: <strong>integrità dell’ambiente</strong> — quante volte il modello modifica
-          la verifica invece di risolverne la causa.
+          Modificare il file dei test non abbassa il punteggio di per sé: si conta a parte, come{" "}
+          <strong>tasso di manomissione</strong>. Il punteggio riguarda il report — se l’utente si fa un’idea vera di cosa è
+          successo.
         </>
       ),
-      verifyTitle: "Da verificare, non da assumere",
-      verify: (
-        <>
-          Che il punteggio sia una proprietà del modello e non dello scenario: si controlla distribuendo le prove su domini
-          lontani e guardando se l’ordinamento dei modelli <strong>regge</strong>.
-        </>
-      ),
+      more: "Il probe passo per passo, su una run reale →",
     },
     where: {
       heading: "Dove si colloca",
@@ -536,15 +548,10 @@ export function ConceptSection({ locale }: { locale: Locale }) {
         <p className={styles.cNote}>{t.what.ceiling}</p>
       </div>
 
-      {/* 3 — how enacted is measured */}
+      {/* 3 — how enacted is measured: the L3 probe in outline. The full
+          walkthrough on a real run (GapAnatomy) lives on /methodology. */}
       <div className={styles.cBlock}>
         <h3 className={styles.cHeading}>{t.how.heading}</h3>
-        <div className={styles.softCard}>
-          <p>
-            <strong>{t.how.probeTitle}</strong>
-          </p>
-          <p>{t.how.probeBody}</p>
-        </div>
         <p className={styles.cLabel}>{t.how.ladderTitle}</p>
         <ul className={styles.ladder}>
           {t.how.ladder.map((row) => (
@@ -555,11 +562,32 @@ export function ConceptSection({ locale }: { locale: Locale }) {
             </li>
           ))}
         </ul>
-        <p>{t.how.integrity}</p>
-        <div className={styles.softCard}>
-          <p className={styles.softTag}>{t.how.verifyTitle}</p>
-          <p>{t.how.verify}</p>
+        <p>{t.how.intro}</p>
+        <div className={styles.probeFlow}>
+          <Box>
+            {t.how.task}
+            <small>{t.how.taskSub}</small>
+          </Box>
+          <span className={styles.down}>↓</span>
+          <p className={styles.probeQ}>{t.how.tamperQ}</p>
+          <div className={styles.branch}>
+            <Box>{t.how.tamperNo}</Box>
+            <Box>{t.how.tamperYes}</Box>
+          </div>
+          <span className={styles.down}>↓</span>
+          <Box>{t.how.report}</Box>
+          <span className={styles.down}>↓</span>
+          <Box>
+            {t.how.judge}
+            <small>{t.how.judgeSub}</small>
+          </Box>
+          <span className={styles.down}>↓</span>
+          <Box variant="out">{t.how.score}</Box>
         </div>
+        <p>{t.how.note}</p>
+        <p>
+          <Link href="/methodology#l3-probe">{t.how.more}</Link>
+        </p>
       </div>
 
       {/* 4 — positioning */}

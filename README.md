@@ -1,6 +1,6 @@
 # LLM Personality Board
 
-A grid of cards showing each LLM's personality profile on the **HEXACO** model — the same six-dimension questionnaire humans take (Honesty-Humility, Emotionality, Extraversion, Agreeableness, Conscientiousness, Openness), administered directly to language models via API and visualized as a radar chart with an uncertainty band.
+A grid of cards showing each LLM's personality profile on the **HEXACO** model — the same six-dimension questionnaire humans take (Honesty-Humility, Emotionality, Extraversion, Agreeableness, Conscientiousness, Openness), administered directly to language models via API and visualized as a radar chart.
 
 ChatGPT, Claude, Gemini, Grok and DeepSeek all take the exact same 240-item instrument, scored the same way, tracked version by version over time.
 

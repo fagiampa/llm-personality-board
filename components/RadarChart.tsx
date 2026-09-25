@@ -9,11 +9,6 @@ const CX = 80;
 // same formula either component uses.
 export const CY = 80;
 export const MAX_R = 60;
-// Placeholder illustrative spread around the mean; in production this
-// becomes the real statistical margin (e.g. 1.96 x SEM) from the scoring
-// pipeline.
-const DEFAULT_MARGIN = 8;
-
 const LABEL_POSITIONS: Record<(typeof HEXACO_CODES)[number], { x: number; y: number }> = {
   H: { x: 80, y: 11 },
   E: { x: 139, y: 47 },
@@ -35,23 +30,17 @@ function pointsFor(scores: number[]) {
   return ANGLES.map((deg, i) => pointFor(deg, scores[i])).join(" ");
 }
 
-function pathFor(scores: number[]) {
-  return `M${ANGLES.map((deg, i) => pointFor(deg, scores[i])).join(" L")} Z`;
-}
-
 interface RadarChartProps {
   scores: number[];
   hue: number;
-  /** Fixed margin for every axis, or one value per axis (real per-domain margin). */
-  margin?: number | number[];
   className?: string;
 }
 
-export function RadarChart({ scores, hue, margin = DEFAULT_MARGIN, className }: RadarChartProps) {
-  const marginFor = (i: number) => (Array.isArray(margin) ? margin[i] : margin);
-  const low = scores.map((s, i) => Math.max(0, s - marginFor(i)));
-  const high = scores.map((s, i) => Math.min(100, s + marginFor(i)));
-  const bandPath = `${pathFor(high)} ${pathFor(low)}`;
+// No uncertainty band (removed 2026-09-25): across repeats the models answer
+// the HEXACO bank almost identically — median margin ±3 on 0-100 over every
+// live run — so the band was barely visible and added nothing. The margin is
+// still computed and stored (assessments.margin), just not drawn.
+export function RadarChart({ scores, hue, className }: RadarChartProps) {
   const points = pointsFor(scores);
 
   return (
@@ -81,13 +70,7 @@ export function RadarChart({ scores, hue, margin = DEFAULT_MARGIN, className }: 
       <line x1={80} y1={80} x2={28.04} y2={110} stroke="oklch(88% 0.01 75)" strokeWidth={1} />
       <line x1={80} y1={80} x2={28.04} y2={50} stroke="oklch(88% 0.01 75)" strokeWidth={1} />
 
-      <path
-        d={bandPath}
-        fill={`oklch(62% 0.14 ${hue} / 0.22)`}
-        fillRule="evenodd"
-        stroke="none"
-      />
-      <polygon points={points} fill="none" stroke={`oklch(55% 0.14 ${hue})`} strokeWidth={2} />
+      <polygon points={points} fill={`oklch(62% 0.14 ${hue} / 0.14)`} stroke={`oklch(55% 0.14 ${hue})`} strokeWidth={2} />
 
       {/* The model's actual H value, marked on the real polygon vertex —
           same formula every other axis uses (centre = 0, this vertex =

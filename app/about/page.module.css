@@ -369,6 +369,46 @@
   color: oklch(50% 0.12 75);
 }
 
+/* L3 probe in outline (how block): a vertical flow with one yes/no fork. */
+.probeFlow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.probeFlow .cBox {
+  max-width: 420px;
+}
+
+.down {
+  font-size: 14px;
+  line-height: 1;
+  color: oklch(55% 0.02 75);
+}
+
+.cBlock .probeQ {
+  font-weight: 600;
+  font-size: 13px;
+  color: oklch(22% 0.02 75);
+  margin-top: 2px;
+}
+
+.branch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.branch .cBox:last-child {
+  background: oklch(96.5% 0.04 60);
+  border-color: oklch(80% 0.08 60);
+  color: oklch(30% 0.06 60);
+}
+
 .whereGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -417,15 +457,6 @@
     grid-template-columns: 1fr;
   }
 
-  .cBox {
-    padding: 6px 8px;
-    font-size: 11.5px;
-  }
-
-  .flow {
-    grid-template-columns: minmax(0, auto) 16px minmax(0, auto) 24px minmax(0, auto);
-  }
-
   .ladder li {
     grid-template-columns: 28px 1fr;
   }
@@ -433,6 +464,15 @@
   .ladderStatus {
     grid-column: 2;
     text-align: left;
+  }
+
+  .cBox {
+    padding: 6px 8px;
+    font-size: 11.5px;
+  }
+
+  .flow {
+    grid-template-columns: minmax(0, auto) 16px minmax(0, auto) 24px minmax(0, auto);
   }
 }
 

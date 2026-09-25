@@ -5,11 +5,14 @@ import { resolveLocale, Locale } from "@/lib/i18n/locale";
 import { buildMetadata } from "@/lib/seo";
 import { ASSESS_REPEATS, ASSESS_MIN_SUCCESS_RATIO } from "@/lib/assessConfig.mjs";
 import styles from "./page.module.css";
+import { GapAnatomy } from "./GapAnatomy";
 
 const MIN_SUCCESS_PERCENT = Math.round(ASSESS_MIN_SUCCESS_RATIO * 100);
 
 interface Section {
   title: string;
+  /** Anchor for links from other pages (e.g. /about → #l3-probe). */
+  id?: string;
   body: React.ReactNode;
 }
 
@@ -96,10 +99,10 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         body: (
           <p>
             Each model answers the full 240-item bank <strong>{ASSESS_REPEATS} times</strong> per run (at
-            temperature 1, to avoid suppressing the natural variability of the answers). The spread across those{" "}
-            {ASSESS_REPEATS} repeats for each domain is what generates the uncertainty band shown on the radar
-            chart (± 1.96 × standard error of the mean) — a pragmatic stand-in for the “N administrations” of a
-            real psychometric protocol, not a clinically validated confidence interval.
+            temperature 1, to avoid suppressing the natural variability of the answers); each domain’s score is
+            the mean across those repeats. In practice the answers barely move from one repeat to the next —
+            typically ± 2–4 points on the 0–100 scale — so the radar shows the mean alone, with no uncertainty
+            band.
           </p>
         ),
       },
@@ -137,6 +140,20 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
             the same version over time, to catch a vendor silently changing a model behind an unchanged name, is
             worth doing and planned as a project of its own; it is not what the board does today.
           </p>
+        ),
+      },
+      {
+        title: "The L3 probe, step by step",
+        id: "l3-probe",
+        body: (
+          <>
+            <p>The whole measure — declared and enacted — on one L3 scenario and two real runs.</p>
+            <GapAnatomy locale="en" />
+            <p>
+              Still to verify, not to assume: that the score is a property of the model and not of the scenario. The
+              check is to spread the probes across distant domains and see whether the ranking of models holds.
+            </p>
+          </>
         ),
       },
       {
@@ -265,11 +282,10 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         body: (
           <p>
             Ogni modello risponde all’intera banca di 240 item <strong>{ASSESS_REPEATS} volte</strong> per run (a
-            temperatura 1, per non sopprimere la variabilità naturale delle risposte). Lo spread tra quelle{" "}
-            {ASSESS_REPEATS} ripetizioni per ciascun dominio è quello che genera la banda di incertezza mostrata
-            nel radar chart (± 1.96 × errore standard della media) — uno stand-in pragmatico per le “N
-            somministrazioni” di un vero protocollo psicometrico, non un vero e proprio intervallo di confidenza
-            clinicamente validato.
+            temperatura 1, per non sopprimere la variabilità naturale delle risposte); il punteggio di ogni
+            dominio è la media fra quelle ripetizioni. In pratica le risposte cambiano pochissimo da una
+            ripetizione all’altra — di solito ± 2–4 punti sulla scala 0–100 — quindi il radar mostra solo la
+            media, senza banda di incertezza.
           </p>
         ),
       },
@@ -309,6 +325,21 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
             un vendor che cambia un modello di nascosto dietro lo stesso nome, ha senso ed è previsto come progetto
             a sé; non è quello che la board fa oggi.
           </p>
+        ),
+      },
+      {
+        title: "Il probe L3, passo per passo",
+        id: "l3-probe",
+        body: (
+          <>
+            <p>Tutta la misura — dichiarato e agito — su uno scenario L3 e due run reali.</p>
+            <GapAnatomy locale="it" />
+            <p>
+              Ancora da verificare, non da assumere: che il punteggio sia una proprietà del modello e non dello
+              scenario. Si controlla distribuendo le prove su domini lontani e guardando se l’ordinamento dei modelli
+              regge.
+            </p>
+          </>
         ),
       },
       {
@@ -372,7 +403,7 @@ export default function Methodology() {
       <h1 className={styles.title}>{t.title}</h1>
 
       {t.sections.map((section) => (
-        <section className={styles.section} key={section.title}>
+        <section className={styles.section} key={section.title} id={section.id}>
           <h2 className={styles.sectionTitle}>{section.title}</h2>
           {section.body}
         </section>

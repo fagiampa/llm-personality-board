@@ -2,7 +2,6 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { ModelGrid } from "@/components/ModelGrid";
 import { getHomeData } from "@/lib/db.mjs";
-import { ASSESS_REPEATS } from "@/lib/assessConfig.mjs";
 import { resolveLocale } from "@/lib/i18n/locale";
 import { dict } from "@/lib/i18n/dictionaries";
 import styles from "./page.module.css";
@@ -22,10 +21,6 @@ export default async function Home() {
         <div className={styles.headerText}>
           <h1 className={styles.title}>{t.title}</h1>
           <p className={styles.subtitle}>{t.subtitle}</p>
-          <p className={styles.legend}>
-            <span className={styles.legendSwatch} />
-            {t.legend(ASSESS_REPEATS)}
-          </p>
         </div>
         <div className={styles.footerLinks}>
           <Link href="/about" className={styles.aboutLink}>

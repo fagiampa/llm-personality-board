@@ -20,24 +20,6 @@
   color: oklch(45% 0.02 75);
 }
 
-.legend {
-  font-size: 11px;
-  color: oklch(55% 0.02 75);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.legendSwatch {
-  display: inline-block;
-  width: 20px;
-  height: 8px;
-  background: oklch(62% 0.06 75 / 0.5);
-  border: 1px solid oklch(60% 0.06 75);
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
 .headerRow {
   display: flex;
   justify-content: space-between;

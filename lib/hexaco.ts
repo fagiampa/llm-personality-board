@@ -25,9 +25,9 @@ export interface ModelScore {
   oneLinerIt?: string;
   dominant: string;
   /**
-   * Optional per-domain uncertainty band half-width (same order/scale as
-   * `scores`), e.g. 1.96 x SEM from repeated administrations. Falls back to
-   * RadarChart's fixed illustrative margin when omitted (current mock data).
+   * Optional per-domain half-width, 1.96 x SEM across repeated administrations
+   * (same order/scale as `scores`). Stored but no longer drawn: the radar
+   * lost its uncertainty band on 2026-09-25 (median ±3 over every live run).
    */
   margin?: [number, number, number, number, number, number];
   /** "live" = scored by actually calling the model's API (scripts/assess.mjs); "fake" = illustrative mock data. */

@@ -11,8 +11,6 @@ export const dictionaries = {
       title: "AI Model Personality — HEXACO Profiles",
       subtitle:
         "H Honesty-Humility · E Emotionality · X Extraversion · A Agreeableness · C Conscientiousness · O Openness",
-      legend: (repeats: number) =>
-        `band = confidence interval (mean ± error across ${repeats} administrations), solid line = mean`,
       aboutLink: "about this idea →",
       methodologyLink: "methodology & references →",
       questionnaireLink: "the questionnaire →",
@@ -68,7 +66,7 @@ export const dictionaries = {
           <strong>LLM Personality Board</strong> treats large language models like people taking a personality
           test: the same HEXACO questionnaire — six dimensions, Honesty-Humility, Emotionality, Extraversion,
           Agreeableness, Conscientiousness, Openness — is administered directly to the models via API, the
-          answers are aggregated into a per-dimension score with an uncertainty band, and the result lands in a
+          answers are aggregated into a per-dimension score, and the result lands in a
           grid of cards with radar charts, comparable model by model and version by version.
         </>,
         <>
@@ -89,8 +87,6 @@ export const dictionaries = {
       title: "Personalità dei Modelli IA — Profili HEXACO",
       subtitle:
         "H Onestà-Umiltà · E Emotività · X Estroversione · A Gradevolezza · C Coscienziosità · O Apertura",
-      legend: (repeats: number) =>
-        `banda = intervallo di confidenza (media ± errore su ${repeats} somministrazioni), linea piena = media`,
       aboutLink: "riguardo a questa idea →",
       methodologyLink: "metodologia e riferimenti →",
       questionnaireLink: "il questionario →",
@@ -138,7 +134,7 @@ export const dictionaries = {
           <strong>LLM Personality Board</strong> tratta i modelli linguistici come persone che sostengono un test
           di personalità: lo stesso questionario HEXACO — sei dimensioni, Onestà-Umiltà, Emotività,
           Estroversione, Gradevolezza, Coscienziosità, Apertura — viene somministrato direttamente ai modelli via
-          API, le risposte vengono aggregate in un punteggio per dimensione con una banda di incertezza, e il
+          API, le risposte vengono aggregate in un punteggio per dimensione, e il
           risultato finisce in una griglia di card con radar chart, confrontabili modello per modello e versione
           per versione.
         </>,
