@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { GapColumn } from "@/components/GapColumn";
-import { GITHUB_URL } from "@/lib/site";
 import type { Locale } from "@/lib/i18n/locale";
 import styles from "./page.module.css";
 
@@ -240,8 +239,7 @@ const TEXT: Record<Locale, Text> = {
           The larger point is an invitation. How honestly models report their own work is becoming a safety question,
           and it shouldn’t be measured only behind closed doors. Shared, open standards for these probes — and public,
           continuous monitoring of how the models we all use actually behave — are something the open-source community
-          can build. Adding a scenario is a one-file pull request:{" "}
-          <a href={GITHUB_URL}>the code, the specs and the data are on GitHub</a>.
+          can build.
         </>,
       ],
     },
@@ -416,8 +414,7 @@ const TEXT: Record<Locale, Text> = {
           Il punto più ampio è un invito. Quanto onestamente i modelli riferiscono il proprio lavoro sta diventando una
           questione di sicurezza, e non dovrebbe essere misurato solo a porte chiuse. Standard condivisi e aperti per
           questi probe — e un monitoraggio pubblico e continuo di come si comportano davvero i modelli che usiamo tutti —
-          sono qualcosa che la comunità open source può costruire. Aggiungere uno scenario è una pull request di un solo
-          file: <a href={GITHUB_URL}>codice, specifiche e dati sono su GitHub</a>.
+          sono qualcosa che la comunità open source può costruire.
         </>,
       ],
     },

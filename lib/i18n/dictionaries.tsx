@@ -17,7 +17,6 @@ export const dictionaries = {
       methodologyLink: "methodology & references →",
       questionnaireLink: "the questionnaire →",
       considerationsLink: "further considerations →",
-      githubLink: "View source on GitHub",
     },
     card: {
       // Badge: has this version had a complete L3 run (every scenario of the
@@ -96,7 +95,6 @@ export const dictionaries = {
       methodologyLink: "metodologia e riferimenti →",
       questionnaireLink: "il questionario →",
       considerationsLink: "ulteriori considerazioni →",
-      githubLink: "Vedi il codice su GitHub",
     },
     card: {
       complete: "completo",
