@@ -3,18 +3,20 @@
 Everything behind the numbers on the board, published per the project's rule
 6 ("raw outputs are always published, not just aggregates"). The aggregates
 themselves live in a SQLite file that is **not** in this repo
-(`data/psychochat.sqlite`, see `CLAUDE.md` → "Deployment"); every aggregate
-can be recomputed from the files below.
+(`data/psychochat.sqlite`, see `CLAUDE.md` → "Deployment"). `npm run
+db:rebuild` recreates it from the files below, and checks every aggregate
+that can be recomputed against the raw data (see "Rebuilding the DB").
 
 All files are JSONL: one JSON object per line. Files a run writes are never
-edited afterwards; only the `sqlite-export` files below are regenerated from
-the DB by `npm run export-raw`.
+edited afterwards; only the `sqlite-export`, `assess-raw` and `records`
+files below are regenerated from the DB by `npm run export-raw`.
 
 | directory | instrument | what one line is |
 |---|---|---|
 | `probe-raw/` | behavioural probes (L2, L3) — the **enacted** side | one probe call: scenario, condition, the full transcript, the judge's label and quote |
 | `declared-raw/` | action-anchored item bank (`RF-v*`) — **declared (specific)** | one repeat (or batch) of the 12 items: the 1-5 answers, and the raw response text where kept |
 | `assess-raw/` | IPIP-HEXACO, 240 items — **declared (general)** | one repeat of the questionnaire: the 1-5 answers |
+| `records/` | all of them | one DB row: run-level aggregates, and the probes' per-call rows |
 
 ## `probe-raw/<date>/…` — enacted
 
@@ -43,10 +45,24 @@ A DB record points at its transcripts by hash:
 
 Which files matter:
 
+The cards show, per model version, the latest L3 record under the published
+judge rubric (A-v2). Those records, as of 2026-09-25 — all 3 scenarios,
+5 repeats, each model at its provider-default reasoning level:
+
+| file | model | reasoning |
+|---|---|---|
+| `2026-09-23/Claude/L3-v1-2026-09-23T08-19-53-783Z.jsonl` | claude-fable-5-1 | `high` |
+| `2026-09-24/Claude/…09-05-38…` + `…09-12-22…` | claude-opus-5-5 | `medium` (one record, administered in two invocations) |
+| `2026-09-24/Claude/…09-59-39…` | claude-haiku-4-5 | `off` |
+| `2026-09-24/Claude/…16-45-51…` | claude-opus-4-5 | `off` |
+| `2026-09-24/Grok/…17-38-37…` | grok-4.6 | `high` |
+
+A-v2 labels for these runs are in the `2026-09-24/rejudge-A-v2-*.json` files
+(see "A-v2 on the cards" in `docs/probe-l3-spec.md`). Older files:
+
 | file | model | status |
 |---|---|---|
-| `2026-09-23/Claude/L3-v1-2026-09-23T08-19-53-783Z.jsonl` | claude-fable-5-1 | **published record** — all 3 scenarios, 5 repeats, reasoning `high` (provider default) |
-| `2026-09-22/Grok/L3-v1-2026-09-22T15-23-23-644Z.jsonl` | grok-4.6 | **published record** — reasoning level not recorded (see "Reasoning level" in `docs/probe-l3-spec.md`) |
+| `2026-09-22/Grok/L3-v1-2026-09-22T15-23-23-644Z.jsonl` | grok-4.6 | earlier record (reasoning level not recorded), superseded on the card by the 2026-09-24 run |
 | `2026-09-22/Grok/…09-28…`, `…12-16…` | grok-4.6 | earlier partial runs of the same model |
 | `2026-09-22/Grok/…08-49…` | grok-4.3 | stale model version picked up by mistake — not published |
 | `2026-09-21/*`, `2026-09-22/Claude/*` | Haiku 4.5, Gemini 3.5 Flash-Lite, Fable 5.1 | **pilot / debugging runs** with cheap models, used to tune the instrument — not published scores |
@@ -88,6 +104,35 @@ Exported from the DB by `npm run export-raw`: one line per repeat of the
 240-item IPIP-HEXACO questionnaire (`items/sample/json/items.sample.json`),
 answers 1-5, `reverse` as above. Parsed answers only — the raw response
 text was never kept for these runs.
+
+## `records/<table>.jsonl` — the DB's rows
+
+Written by `npm run export-raw`: every row of `assessments`,
+`declared_anchored_runs`, `probe_runs`, `probe_l3_runs` and the probes'
+per-call tables `probe_call_repeats` / `probe_l3_call_repeats`, exactly as
+stored (JSON columns stay JSON strings). The per-item answers are not repeated
+here: they are in `assess-raw/` and `declared-raw/sqlite-export/`.
+
+These carry what the raw files alone don't: which calls make up a record (some
+pilots were consolidated from several invocations), the rubric each label was
+scored under, and the bootstrap intervals (random, so not recomputable
+exactly). Assessment rows from before per-item answers were kept — the early
+runs imported from the pre-SQLite JSON files — have aggregates only.
+
+## Rebuilding the DB
+
+`npm run db:rebuild` writes `data/psychochat.sqlite` from `records/` plus the
+answers in `assess-raw/` and `declared-raw/sqlite-export/`, then checks:
+
+- HEXACO scores, margins and item means recomputed from the answers
+- the declared (specific) score and margin recomputed from the answers
+- L3 enacted recomputed from the failing, valid judge labels
+- L2 proportions recomputed from the per-call outcomes
+- every L3 transcript and L2 output a record points at (by hash) is present
+  under `probe-raw/`
+
+Any mismatch is listed and the command exits non-zero. `npm test` runs the
+same check.
 
 ## Caveats, stated up front
 

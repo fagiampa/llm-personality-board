@@ -298,7 +298,7 @@ async function main() {
   for (const config of MODEL_CONFIG) {
     const base = await getLatest(config.name);
     if (!base) {
-      console.warn(`Skipping ${config.name}: no existing DB entry (run npm run db:import / npm run assess first).`);
+      console.warn(`Skipping ${config.name}: no questionnaire run for this model yet — run npm run assess first.`);
       continue;
     }
     if (ONLY && !ONLY.has(config.name)) {

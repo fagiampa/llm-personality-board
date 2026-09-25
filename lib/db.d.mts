@@ -129,6 +129,8 @@ export function upsertAssessment(record: AssessmentRecord): Promise<void>;
 export function listLatestPerModel(): Promise<ModelScore[]>;
 export function getLatest(modelName: string): Promise<ModelScore | undefined>;
 export function listVersions(modelName: string): Promise<VersionOption[]>;
+/** Creates every table and applies column migrations on a sql.js Database (scripts/rebuild-db.mjs). */
+export function createSchema(db: unknown): void;
 export function getHomeData(): Promise<{
   models: ModelScore[];
   versionsByModel: Record<string, VersionOption[]>;

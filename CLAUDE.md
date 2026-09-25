@@ -93,8 +93,9 @@ or interleaved. The card composes the two; the types stay apart.
 
 ## Persistence (`lib/db.mjs`)
 
-Single-file SQLite DB (`data/psychochat.sqlite`, **tracked in git** — see
-"Deployment" below for why), two tables:
+Single-file SQLite DB (`data/psychochat.sqlite`, **not tracked in git** —
+see "Deployment" below for why; `npm run db:rebuild` recreates it from
+`data/`, see "Rebuilding the DB from git" below), two tables:
 
 - `assessments`: one row per `(model_name, assessed_at)` run — same shape as
   `ModelScore` plus `item_means` (per-item mean across repeats) and
@@ -514,7 +515,8 @@ research.
 /scripts/declared.mjs            # administers the anchored item bank (RF-v3 default), own session, writes to the DB
 /scripts/probe.mjs               # runs the L2 behavioural probe (control), writes to the DB
 /scripts/probe-l3.mjs            # runs the L3 behavioural probe (primary), writes to the DB
-/scripts/import-to-db.mjs        # one-off migration from mock-scores.json + data/history/ to the DB
+/scripts/import-to-db.mjs        # one-off migration from mock-scores.json + data/history/ to the DB (historical: those files are untracked)
+/scripts/rebuild-db.mjs          # npm run db:rebuild — recreates the DB from data/records/ + raw answers, checks aggregates vs raw
 /scripts/dump-db.mjs             # DB inspection dump
 /scripts/translate-onliners.mjs  # one-off backfill of missing Italian translations
 /lib/scenarios.mjs, /lib/probeConfig.mjs         # L2 scenario schema/validator + sampling config
@@ -537,7 +539,8 @@ research.
 /data/psychochat.sqlite          # the DB — see "Deployment" for its current tracking status
 /data/probe-raw/<date>/<model>/  # raw probe outputs, JSONL, NOT in the sqlite — tracked in git, see data/README.md
 /data/declared-raw/, /data/assess-raw/  # declared side's raw answers, JSONL, tracked (npm run export-raw for DB-only runs)
-/scripts/export-raw.mjs          # exports declared/assess item answers from the sqlite to JSONL
+/scripts/export-raw.mjs          # exports item answers + every run-level row (data/records/) from the sqlite to JSONL
+/data/records/<table>.jsonl      # the DB's rows (aggregates, probes' per-call rows), tracked — what db:rebuild loads
 /data/mock-scores.json, /data/history/*.json  # pre-DB state, untracked, historical archive only
 /img/favicon/                    # source favicon files (favicon.ico/svg, apple-touch-icon.png)
 ```
@@ -606,6 +609,26 @@ card the chart only orients; the wide-format dumbbell (post, paper,
 /methodology) is where the gap gets measured. Known cost: a double ceiling
 (both at 100) looks like perfect agreement on the card.
 
+## Rebuilding the DB from git (`scripts/rebuild-db.mjs`, `npm run db:rebuild`)
+
+A fresh clone has no DB. `npm run db:rebuild` writes one from
+`data/records/*.jsonl` (every run-level row, plus the probes' per-call rows)
+and the per-item answers in `data/assess-raw/` and
+`data/declared-raw/sqlite-export/` — both written by `npm run export-raw`.
+It then recomputes what is deterministic (HEXACO scores/margins/item means,
+anchored, L3 enacted from labels, L2 proportions) and checks it against the
+records, and checks every transcript/output hash is under `data/probe-raw/`;
+bootstrap CIs are random, so they're loaded, not recomputed. Verified
+2026-09-25: the rebuilt DB is row-for-row identical to the live one (ids of
+the item-answer tables aside). `tests/rebuild-db.test.mjs` runs the same
+check, so **run `npm run export-raw` after every measurement run**, or the
+committed data drifts from the DB.
+
+Model identity (`monogram`, `hue`) lives in `MODEL_CONFIG`
+(`lib/providers.mjs`), not in the DB, so `npm run assess` works on an
+empty DB. `declared`/`probe`/`probe-l3` still require a questionnaire run
+for the model first.
+
 ## Deployment (Vercel)
 
 Two gotchas that cost real debugging time, worth knowing before touching
@@ -617,7 +640,8 @@ deploy config:
    directly rather than from git — so the file ships as part of a manual
    deploy without ever entering git history. Updating live data means:
    `npm run assess` (and/or `declared`/`probe`/`probe-l3`) locally →
-   `vercel --prod`. This was a straight tracked-in-git file earlier in the
+   `npm run export-raw` (so `data/` and the DB stay in step, and a clone can
+   rebuild it) → commit → `vercel --prod`. This was a straight tracked-in-git file earlier in the
    project; it moved to this scheme once the probes started producing much
    larger runs than the questionnaire ever did (see the note below).
 2. **`next.config.mjs`'s `outputFileTracingIncludes`** forces

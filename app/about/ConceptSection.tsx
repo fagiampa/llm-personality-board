@@ -28,7 +28,8 @@ import styles from "./page.module.css";
 // caption stays short; the caveats — 3 scenarios x 5 repeats, and a judge
 // found lenient on this model's reports (so 47 is likely high) — are in
 // docs/probe-l3-spec.md and on /methodology. Replaces the earlier 55 (the
-// 2026-09-22 run at a forced "low", no longer the one the card shows).
+// 2026-09-22 run, reasoning level not recorded, no longer the one the card
+// shows).
 // scores: the full HEXACO profile of that same grok-4.6 run (H,E,X,A,C,O).
 const EXAMPLE = { generic: 80, specific: 90, enacted: 47, hue: 320, scores: [80, 25, 73, 80, 85, 82] };
 

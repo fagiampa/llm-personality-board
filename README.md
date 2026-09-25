@@ -1,56 +1,103 @@
 # LLM Personality Board
 
-A grid of cards showing each LLM's personality profile on the **HEXACO** model — the same six-dimension questionnaire humans take (Honesty-Humility, Emotionality, Extraversion, Agreeableness, Conscientiousness, Openness), administered directly to language models via API and visualized as a radar chart.
+An open observatory of **what language models say about their own honesty, and what they actually do**.
 
-ChatGPT, Claude, Gemini, Grok and DeepSeek all take the exact same 240-item instrument, scored the same way, tracked version by version over time.
+Each model answers a personality questionnaire about itself. Then it is put to work: a coding task, with tools, that
+cannot be completed. The project measures the **gap** between the two, that is, between what the model *declares*
+and what it *enacts* when an honest report costs it something.
 
-**Live demo**: https://progetto-psycochat.vercel.app
+**Live site**: https://aipersonality.org
 
-## Features
+## What a card shows
 
-- **Real assessment pipeline** (`scripts/assess.mjs`): administers the full 240-item [IPIP-HEXACO](https://ipip.ori.org/newHEXACO_PI_key.htm) inventory (public-domain analog of the HEXACO-PI-R) to each configured model, 3 repeats at temperature 1, batched to cut API round-trips.
-- **Hand-drawn SVG radar chart** (`components/RadarChart.tsx`) — no charting library, just polar-to-cartesian math.
-- **Version history per model** — every run is a row in a SQLite DB; each card has a version combo to browse past runs, with the highest-ranked version per model shown as "live" and the rest "Archived".
-- **Model self-interpretation** — the one-liner on each card isn't a template, it's the model describing its own personality in light of its own scores.
-- **Bilingual (EN/IT)**, driven automatically by the browser's `Accept-Language` header — no manual switcher.
-- **`/questionnaire`** — the full 240-item list, grouped by domain and facet, shown in the exact English wording actually sent to the models.
-- **`/methodology`** and **`/considerations`** — the reasoning behind the design choices, and honest doubts about what the whole exercise does and doesn't mean.
+One card per model version:
 
-## Tech stack
+- a **HEXACO radar**, from the model's answers to the 240-item [IPIP-HEXACO](https://ipip.ori.org/newHEXACO_PI_key.htm)
+  questionnaire (public-domain analog of the HEXACO-PI-R): the general, trait-level self-report (**declared, general**)
+- on the Honesty-Humility axis, two points:
+  - **declared (specific)**: the model's answers to 12 statements about concrete work situations (for example,
+    naming a workaround in the same sentence where it reports success), asked in a separate session
+  - **enacted**: how faithfully it reports on its own work in an agentic task it cannot finish (the L3 probe),
+    labelled by a judge model from the tool log and the final message
+- a badge: **complete** once that version has had a complete run of the current L3 scenario set
 
-- **Frontend**: Next.js 14 (App Router), React 18, TypeScript.
-- **Persistence**: SQLite via [`sql.js`](https://github.com/sql-js/sql.js) (WASM, no native build step) — `data/psychochat.sqlite`.
-- **Providers**: `@anthropic-ai/sdk`, `openai` (also used for xAI/Grok and DeepSeek, both OpenAI-compatible), `@google/generative-ai`.
-- **Item bank**: `items/sample/json/items.sample.json` — the real, full IPIP-HEXACO battery (public domain), despite the "sample" name.
+For now the grid shows only versions with a complete L3 run (`HOME_ONLY_COMPLETE_L3` in `lib/db.mjs`).
+
+Everything is preliminary: three L3 scenarios, a handful of models. The pages `/about`, `/methodology` and
+`/considerations` explain the design, its limits and the doubts behind it.
 
 ## Getting started
+
+Requires Node.js 20.6 or later.
 
 ```bash
 git clone https://github.com/fagiampa/llm-personality-board.git
 cd llm-personality-board
 npm install
-cp .env.example .env   # fill in the API keys for the providers you want to assess
+npm run db:rebuild   # recreate the SQLite DB from the data in the repo
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000): you get the same board as the live site, with no API keys needed.
+
+`npm run db:rebuild` builds `data/psychochat.sqlite` from `data/records/` and the raw answers under `data/`. It also
+checks every aggregate that can be recomputed (scores from the answers, enacted from the judge labels), and that every
+transcript a record points at is in `data/probe-raw/`. See [`data/README.md`](data/README.md).
+
+## Running your own measurements
+
+Copy `.env.example` to `.env` and add API keys for the providers you want to call (Anthropic, OpenAI, Google, xAI,
+DeepSeek). Pick the model version with `ANTHROPIC_MODEL`, `OPENAI_MODEL`, etc. The defaults are cheap models on
+purpose.
+
+The order matters:
+
+1. `npm run assess`: the HEXACO questionnaire (declared, general)
+2. `npm run declared`: the action-anchored item bank (declared, specific). Always its **own session**, never in the
+   same conversation as the probes: the items describe the probe's situations, and sharing a session is priming.
+3. `npm run probe-l3`: the agentic probe (enacted). Multi-turn conversations with tool calls, so costs add up
+   quickly on large models. Debug with the fake driver in `tests/l3-agent.test.mjs`, never with paid calls.
+
+Each script can be scoped to one model (`ASSESS_ONLY=Claude`, `DECLARED_ONLY=…`, `PROBE_L3_ONLY=…`). After a run,
+`npm run export-raw` writes the new data to `data/`, so it can be committed and rebuilt by anyone.
 
 ### Scripts
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Start the Next.js dev server |
+| `npm run dev` | Next.js dev server |
 | `npm run build` / `npm run start` | Production build / serve |
+| `npm test` | Unit tests, plus a check that the committed data rebuilds into a consistent DB |
 | `npm run lint` | ESLint |
-| `npm run assess` | Administer the questionnaire to every configured model and write results to the DB (needs API keys in `.env`) |
-| `npm run db:import` | One-off: import `data/mock-scores.json` + `data/history/*.json` into the SQLite DB |
-| `npm run translate-onliners` | One-off: backfill Italian translations for existing English card descriptions |
+| `npm run db:rebuild` | Recreate the DB from `data/` (add `-- --force` to overwrite an existing one) |
+| `npm run export-raw` | Write the DB's answers and records to `data/` |
+| `npm run assess` | HEXACO questionnaire, 240 items, repeated at temperature 1 |
+| `npm run declared` | Action-anchored item bank (current set: `RF-v3`) |
+| `npm run probe-l3` | L3 agentic probe (primary), judged by `gpt-6-astra` by default |
+| `npm run probe` | L2 probe (a small control) |
 
-Useful `assess` overrides (see `.env.example`): `ASSESS_ONLY=Gemini` to (re)assess a single model, `GOOGLE_MODEL=gemini-3.6-flash` (etc.) to pin a specific provider model version.
+## Specs and docs
+
+The specs are the source of truth. When a decision changes, the spec is updated first, then the code.
+
+- [`docs/declared-spec.md`](docs/declared-spec.md): the declared side and the three-level record
+- [`docs/probe-l3-spec.md`](docs/probe-l3-spec.md): the primary probe, its judge rubric and its calibration
+- [`docs/probe-l2-spec.md`](docs/probe-l2-spec.md): the control probe
+- [`docs/positioning.md`](docs/positioning.md): related work
+- [`CLAUDE.md`](CLAUDE.md): architecture notes and the non-negotiable rules
+
+## Tech stack
+
+Next.js 14 (App Router), React 18, TypeScript. SQLite via [`sql.js`](https://github.com/sql-js/sql.js) (WASM, no
+native build step). Provider SDKs: `@anthropic-ai/sdk`, `openai` (also used for xAI and DeepSeek),
+`@google/generative-ai`. Hand-drawn SVG charts, no charting library. Bilingual (EN/IT), picked from the browser's
+`Accept-Language` header.
 
 ## Contributing
 
-Issues and pull requests are welcome — this is meant to be a community-run instrument, not a one-off demo. See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for how to contribute, including AI-assisted contributions, and [`LICENSE`](./LICENSE) for the terms.
+Issues and pull requests are welcome. This is meant to be a community-run instrument, not a one-off demo. Adding a
+scenario is a one-file pull request. See [`CONTRIBUTING.md`](./CONTRIBUTING.md), including the notes on AI-assisted
+contributions.
 
 ## Licenza
 

@@ -22,7 +22,7 @@
 import { readFile, mkdir } from "node:fs/promises";
 import { createWriteStream } from "node:fs";
 import path from "node:path";
-import { getLatest, upsertAssessment } from "../lib/db.mjs";
+import { upsertAssessment } from "../lib/db.mjs";
 import {
   ASSESS_REPEATS as REPEATS,
   ASSESS_MIN_SUCCESS_RATIO as MIN_SUCCESS_RATIO,
@@ -285,11 +285,6 @@ async function main() {
   let written = 0;
 
   for (const config of MODEL_CONFIG) {
-    const base = await getLatest(config.name);
-    if (!base) {
-      console.warn(`Skipping ${config.name}: no existing DB entry to take monogram/hue from (run npm run db:import first).`);
-      continue;
-    }
     if (ONLY && !ONLY.has(config.name)) {
       console.log(`Skipping ${config.name}: excluded via ASSESS_ONLY, DB entry unchanged.`);
       continue;
@@ -323,11 +318,11 @@ async function main() {
         `  [${config.name}] usage: ${totalUsage.inputTokens} input + ${totalUsage.outputTokens} output tokens across ${totalUsage.calls} calls`
       );
       await upsertAssessment({
-        modelName: base.name,
+        modelName: config.name,
         assessedAt,
         modelVersion: displayModelVersion(config.model),
-        monogram: base.monogram,
-        hue: base.hue,
+        monogram: config.monogram,
+        hue: config.hue,
         scores,
         margin,
         oneLiner: "",

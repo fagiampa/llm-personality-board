@@ -5,6 +5,9 @@
 //
 //   data/declared-raw/sqlite-export/<model_version>/<item_set>-<assessedAt>.jsonl
 //   data/assess-raw/<model_version>/<assessedAt>.jsonl
+//   data/records/<table>.jsonl — every row of the run-level tables (and the
+//     probes' per-call tables), exactly as stored: what scripts/rebuild-db.mjs
+//     needs, with the item answers above, to recreate the DB from git alone.
 //
 // One line per (run, repeat), with that repeat's answers. These exports carry
 // the parsed 1-5 answers only: the models' raw response text was never kept
@@ -101,8 +104,30 @@ async function main() {
     files++;
   }
 
+  // Run-level records. The per-item answers are not repeated here (they are
+  // in assess-raw/ and declared-raw/ above); the probes' per-call rows are,
+  // since they carry the judge labels and output hashes the aggregates were
+  // computed from. Ordered by primary key so re-exports diff cleanly.
+  const RECORD_TABLES = {
+    assessments: "model_name, assessed_at",
+    declared_anchored_runs: "model_version, assessed_at, item_set_version",
+    probe_runs: "model_version, assessed_at, probe_id",
+    probe_call_repeats: "id",
+    probe_l3_runs: "model_version, assessed_at, probe_id",
+    probe_l3_call_repeats: "id",
+  };
+  let recordRows = 0;
+  for (const [table, orderBy] of Object.entries(RECORD_TABLES)) {
+    const rows = queryAll(db, `SELECT * FROM ${table} ORDER BY ${orderBy}`);
+    await writeJsonl(`data/records/${table}.jsonl`, rows);
+    recordRows += rows.length;
+    files++;
+  }
+
   db.close();
-  console.log(`Exported ${declaredRuns.length} declared run(s) and ${assessRuns.length} assess run(s) — ${files} file(s).`);
+  console.log(
+    `Exported ${declaredRuns.length} declared run(s), ${assessRuns.length} assess run(s) and ${recordRows} record row(s) — ${files} file(s).`
+  );
 }
 
 main().catch((err) => {
