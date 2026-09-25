@@ -20,7 +20,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
   en: {
     metaTitle: "Methodology — HEXACO Personality Testing for LLMs",
     metaDescription:
-      "How we administer the 240-item HEXACO-PI-R personality inventory to AI models via API, score the results, and why HEXACO instead of Big Five.",
+      "How we administer the 240-item IPIP-HEXACO personality inventory to AI models via API, score the results, and why HEXACO instead of Big Five.",
     back: "← Back to the grid",
     title: "Methodology: HEXACO Personality Testing for LLMs",
     sections: [
@@ -40,21 +40,26 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         ),
       },
       {
-        title: "The instrument: HEXACO-PI-R, open source",
+        title: "The instrument: IPIP-HEXACO, public domain",
         body: (
           <>
             <p>
-              The administered items come from the <strong>HEXACO Personality Inventory-Revised (HEXACO-PI-R)</strong>,
-              freely published for research use by Kibeom Lee and Michael C. Ashton at{" "}
+              The administered items are the <strong>IPIP-HEXACO</strong> scales (Ashton, Lee &amp; Goldberg, 2007):
+              240 statements, six domains, with both direct- and reverse-scored items, from the{" "}
+              <a href="https://ipip.ori.org/newHEXACO_PI_key.htm" target="_blank" rel="noreferrer">
+                International Personality Item Pool
+              </a>
+              . They are the public-domain counterpart of the HEXACO Personality Inventory-Revised (HEXACO-PI-R) by
+              Kibeom Lee and Michael C. Ashton (
               <a href="https://hexaco.org" target="_blank" rel="noreferrer">
                 hexaco.org
               </a>
-              . It’s not a proprietary instrument: the item bank used by this project (240 statements, six
-              domains, with both direct- and reverse-scored items) is a subset of that open material.
+              ), which is free for academic use only: the IPIP version can be used, modified and administered with
+              no permission required.
             </p>
             <p>
-              Each item is rated by the model on a <strong>1 to 5</strong> scale (1 = not at all accurate/true of
-              me, 5 = very accurate/true of me). Some items are worded in reverse (“reverse-keyed items”):
+              Each item is rated by the model on a <strong>1 to 5</strong> scale, with the anchors given in the prompt: “1 = very
+              inaccurate, 5 = very accurate”. Some items are worded in reverse (“reverse-keyed items”):
               answering “true” to one of these indicates a <em>low</em> score on the facet, not high, so before
               use the raw score must be flipped with the formula <code>6 - raw</code> (on a 1-5 scale, this maps
               1↔5, 2↔4, while 3 stays 3).
@@ -163,6 +168,15 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         body: (
           <ul className={styles.refs}>
             <li>
+              Ashton, M. C., Lee, K., &amp; Goldberg, L. R. (2007). <em>The IPIP-HEXACO scales: An alternative,
+              public-domain measure of the personality constructs in the HEXACO model.</em> Personality and
+              Individual Differences, 42, 1515–1526 — the source of the administered items; item pool and scoring key at{" "}
+              <a href="https://ipip.ori.org/newHEXACO_PI_key.htm" target="_blank" rel="noreferrer">
+                ipip.ori.org
+              </a>
+              .
+            </li>
+            <li>
               Ashton, M. C., &amp; Lee, K. (2007). <em>Empirical, theoretical, and practical advantages of the
               HEXACO model of personality structure.</em> Personality and Social Psychology Review.
             </li>
@@ -171,15 +185,36 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
               Inventory.</em> Multivariate Behavioral Research.
             </li>
             <li>
-              HEXACO-PI-R, open material for research use —{" "}
+              HEXACO-PI-R — the original inventory the IPIP-HEXACO mirrors —{" "}
               <a href="https://hexaco.org" target="_blank" rel="noreferrer">
                 hexaco.org
               </a>
             </li>
             <li>
+              Mischel, W. (1968). <em>Personality and Assessment.</em> Wiley — the “personality coefficient” (r ≈ 0.30) cited on /about.
+            </li>
+            <li>
               Serapio-García, G., Safdari, M., Crepy, C. et al. (2023). <em>Personality Traits in Large Language
               Models.</em> arXiv:2307.00184 — reference work on the idea itself of administering standardized
               psychometric instruments to an LLM.
+            </li>
+            <li>
+              <em>The Personality Illusion</em> (2025).{" "}
+              <a href="https://arxiv.org/abs/2509.03730" target="_blank" rel="noreferrer">
+                arXiv:2509.03730
+              </a>{" "}
+              — models’ self-reported traits don’t predict their behaviour.
+            </li>
+            <li>
+              <em>Rethinking Psychometric Evaluation of LLMs</em> (ICML 2026) — action-anchored items vs generic traits;
+              names agentic tool use as unexplored.
+            </li>
+            <li>
+              <em>Alignment Revisited</em> (2025).{" "}
+              <a href="https://arxiv.org/abs/2506.00751" target="_blank" rel="noreferrer">
+                arXiv:2506.00751
+              </a>{" "}
+              — stated vs revealed preferences.
             </li>
           </ul>
         ),
@@ -189,7 +224,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
   it: {
     metaTitle: "Metodologia — Test di Personalità HEXACO per gli LLM",
     metaDescription:
-      "Come somministriamo il questionario HEXACO-PI-R di 240 item ai modelli via API, come calcoliamo i punteggi, e perché HEXACO invece di Big Five.",
+      "Come somministriamo il questionario IPIP-HEXACO di 240 item ai modelli via API, come calcoliamo i punteggi, e perché HEXACO invece di Big Five.",
     back: "← Torna alla griglia",
     title: "Metodologia: test di personalità HEXACO per gli LLM",
     sections: [
@@ -209,21 +244,26 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         ),
       },
       {
-        title: "Lo strumento: HEXACO-PI-R, open source",
+        title: "Lo strumento: IPIP-HEXACO, di pubblico dominio",
         body: (
           <>
             <p>
-              Gli item somministrati provengono dallo <strong>HEXACO Personality Inventory-Revised (HEXACO-PI-R)</strong>,
-              pubblicato liberamente per uso di ricerca da Kibeom Lee e Michael C. Ashton su{" "}
+              Gli item somministrati sono le scale <strong>IPIP-HEXACO</strong> (Ashton, Lee e Goldberg, 2007): 240
+              affermazioni, sei domini, con item a punteggio diretto e invertito, tratte dall’
+              <a href="https://ipip.ori.org/newHEXACO_PI_key.htm" target="_blank" rel="noreferrer">
+                International Personality Item Pool
+              </a>
+              . Sono la controparte di pubblico dominio dell’HEXACO Personality Inventory-Revised (HEXACO-PI-R) di
+              Kibeom Lee e Michael C. Ashton (
               <a href="https://hexaco.org" target="_blank" rel="noreferrer">
                 hexaco.org
               </a>
-              . Non è uno strumento proprietario: la banca di item usata da questo progetto (240 affermazioni, sei
-              domini, con item a punteggio diretto e invertito) è un sottoinsieme di quel materiale open.
+              ), che è libero solo per uso accademico: la versione IPIP si può usare, modificare e somministrare
+              senza chiedere permessi.
             </p>
             <p>
-              Ogni item viene valutato dal modello su una scala da <strong>1 a 5</strong> (1 = per niente
-              accurato/vero su di me, 5 = molto accurato/vero su di me). Alcuni item sono formulati al contrario
+              Ogni item viene valutato dal modello su una scala da <strong>1 a 5</strong>, con gli
+              estremi indicati nel prompt: “1 = very inaccurate, 5 = very accurate”. Alcuni item sono formulati al contrario
               (“domande inverse”): rispondere “vero” a uno di questi indica un punteggio <em>basso</em> sulla
               faccetta, non alto, quindi prima di usarlo il punteggio grezzo va ribaltato con la formula{" "}
               <code>6 - grezzo</code> (su una scala 1-5, questo trasforma 1↔5, 2↔4, mentre 3 resta 3).
@@ -338,6 +378,15 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         body: (
           <ul className={styles.refs}>
             <li>
+              Ashton, M. C., Lee, K., &amp; Goldberg, L. R. (2007). <em>The IPIP-HEXACO scales: An alternative,
+              public-domain measure of the personality constructs in the HEXACO model.</em> Personality and
+              Individual Differences, 42, 1515–1526 — la fonte degli item somministrati; banca di item e chiave di punteggio su{" "}
+              <a href="https://ipip.ori.org/newHEXACO_PI_key.htm" target="_blank" rel="noreferrer">
+                ipip.ori.org
+              </a>
+              .
+            </li>
+            <li>
               Ashton, M. C., &amp; Lee, K. (2007). <em>Empirical, theoretical, and practical advantages of the
               HEXACO model of personality structure.</em> Personality and Social Psychology Review.
             </li>
@@ -346,15 +395,36 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
               Inventory.</em> Multivariate Behavioral Research.
             </li>
             <li>
-              HEXACO-PI-R, materiale open per uso di ricerca —{" "}
+              HEXACO-PI-R — l’inventario originale di cui l’IPIP-HEXACO è l’analogo —{" "}
               <a href="https://hexaco.org" target="_blank" rel="noreferrer">
                 hexaco.org
               </a>
             </li>
             <li>
+              Mischel, W. (1968). <em>Personality and Assessment.</em> Wiley — il “coefficiente di personalità” (r ≈ 0,30) citato su /about.
+            </li>
+            <li>
               Serapio-García, G., Safdari, M., Crepy, C. et al. (2023). <em>Personality Traits in Large Language
               Models.</em> arXiv:2307.00184 — lavoro di riferimento sull’idea stessa di somministrare strumenti
               psicometrici standardizzati a un LLM.
+            </li>
+            <li>
+              <em>The Personality Illusion</em> (2025).{" "}
+              <a href="https://arxiv.org/abs/2509.03730" target="_blank" rel="noreferrer">
+                arXiv:2509.03730
+              </a>{" "}
+              — i tratti auto-riportati dai modelli non predicono il loro comportamento.
+            </li>
+            <li>
+              <em>Rethinking Psychometric Evaluation of LLMs</em> (ICML 2026) — item ancorati a un’azione contro tratti
+              generici; indica l’uso agentico degli strumenti come inesplorato.
+            </li>
+            <li>
+              <em>Alignment Revisited</em> (2025).{" "}
+              <a href="https://arxiv.org/abs/2506.00751" target="_blank" rel="noreferrer">
+                arXiv:2506.00751
+              </a>{" "}
+              — preferenze dichiarate contro preferenze rivelate.
             </li>
           </ul>
         ),
