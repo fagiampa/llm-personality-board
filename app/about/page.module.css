@@ -267,7 +267,7 @@
   margin-top: 10px;
 }
 
-/* The ruler: the same GapColumn the cards use, plus a legend. */
+/* The worked example: the same RadarChart the cards use, at the cards size, plus a legend. */
 .ruler {
   display: flex;
   align-items: stretch;
@@ -275,8 +275,8 @@
 }
 
 .rulerSvg {
-  height: 180px;
-  width: auto;
+  height: 240px;
+  width: 240px;
   flex-shrink: 0;
 }
 

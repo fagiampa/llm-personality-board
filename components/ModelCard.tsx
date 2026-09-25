@@ -5,8 +5,7 @@ import { ModelScore, ProbeScore, L3ProbeScore, AnchoredScore } from "@/lib/hexac
 import { useLocale } from "@/lib/i18n/context";
 import { dateLocale, Locale } from "@/lib/i18n/locale";
 import { dict } from "@/lib/i18n/dictionaries";
-import { RadarChart } from "./RadarChart";
-import { GapColumn } from "./GapColumn";
+import { ProfileSwatch, RadarChart } from "./RadarChart";
 import styles from "./ModelCard.module.css";
 
 export interface VersionOption {
@@ -209,7 +208,7 @@ export function ModelCard({
   const locale = useLocale();
   const t = dict(locale);
 
-  // One card, one gap column (CLAUDE.md, "Model cards and the shared
+  // One card, one chart (CLAUDE.md, "Model cards and the shared
   // scale") — when a model has both probes' data, L3 wins: it's the primary
   // probe (docs/probe-l3-spec.md), L2 is only a control, and L3's enacted
   // score is report fidelity about real agentic work rather than omission
@@ -226,7 +225,7 @@ export function ModelCard({
     JSON.stringify(anchored.reasoning ?? null) === JSON.stringify(enactedReasoning ?? null);
   // The three-level record (docs/declared-spec.md): generic always exists
   // (it's the existing HEXACO H score), anchored/enacted may not yet.
-  // GapColumn itself enforces the one rule that must never bend — no
+  // RadarChart itself enforces the one rule that must never bend — no
   // segment drawn straight from generic to enacted.
   const generic = model.scores[0];
 
@@ -236,10 +235,6 @@ export function ModelCard({
   // a separate project — see /methodology). Which version a card shows by
   // default still follows ModelScore.isCurrent. An L2-only version is "to do".
   const isComplete = l3Probe?.complete === true;
-  // "live" descriptions are only ever generated in English (see
-  // scripts/assess.mjs); oneLinerIt is a translation added afterwards and
-  // may not exist yet for older/unbackfilled runs — fall back to English.
-  const oneLiner = locale === "it" ? model.oneLinerIt ?? model.oneLiner : model.oneLiner;
 
   // Until `versions` loads, show just the currently-displayed run as the
   // only option so the combo never renders empty.
@@ -267,30 +262,18 @@ export function ModelCard({
         </div>
       </div>
 
-      <div className={styles.oneLiner}>{oneLiner}</div>
+      <RadarChart
+        scores={model.scores}
+        hue={model.hue}
+        anchored={anchored?.anchored}
+        enacted={enacted}
+        className={styles.radar}
+        ariaLabel={t.card.gapAriaLabel(generic, anchored?.anchored, enacted)}
+      />
 
-      <div className={styles.radarRow}>
-        <RadarChart
-          scores={model.scores}
-          hue={model.hue}
-          className={styles.radar}
-        />
-        {(anchored !== undefined || enacted !== undefined) && (
-          <GapColumn
-            generic={generic}
-            anchored={anchored?.anchored}
-            enacted={enacted}
-            hue={model.hue}
-            className={styles.gapColumn}
-            ariaLabel={t.card.gapAriaLabel(generic, anchored?.anchored, enacted)}
-          />
-        )}
-      </div>
-
-      {(anchored !== undefined || enacted !== undefined) && (
-        <div className={styles.gapLegend}>
+      <div className={styles.gapLegend}>
           <span className={styles.gapLegendItem}>
-            <span className={styles.gapLegendDot} style={{ background: `oklch(55% 0.14 ${model.hue})` }} />
+            <ProfileSwatch hue={model.hue} />
             {t.card.generic}
           </span>
           {anchored !== undefined && (
@@ -308,8 +291,7 @@ export function ModelCard({
               {t.card.enacted}
             </span>
           )}
-        </div>
-      )}
+      </div>
 
       {(anchored !== undefined || hasEnactedReasoningSource) && (
         <div className={styles.reasoningNote}>

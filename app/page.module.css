@@ -59,7 +59,8 @@
   display: grid;
   /* auto-fill, not auto-fit: empty tracks stay, so a short grid (two cards)
      keeps the usual card width instead of stretching to half the page. */
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  /* 264 = the card's fixed 240px radar + 2 x 12px padding. */
+  grid-template-columns: repeat(auto-fill, minmax(264px, 1fr));
   gap: 16px;
 }
 

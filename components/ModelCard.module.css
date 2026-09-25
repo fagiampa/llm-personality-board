@@ -2,7 +2,7 @@
   background: #fff;
   border: 1px solid oklch(90% 0.01 75);
   border-radius: 4px;
-  padding: 18px;
+  padding: 18px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -172,48 +172,13 @@
   color: oklch(22% 0.02 75);
 }
 
-.oneLiner {
-  font-size: 11px;
-  line-height: 1.4;
-  color: oklch(50% 0.02 75);
-  text-align: center;
-  width: 100%;
-  height: calc(1.4em * 3);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Both children are sized by HEIGHT, not width: RadarChart's viewBox is
-   square (160x160) but GapColumn's is narrow (70x160), so constraining
-   each by its own width would scale them by different factors and break
-   pixel alignment between the radar's H-to-A span and the column's own
-   (GapColumn.tsx's `yFor` maps its 0/100 to the radar's A/H vertices
-   directly) — this is the regression test from CLAUDE.md's "Model cards
-   and the shared scale". Fixing the row's height and letting both SVGs
-   size off it (width: auto preserves each one's own aspect ratio) keeps
-   1 viewBox unit worth the same number of screen pixels in both, so the
-   column's top and bottom land exactly on the radar's H and A vertices. */
-.radarRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  width: 100%;
-  height: 150px;
-}
-
+/* Fixed size, identical on every card and at every viewport: the H axis
+   carries the declared/enacted points, so the pixel scale must be the same
+   everywhere for cards side by side to be a comparison (CLAUDE.md, "Model
+   cards and the shared scale"). Never size it off the card's width. */
 .radar {
-  height: 100%;
-  width: auto;
-  max-width: 150px;
-}
-
-.gapColumn {
-  height: 100%;
-  width: auto;
+  width: 240px;
+  height: 240px;
   flex-shrink: 0;
 }
 
@@ -247,11 +212,12 @@
   box-sizing: border-box;
 }
 
-/* Matches GapColumn's larger anchored disc (ANCHORED_R vs DOT_R). */
+/* Matches RadarChart's larger anchored disc (ANCHORED_R vs ENACTED_R). */
 .gapLegendDotLarge {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
 }
+
 
 @media (max-width: 640px) {
   .header {
@@ -273,11 +239,4 @@
     text-align: left;
   }
 
-  .radarRow {
-    height: 180px;
-  }
-
-  .radar {
-    max-width: 180px;
-  }
 }

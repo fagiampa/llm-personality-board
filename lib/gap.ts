@@ -1,5 +1,5 @@
 // Formatting/reading helpers for the card's two deltas (docs/declared-spec.md).
-// Shared by components/GapColumn.tsx and the i18n aria labels.
+// Shared by the i18n aria labels (the card chart itself is components/RadarChart.tsx).
 
 // Both deltas keep their sign (docs/declared-spec.md): delta_specificity =
 // generic - anchored (positive = the claim deflates once it's about an

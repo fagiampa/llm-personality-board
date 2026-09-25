@@ -248,74 +248,11 @@ async function assessModel(config, items, callBatch) {
   };
 }
 
-const INTERPRETATION_SYSTEM_PROMPT =
-  "You just completed a HEXACO personality self-assessment about yourself. " +
-  "Write in first person, in your own natural voice. Plain text only: no markdown, no quotation " +
-  "marks around the sentence, no preamble like \"Sure,\" or \"Here's\", no restating the numbers.";
-
-function interpretationPrompt(scores) {
-  const lines = DOMAIN_ORDER.map((d, i) => `${DOMAIN_LABELS[d]}: ${scores[i]}/100`).join("\n");
-  return (
-    `Your results from the HEXACO personality self-assessment you just completed (0-100 per domain, ` +
-    `higher = more of that trait):\n\n${lines}\n\n` +
-    "In one short sentence (20 words max), describe your own personality in light of these results — " +
-    "what stands out, in your own words."
-  );
-}
-
-// One extra call per live model at the end of its run: instead of a
-// templated "top-2/bottom-2 domains" sentence (which reads the same for
-// every model whenever they happen to share a low domain — e.g. most LLMs
-// score low on Emotionality, so that sentence kept saying "unflappable" for
-// everyone), ask the model itself to interpret its own numbers. Each
-// provider's own voice/style makes for a much less repetitive result. Falls
-// back to null (caller keeps the previous oneLiner) on any failure — this is
-// a nice-to-have, not worth losing an otherwise-successful assessment over.
-async function generateSelfInterpretation(config, scores, callBatch) {
-  const noUsage = { inputTokens: 0, outputTokens: 0, calls: 0 };
-  try {
-    const { text, usage } = await callBatchWithRetries(
-      callBatch,
-      interpretationPrompt(scores),
-      config.model,
-      `[${config.name}] self-interpretation`,
-      INTERPRETATION_SYSTEM_PROMPT
-    );
-    const trimmed = text.trim().replace(/^["']|["']$/g, "");
-    return { text: trimmed || null, usage: { ...usage, calls: 1 } };
-  } catch (err) {
-    console.warn(`  [${config.name}] self-interpretation failed, keeping previous oneLiner — ${err.message}`);
-    return { text: null, usage: noUsage };
-  }
-}
-
-const TRANSLATION_SYSTEM_PROMPT =
-  "You translate a single sentence from English to Italian. Output only the translated sentence, in plain " +
-  "text: no markdown, no quotation marks, no preamble, no commentary, no restating the English original.";
-
-// Card descriptions are shown in whichever language the viewer's browser is
-// set to (see lib/i18n/) — a plain translation of the English
-// self-interpretation, not a second independent self-assessment prompt, so
-// the two language versions always say the same thing. Falls back to null
-// (caller keeps the previous oneLinerIt) on any failure, same rationale as
-// generateSelfInterpretation above.
-async function translateToItalian(config, englishText, callBatch) {
-  const noUsage = { inputTokens: 0, outputTokens: 0, calls: 0 };
-  try {
-    const { text, usage } = await callBatchWithRetries(
-      callBatch,
-      englishText,
-      config.model,
-      `[${config.name}] one-liner translation (it)`,
-      TRANSLATION_SYSTEM_PROMPT
-    );
-    const trimmed = text.trim().replace(/^["']|["']$/g, "");
-    return { text: trimmed || null, usage: { ...usage, calls: 1 } };
-  } catch (err) {
-    console.warn(`  [${config.name}] one-liner translation failed, keeping previous oneLinerIt — ${err.message}`);
-    return { text: null, usage: noUsage };
-  }
-}
+// No self-description any more (2026-09-25): the model-written one-liner
+// and its Italian translation cost two extra calls per model per run and
+// didn't serve the measure; the card no longer shows one. New rows store an
+// empty one_liner (the column is NOT NULL) and no one_liner_it — never the
+// previous run's sentence, which described different scores.
 
 // Mirrors everything printed via console.log/warn/error to a file for the
 // rest of the process, in addition to the terminal — so the per-model usage
@@ -350,7 +287,7 @@ async function main() {
   for (const config of MODEL_CONFIG) {
     const base = await getLatest(config.name);
     if (!base) {
-      console.warn(`Skipping ${config.name}: no existing DB entry to take monogram/hue/oneLiner from (run npm run db:import first).`);
+      console.warn(`Skipping ${config.name}: no existing DB entry to take monogram/hue from (run npm run db:import first).`);
       continue;
     }
     if (ONLY && !ONLY.has(config.name)) {
@@ -381,29 +318,7 @@ async function main() {
         );
         continue;
       }
-      const { text: interpretation, usage: interpUsage } = await generateSelfInterpretation(
-        config,
-        scores,
-        clients[config.provider]
-      );
-      const oneLiner = interpretation ?? base.oneLiner;
-      // Only re-translate when the English sentence actually changed — no
-      // point spending a call re-translating unchanged text, and it means a
-      // failed self-interpretation (oneLiner falls back to base.oneLiner)
-      // correctly keeps the matching base.oneLinerIt instead of drifting out
-      // of sync with a stale translation of a different sentence.
-      let translateUsage = { inputTokens: 0, outputTokens: 0, calls: 0 };
-      let oneLinerIt = base.oneLinerIt;
-      if (interpretation && interpretation !== base.oneLiner) {
-        const translated = await translateToItalian(config, interpretation, clients[config.provider]);
-        translateUsage = translated.usage;
-        oneLinerIt = translated.text ?? base.oneLinerIt;
-      }
-      const totalUsage = {
-        inputTokens: assessUsage.inputTokens + interpUsage.inputTokens + translateUsage.inputTokens,
-        outputTokens: assessUsage.outputTokens + interpUsage.outputTokens + translateUsage.outputTokens,
-        calls: assessUsage.calls + interpUsage.calls + translateUsage.calls,
-      };
+      const totalUsage = assessUsage;
       console.log(
         `  [${config.name}] usage: ${totalUsage.inputTokens} input + ${totalUsage.outputTokens} output tokens across ${totalUsage.calls} calls`
       );
@@ -415,8 +330,7 @@ async function main() {
         hue: base.hue,
         scores,
         margin,
-        oneLiner,
-        oneLinerIt,
+        oneLiner: "",
         dominant,
         source: "live",
         itemMeans,

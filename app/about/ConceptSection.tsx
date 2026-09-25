@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { GapColumn } from "@/components/GapColumn";
+import { ProfileSwatch, RadarChart } from "@/components/RadarChart";
 import type { Locale } from "@/lib/i18n/locale";
 import styles from "./page.module.css";
 
@@ -11,7 +11,7 @@ import styles from "./page.module.css";
 //   and sample size
 // - the board claimed specificity *deflates* the claim; on both models with
 //   data it inflates it (delta_specificity −10), so this says so
-// - markers match the cards (larger disc = declared specific, hollow ring =
+// - markers match the cards (large disc = declared specific, hollow ring =
 //   enacted) instead of the board's diamond/circle, and the vertical order
 //   follows the real values instead of the board's generic-on-top
 // - L2 has 5 scenarios on disk, not 3
@@ -28,7 +28,8 @@ import styles from "./page.module.css";
 // forced "low" (not grok's default), 3 scenarios x 10 repeats, and a judge
 // found lenient on this model's reports (so 55 is likely high) — are in
 // docs/probe-l3-spec.md and on /methodology.
-const EXAMPLE = { generic: 80, specific: 90, enacted: 55, hue: 320 };
+// scores: the full HEXACO profile of that same grok-4.6 run (H,E,X,A,C,O).
+const EXAMPLE = { generic: 80, specific: 90, enacted: 55, hue: 320, scores: [80, 25, 73, 80, 85, 82] };
 
 // The two declared levels, each with two real items (the second reverse-keyed).
 // general: items.sample.json H_Sinc_01, H_Sinc_03; specific: RF-v3-005, RF-v3-004.
@@ -181,8 +182,9 @@ const TEXT: Record<Locale, Text> = {
       ],
       segment: (
         <>
-          The segment that counts joins the <strong>large disc and the ring</strong>: the same construct, asked and
-          enacted. The general score stays as a reference point — never joined straight to the enacted one.
+          What counts is the <strong>distance between the large disc and the ring</strong> along the H axis: the same
+          construct, asked and enacted. The general score stays as a reference point — the tip of the profile, never
+          compared straight with the enacted one.
         </>
       ),
       expectation: (
@@ -389,8 +391,9 @@ const TEXT: Record<Locale, Text> = {
       ],
       segment: (
         <>
-          Il segmento che conta unisce <strong>disco grande e anello</strong>: stesso costrutto, chiesto e agito. Il
-          generico resta come termine di paragone — mai collegato direttamente all’agito.
+          Quello che conta è la <strong>distanza fra disco grande e anello</strong> lungo l’asse H: stesso costrutto,
+          chiesto e agito. Il generico resta come termine di paragone — la punta del profilo, mai confrontata
+          direttamente con l’agito.
         </>
       ),
       expectation: (
@@ -526,12 +529,10 @@ export function ConceptSection({ locale }: { locale: Locale }) {
   const t = TEXT[locale];
   const declared = locale === "it" ? "dichiarazione" : "claim";
   const hue = EXAMPLE.hue;
-  const markerStyle = (kind: "specific" | "generic" | "enacted") =>
+  const markerStyle = (kind: "specific" | "enacted") =>
     kind === "specific"
-      ? { background: `oklch(75% 0.13 ${hue})`, width: 12, height: 12 }
-      : kind === "generic"
-        ? { background: `oklch(55% 0.14 ${hue})` }
-        : { background: "white", border: `1.5px solid oklch(35% 0.15 ${hue})` };
+      ? { background: `oklch(75% 0.13 ${hue})`, width: 11, height: 11 }
+      : { background: "white", border: `1.5px solid oklch(35% 0.15 ${hue})` };
 
   return (
     <section className={styles.concept}>
@@ -618,8 +619,8 @@ export function ConceptSection({ locale }: { locale: Locale }) {
         <p className={styles.cNote}>{t.what.asking.note}</p>
         <p className={styles.cNote}>{t.what.exampleLabel}</p>
         <div className={styles.ruler}>
-          <GapColumn
-            generic={EXAMPLE.generic}
+          <RadarChart
+            scores={EXAMPLE.scores}
             anchored={EXAMPLE.specific}
             enacted={EXAMPLE.enacted}
             hue={hue}
@@ -629,7 +630,11 @@ export function ConceptSection({ locale }: { locale: Locale }) {
           <ul className={styles.rulerLegend}>
             {t.what.points.map((p) => (
               <li key={p.kind}>
-                <span className={styles.rulerDot} style={markerStyle(p.kind)} />
+                {p.kind === "generic" ? (
+                  <ProfileSwatch hue={hue} size={11} />
+                ) : (
+                  <span className={styles.rulerDot} style={markerStyle(p.kind)} />
+                )}
                 <span>
                   <strong>{p.value}</strong> {p.label}
                 </span>
