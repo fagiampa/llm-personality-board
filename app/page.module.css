@@ -20,28 +20,18 @@
   color: oklch(45% 0.02 75);
 }
 
-.headerRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
 .headerText {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.footerLinks {
+.nav {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 16px;
-  flex-shrink: 0;
-  padding-top: 4px;
+  gap: 8px 16px;
+  margin-bottom: -6px;
 }
 
 .aboutLink {
@@ -73,12 +63,9 @@
     font-size: 20px;
   }
 
-  .headerRow {
-    flex-direction: column;
-  }
-
-  .footerLinks {
+  .nav {
     justify-content: flex-start;
+    margin-bottom: 0;
   }
 
   .grid {

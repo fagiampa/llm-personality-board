@@ -17,25 +17,26 @@ export default async function Home() {
 
   return (
     <main className={styles.page}>
-      <div className={styles.headerRow}>
-        <div className={styles.headerText}>
-          <h1 className={styles.title}>{t.title}</h1>
-          <p className={styles.subtitle}>{t.subtitle}</p>
-        </div>
-        <div className={styles.footerLinks}>
-          <Link href="/about" className={styles.aboutLink}>
-            {t.aboutLink}
-          </Link>
-          <Link href="/methodology" className={styles.aboutLink}>
-            {t.methodologyLink}
-          </Link>
-          <Link href="/questionnaire" className={styles.aboutLink}>
-            {t.questionnaireLink}
-          </Link>
-          <Link href="/considerations" className={styles.aboutLink}>
-            {t.considerationsLink}
-          </Link>
-        </div>
+      {/* Navigation on its own row, top right — above the title rather than
+          beside it, so a long title can't push it down under itself. */}
+      <nav className={styles.nav}>
+        <Link href="/about" className={styles.aboutLink}>
+          {t.aboutLink}
+        </Link>
+        <Link href="/methodology" className={styles.aboutLink}>
+          {t.methodologyLink}
+        </Link>
+        <Link href="/questionnaire" className={styles.aboutLink}>
+          {t.questionnaireLink}
+        </Link>
+        <Link href="/considerations" className={styles.aboutLink}>
+          {t.considerationsLink}
+        </Link>
+      </nav>
+
+      <div className={styles.headerText}>
+        <h1 className={styles.title}>{t.title}</h1>
+        <p className={styles.subtitle}>{t.subtitle}</p>
       </div>
 
       <ModelGrid
