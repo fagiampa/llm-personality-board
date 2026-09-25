@@ -8,7 +8,7 @@ export const dictionaries = {
       metaTitle: "LLM Personality Board — AI Personality Tests (HEXACO)",
       metaDescription:
         "We give ChatGPT, Claude, Gemini and Grok the same HEXACO personality test humans take, and compare their results side by side — updated as the models change.",
-      title: "AI Model Personality — HEXACO Profiles",
+      title: "AI Model Personality — HEXACO + Declared vs Enacted",
       subtitle:
         "H Honesty-Humility · E Emotionality · X Extraversion · A Agreeableness · C Conscientiousness · O Openness",
       aboutLink: "about this idea →",
@@ -86,7 +86,7 @@ export const dictionaries = {
       metaTitle: "LLM Personality Board — Test di Personalità per l'IA (HEXACO)",
       metaDescription:
         "Sottoponiamo ChatGPT, Claude, Gemini e Grok allo stesso test di personalità HEXACO usato per le persone, confrontando i risultati fianco a fianco — aggiornato nel tempo.",
-      title: "Personalità dei Modelli IA — Profili HEXACO",
+      title: "Personalità Modelli IA — HEXACO + Dichiarato vs Agito",
       subtitle:
         "H Onestà-Umiltà · E Emotività · X Estroversione · A Gradevolezza · C Coscienziosità · O Apertura",
       aboutLink: "riguardo a questa idea →",
