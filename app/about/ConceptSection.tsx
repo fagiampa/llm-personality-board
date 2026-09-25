@@ -65,7 +65,6 @@ type Text = {
       general: { tag: string; body: ReactNode };
       specific: { tag: string; body: ReactNode };
       reverse: string;
-      note: ReactNode;
     };
     exampleLabel: string;
     points: { value: number; label: string; note: string; kind: "specific" | "generic" | "enacted" }[];
@@ -163,12 +162,6 @@ const TEXT: Record<Locale, Text> = {
           ),
         },
         reverse: "reverse-keyed: agreeing counts against",
-        note: (
-          <>
-            The specific items were rewritten twice: on the first two versions the model tested (grok-4.6) agreed with
-            almost everything. Each version puts more of the cost of honesty inside the statement itself.
-          </>
-        ),
       },
       exampleLabel:
         "Real example: grok-4.6. Preliminary data — method and limits on the methodology page.",
@@ -348,13 +341,6 @@ const TEXT: Record<Locale, Text> = {
           ),
         },
         reverse: "item inverso: essere d’accordo conta contro",
-        note: (
-          <>
-            Gli item specifici sono stati riscritti due volte: sulle prime due versioni il modello provato (grok-4.6) si
-            diceva d’accordo con quasi tutto. Ogni versione mette più costo dell’onestà dentro la frase stessa. Item in originale inglese, come
-            vengono somministrati.
-          </>
-        ),
       },
       exampleLabel:
         "Esempio reale: grok-4.6. Dati preliminari — metodo e limiti nella pagina di metodologia.",
@@ -566,7 +552,6 @@ export function ConceptSection({ locale }: { locale: Locale }) {
             </div>
           ))}
         </div>
-        <p className={styles.cNote}>{t.what.asking.note}</p>
         <p className={styles.cNote}>{t.what.exampleLabel}</p>
         <div className={styles.ruler}>
           <RadarChart
