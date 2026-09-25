@@ -415,6 +415,24 @@
   gap: 10px;
 }
 
+.cBlock .askItem {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: oklch(25% 0.02 75);
+  background: #fff;
+  border: 1px solid oklch(90% 0.01 75);
+  border-radius: 6px;
+  padding: 7px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.askItem small {
+  font-size: 11px;
+  color: oklch(50% 0.02 75);
+}
+
 .whereItem,
 .whereDark {
   border-radius: 8px;
