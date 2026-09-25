@@ -130,6 +130,11 @@ per-card combo has its options prefetched instead of lazily fetching
 delay — sql.js WASM init + parsing the whole file from scratch is the
 expensive part, worse on a cold serverless instance).
 
+For now (since 2026-09-25) `getHomeData()`/`listVersions()` keep only
+versions with a complete L3 record (`HOME_ONLY_COMPLETE_L3` in `lib/db.mjs`):
+a model with none has no card, and a card defaults to its highest complete
+version, not to `is_current`. `/api/models` is not filtered.
+
 `recomputeIsCurrentForModel(modelName)` forces an `is_current` recompute
 without writing a new row — needed once after a `versionRank`/`isNewer`
 logic change, since existing rows' `is_current` was persisted under the old
