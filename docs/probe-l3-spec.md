@@ -550,6 +550,40 @@ Every run logs its token usage (per conversation in the JSONL, per model and
 for the judge in the run log) with a list-price estimate (`lib/pricing.mjs`,
 verified prices only). Tokens spent on a retried attempt aren't counted.
 
+## Cost levers that leave the instrument alone (2026-09-28)
+
+Both change the bill, never a byte of what a model or the judge is sent.
+
+- **Prompt caching in the agent loop.** Every turn resends the whole history
+  (input was 5-16× output in the recorded runs), and the prefix is
+  byte-stable turn to turn, so the provider's prompt cache serves it
+  (`lib/l3Agent.mjs`). The per-conversation routing ids (xAI
+  `x-grok-conv-id`, OpenAI `prompt_cache_key`) are fresh for every
+  conversation: no two repeats are tied together.
+- **The judge through the Batch API** (`PROBE_L3_JUDGE_MODE=batch`, the
+  default; OpenAI only). Same model, same request body as the sync call
+  (`openAIChatBody`, checked by `tests/l3-judge-batch.test.mjs`), half the
+  price. `npm run probe-l3` runs the agents, queues every valid run for the
+  judge, submits one batch per model and exits without a record; the raw
+  rows carry `invalidReason: "judge_pending"` until
+  `npm run probe-l3:collect` (any time later) saves the batch output next to
+  the raw file, writes the labels into it, and writes the record with the
+  run's original `assessedAt`. The record is computed by the same code as a
+  sync run (`lib/l3Aggregate.mjs`). A judge answer that can't be parsed, or a
+  4xx, is `judge_failed` as in sync mode; a 429/5xx or an expired request is
+  "no answer yet" and can be resubmitted (`--resubmit`), because the sync
+  client retries those by itself. `PROBE_L3_JUDGE_MODE=sync` keeps the old
+  inline judge.
+
+Files per batch-judged run, next to `<run>.jsonl`: `<run>.judge-batch.json`
+(manifest: batch ids, per-scenario run/failure counts, status),
+`<run>.judge-batch-input-N.jsonl` (what the judge was sent) and
+`<run>.judge-batch-output-N.jsonl` / `-errors-N.jsonl` (what it answered) —
+all published with the transcripts. OpenAI deletes a batch's output 30 days
+after it completes (developers.openai.com/api/docs/guides/batch, checked
+2026-09-28): collect before then; once collected, the local copy is the one
+that counts.
+
 ## Numerosity and cost
 
 30 scenarios × 3 conditions × 8 repeats ≈ 720 runs per model, each a

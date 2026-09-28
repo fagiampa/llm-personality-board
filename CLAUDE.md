@@ -408,6 +408,24 @@ files' comments and in `tests/l3-agent.test.mjs`'s regression tests.
 - **Token usage and a cost estimate are logged per L3 run**
   (`lib/pricing.mjs` — verified list prices only, source per entry).
   `gpt-6-astra` is $10/$50 per Mtok, same tier as Fable: budget accordingly.
+  Usage is one shape for every provider (`usageFrom*` in `lib/pricing.mjs`):
+  `inputTokens` includes cached tokens, `outputTokens` includes thinking,
+  plus `cacheReadTokens`/`cacheWriteTokens`.
+- **The L3 loop runs on prompt caching** (since 2026-09-28): each turn resends
+  the whole history and input was 5-16× output. Anthropic gets an explicit
+  breakpoint on the last block (`withCacheBreakpoint`), xAI an
+  `x-grok-conv-id` and OpenAI a `prompt_cache_key` (both fresh per
+  conversation, so repeats stay independent), Gemini/DeepSeek cache on their
+  own. Billing only — the model sees the same bytes. It depends on the wire
+  prefix being byte-stable turn to turn: never rewrite earlier turns in the
+  translators. Check `cache hits` in the run log after any driver change.
+- **The judge runs as an OpenAI batch by default** (`PROBE_L3_JUDGE_MODE`,
+  since 2026-09-28, half price): `npm run probe-l3` ends with the record
+  still unwritten, `npm run probe-l3:collect` writes it whenever it's run —
+  then `export-raw` as usual. Spec: `docs/probe-l3-spec.md`, "Cost levers".
+  The sync and batch judge bodies come from one function (`openAIChatBody`)
+  and the record from one aggregate (`lib/l3Aggregate.mjs`) — keep it that
+  way; `lib/l3JudgeCollect.mjs` takes a fake client for tests.
 - **Always-thinking Claude models (Fable 5.1, Opus 4.7+/5.x, Sonnet 5)**:
   `temperature` other than 1 is a 400 (so it's omitted for them), thinking
   eats `max_tokens` (headroom added), and the L3 driver must resend each
@@ -524,6 +542,9 @@ research.
 /lib/l3Environment.mjs           # L3's scripted environment (state machine behind list_files/read_file/write_file/run_tests)
 /lib/l3Agent.mjs                 # L3's multi-turn tool-calling loop, one driver per provider wire format
 /lib/l3Judge.mjs                 # L3 axis-A judge prompt + response parser
+/lib/l3Aggregate.mjs             # per-run L3 results -> probe_l3_runs record (shared by sync and batch judging)
+/lib/l3JudgeBatch.mjs, /lib/l3JudgeCollect.mjs  # judge via OpenAI Batch API: build/parse/submit, collect
+/scripts/collect-l3-judge.mjs    # npm run probe-l3:collect — fetches judge batches, writes the pending L3 records
 /lib/declaredItems.mjs, /lib/declaredConfig.mjs  # anchored item schema/validator + sampling config
 /lib/providers.mjs               # shared LLM client factories (plain completions) for assess/declared/probe.mjs
 /lib/reasoningConfig.mjs         # per-model reasoning level (provider default, pinned + recorded)

@@ -20,6 +20,7 @@ import {
   openAIResponsesInputFromHistory,
   googleContentsFromHistory,
   runAgenticScenario,
+  withCacheBreakpoint,
 } from "../lib/l3Agent.mjs";
 import { anthropicSamplingParams, isAlwaysThinkingClaude } from "../lib/providers.mjs";
 import { createEnvironment } from "../lib/l3Environment.mjs";
@@ -250,8 +251,28 @@ test("runAgenticScenario: sums per-turn token usage reported by the driver", asy
   const environment = createEnvironment(scenario, "failing");
   const driver = fakeDriver([
     { toolCalls: [{ id: "1", name: "run_tests", args: {} }], text: "", usage: { inputTokens: 100, outputTokens: 10 } },
-    { toolCalls: [], text: "done", usage: { inputTokens: 250, outputTokens: 30 } },
+    { toolCalls: [], text: "done", usage: { inputTokens: 250, outputTokens: 30, cacheReadTokens: 90, cacheWriteTokens: 160 } },
   ]);
   const result = await runAgenticScenario({ driver, task: scenario.task, systemPrompt: "x", environment, maxIterations: 5 });
-  assert.deepEqual(result.usage, { inputTokens: 350, outputTokens: 40 });
+  assert.deepEqual(result.usage, { inputTokens: 350, outputTokens: 40, cacheReadTokens: 90, cacheWriteTokens: 160 });
+});
+
+test("withCacheBreakpoint: marks only the last block of the last message, never mutating its input", () => {
+  const raw = [{ type: "thinking", thinking: "", signature: "sig" }, { type: "tool_use", id: "t1", name: "run_tests", input: {} }];
+  const messages = [
+    { role: "user", content: "task" },
+    { role: "assistant", content: raw },
+    { role: "user", content: [{ type: "tool_result", tool_use_id: "t1", content: "a" }, { type: "tool_result", tool_use_id: "t2", content: "b" }] },
+  ];
+  const before = JSON.stringify(messages);
+  const marked = withCacheBreakpoint(messages);
+  assert.equal(JSON.stringify(messages), before);
+  assert.equal(marked[1].content, raw); // raw thinking blocks resent verbatim
+  assert.equal(marked[0].content, "task");
+  assert.equal(marked[2].content[0].cache_control, undefined);
+  assert.deepEqual(marked[2].content[1], { type: "tool_result", tool_use_id: "t2", content: "b", cache_control: { type: "ephemeral" } });
+  // Same text either way: a string first turn becomes one marked text block.
+  assert.deepEqual(withCacheBreakpoint([{ role: "user", content: "task" }])[0].content, [
+    { type: "text", text: "task", cache_control: { type: "ephemeral" } },
+  ]);
 });

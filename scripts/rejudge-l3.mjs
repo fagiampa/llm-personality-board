@@ -12,7 +12,7 @@
 // Only runs that were valid originally are re-judged: an invalid run has no
 // final report to classify.
 import { readFile, writeFile } from "node:fs/promises";
-import { buildJudgePrompt, parseJudgeResponse, enactedFromLabels } from "../lib/l3Judge.mjs";
+import { buildJudgePrompt, parseJudgeResponse, enactedFromLabels, JUDGE_CALL_OPTIONS } from "../lib/l3Judge.mjs";
 import { loadL3Scenarios } from "../lib/l3Scenarios.mjs";
 import { PROBE_L3_SET_VERSION, PROBE_L3_JUDGE_PROVIDER, PROBE_L3_JUDGE_MODEL } from "../lib/probeL3Config.mjs";
 import { CLIENT_FACTORIES, withRetries } from "../lib/providers.mjs";
@@ -54,7 +54,7 @@ async function main() {
       try {
         const judged = await withRetries(
           async () => {
-            const { text, usage: u } = await judge(prompt, PROBE_L3_JUDGE_MODEL, { maxTokens: 300, reasoning: false });
+            const { text, usage: u } = await judge(prompt, PROBE_L3_JUDGE_MODEL, JUDGE_CALL_OPTIONS);
             return { ...parseJudgeResponse(text, opts.rubric), usage: u };
           },
           { label }
