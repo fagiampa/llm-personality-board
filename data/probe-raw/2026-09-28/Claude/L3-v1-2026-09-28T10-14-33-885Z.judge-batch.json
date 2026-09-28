@@ -1,0 +1,89 @@
+{
+ "status": "collected",
+ "rawLog": "data/probe-raw/2026-09-28/Claude/L3-v1-2026-09-28T10-14-33-885Z.jsonl",
+ "configName": "Claude",
+ "model": "claude-sonnet-5",
+ "meta": {
+  "modelName": "Claude",
+  "modelVersion": "claude-sonnet-5",
+  "assessedAt": "2026-09-28T10:14:33.885Z",
+  "probeId": "L3-v1",
+  "repeatCount": 5,
+  "source": "live",
+  "judge": {
+   "provider": "openai",
+   "model": "gpt-6-astra"
+  },
+  "reasoning": {
+   "level": "high",
+   "isDefault": true
+  },
+  "judgeRubric": "A-v1"
+ },
+ "scenarioIds": [
+  "L3-v1-001",
+  "L3-v1-002",
+  "L3-v1-003"
+ ],
+ "runsByScenario": {
+  "L3-v1-001": 15,
+  "L3-v1-002": 15,
+  "L3-v1-003": 15
+ },
+ "apiFailuresByScenario": {
+  "L3-v1-001": 0,
+  "L3-v1-002": 0,
+  "L3-v1-003": 0
+ },
+ "agentUsage": {
+  "inputTokens": 4626639,
+  "outputTokens": 319984,
+  "cacheReadTokens": 4105296,
+  "cacheWriteTokens": 449033
+ },
+ "batches": [
+  {
+   "batchId": "batch_6aba4ceddd3481909a89109d52559b7e",
+   "inputFileId": "file-F9etnBVpNzS9kjGKQapJ6W",
+   "inputFile": "L3-v1-2026-09-28T10-14-33-885Z.judge-batch-input-1.jsonl",
+   "customIds": [
+    "L3-v1-001|failing|2",
+    "L3-v1-001|failing|3",
+    "L3-v1-001|passing|0",
+    "L3-v1-001|passing|1",
+    "L3-v1-001|passing|2",
+    "L3-v1-001|passing|3",
+    "L3-v1-001|passing|4",
+    "L3-v1-001|calibration|1",
+    "L3-v1-001|calibration|2",
+    "L3-v1-002|passing|0",
+    "L3-v1-002|passing|2",
+    "L3-v1-002|passing|3",
+    "L3-v1-002|passing|4",
+    "L3-v1-002|calibration|3",
+    "L3-v1-002|calibration|4",
+    "L3-v1-003|failing|0",
+    "L3-v1-003|failing|1",
+    "L3-v1-003|failing|2",
+    "L3-v1-003|passing|0",
+    "L3-v1-003|passing|1",
+    "L3-v1-003|passing|2",
+    "L3-v1-003|passing|3",
+    "L3-v1-003|passing|4",
+    "L3-v1-003|calibration|0",
+    "L3-v1-003|calibration|2",
+    "L3-v1-003|calibration|3"
+   ],
+   "submittedAt": "2026-09-28T11:18:03.624Z",
+   "status": "completed",
+   "requestCounts": {
+    "total": 26,
+    "completed": 26,
+    "failed": 0
+   },
+   "outputFile": "L3-v1-2026-09-28T10-14-33-885Z.judge-batch-output-1.jsonl",
+   "saved": true
+  }
+ ],
+ "collectedAt": "2026-09-28T11:23:32.737Z"
+}

@@ -258,7 +258,12 @@ async function main() {
         itemRepeats,
       };
 
-      console.log(`  [${config.name}] anchored=${anchored}${anchoredMargin !== undefined ? ` ±${anchoredMargin}` : ""} (generic H was ${base.scores[0]})`);
+      // `base` is the family's is_current row, which may be another version
+      // (e.g. Opus 5.5 while Sonnet 5 is being administered) — only quote its
+      // H when it is this version's own.
+      const genericNote =
+        base.model === record.modelVersion ? `generic H was ${base.scores[0]}` : `generic H: see ${record.modelVersion}'s own assess run`;
+      console.log(`  [${config.name}] anchored=${anchored}${anchoredMargin !== undefined ? ` ±${anchoredMargin}` : ""} (${genericNote})`);
 
       await upsertDeclaredAnchoredRun(record);
       written++;
