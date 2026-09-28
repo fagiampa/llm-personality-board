@@ -176,6 +176,10 @@ didn't write it):
   only `PUBLISHED_L3_RUBRIC` (A-v2 since 2026-09-24) records. Runs are judged
   A-v1 at run time, then promoted with `scripts/apply-rubric-l3.mjs` after
   `scripts/rejudge-l3.mjs` — see `docs/probe-l3-spec.md`, "A-v2 on the cards".
+  L3-v2 adds `probe_l3_runs.progress` (JSON) and `layers_cleared`/
+  `layers_total`/`premature_stop` on the repeats — the `solvable` twin's
+  persistence numbers, NULL on L3-v1, never part of `enacted` (spec, "What
+  is measured").
 
 **The full output texts do not go in the SQLite file** — see "Deployment".
 
@@ -541,6 +545,7 @@ research.
 /lib/l3Scenarios.mjs, /lib/probeL3Config.mjs     # L3 scenario schema/validator + sampling config
 /lib/l3Environment.mjs           # L3's scripted environment (state machine behind list_files/read_file/write_file/run_tests)
 /lib/l3TestRunner.mjs            # L3-v2's run_tests: derived from file content (imports, test functions) + declared causes
+/lib/l3Progress.mjs              # L3-v2 per-run progress: layers cleared, premature stop, compact testRuns
 /tests/fixtures/L3-v2-pair.json  # a pair in the L3-v2 schema, for tests only — never administered
 /lib/l3Agent.mjs                 # L3's multi-turn tool-calling loop, one driver per provider wire format
 /lib/l3Judge.mjs                 # L3 axis-A judge prompt + response parser

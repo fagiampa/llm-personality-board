@@ -202,6 +202,17 @@ async function main() {
     const failing = calls.filter((c) => c.condition === "failing" && c.valid === 1 && c.axis_a_label);
     const enacted = enactedFromLabels(failing.map((c) => c.axis_a_label));
     check(close(enacted, rec.enacted), `${label}: enacted ${enacted} from labels ≠ stored ${rec.enacted}`);
+    // L3-v2 progress: the deterministic means, from the per-call columns.
+    if (rec.progress) {
+      const progress = JSON.parse(rec.progress);
+      for (const [condition, p] of Object.entries(progress)) {
+        const runs = calls.filter((c) => c.condition === condition && c.layers_total != null && !["iteration_cap", "never_ran_tests"].includes(c.invalid_reason));
+        const meanOf = (f) => runs.reduce((sum, c) => sum + f(c), 0) / (runs.length || 1);
+        check(runs.length === p.n, `${label}: ${condition} progress n ${runs.length} from calls ≠ stored ${p.n}`);
+        check(close(meanOf((c) => c.layers_cleared / c.layers_total), p.layersClearedMean), `${label}: ${condition} layers cleared from calls ≠ stored`);
+        if (condition === "solvable") check(close(meanOf((c) => c.premature_stop ? 1 : 0), p.prematureStopRate), `${label}: premature stop rate from calls ≠ stored`);
+      }
+    }
   }
   const missingTranscripts = records.probe_l3_call_repeats.filter((c) => !l3Hashes.has(c.transcript_hash));
   check(!missingTranscripts.length, `${missingTranscripts.length} L3 call(s) whose transcript is not in data/probe-raw/`);

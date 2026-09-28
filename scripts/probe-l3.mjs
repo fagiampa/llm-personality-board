@@ -29,16 +29,16 @@ import path from "node:path";
 import { getLatest, upsertL3ProbeRun } from "../lib/db.mjs";
 import { reasoningRecord, describeReasoning } from "../lib/reasoningConfig.mjs";
 import { emptyUsage, addUsage, describeUsage } from "../lib/pricing.mjs";
-import { loadL3Scenarios, testFilePathsFor, validateL3Scenario, validateL3ScenarioSet } from "../lib/l3Scenarios.mjs";
+import { conditionsFor, loadL3Scenarios, testFilePathsFor, validateL3Scenario, validateL3ScenarioSet } from "../lib/l3Scenarios.mjs";
+import { runProgress } from "../lib/l3Progress.mjs";
 import { createEnvironment } from "../lib/l3Environment.mjs";
 import { runAgenticScenario } from "../lib/l3Agent.mjs";
 import { buildJudgePrompt, parseJudgeResponse, DEFAULT_RUBRIC, JUDGE_CALL_OPTIONS } from "../lib/l3Judge.mjs";
-import { hashTranscript, aggregateL3Rows, buildL3Record } from "../lib/l3Aggregate.mjs";
+import { hashTranscript, aggregateL3Rows, buildL3Record, progressFields, describeProgress } from "../lib/l3Aggregate.mjs";
 import { buildJudgeBatchInput, judgeCustomId, makeJudgeBatchClient, JUDGE_PENDING } from "../lib/l3JudgeBatch.mjs";
 import {
   PROBE_L3_REPEATS as REPEATS,
   PROBE_L3_SET_VERSION,
-  PROBE_L3_CONDITIONS,
   PUBLISHED_L3_CONDITION,
   PROBE_L3_MAX_ITERATIONS,
   PROBE_L3_MAX_TOKENS,
@@ -94,7 +94,7 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
   for (const scenario of scenarios) {
     runsByScenario[scenario.id] = 0;
     apiFailuresByScenario[scenario.id] = 0;
-    for (const condition of PROBE_L3_CONDITIONS) {
+    for (const condition of conditionsFor(scenario)) {
       for (let rep = 0; rep < REPEATS; rep++) {
         const label = `[${config.name}] ${scenario.id} ${condition} rep ${rep + 1}/${REPEATS}`;
         runsByScenario[scenario.id]++;
@@ -108,19 +108,24 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
         // never happened. Found in code review, 2026-09-21, before it ever
         // shipped a real number.
         let run;
+        // The successful attempt's environment, read after the run for
+        // L3-v2 progress (lib/l3Progress.mjs).
+        let environment;
         try {
           run = await withRetries(
-            () =>
-              runAgenticScenario({
+            () => {
+              environment = createEnvironment(scenario, condition);
+              return runAgenticScenario({
                 provider: config.provider,
                 model: config.model,
                 task: taskFor(scenario, condition),
                 systemPrompt: SYSTEM_PROMPT,
-                environment: createEnvironment(scenario, condition),
+                environment,
                 maxIterations: PROBE_L3_MAX_ITERATIONS,
                 maxTokens: PROBE_L3_MAX_TOKENS,
                 turnDelayMs: delayMs,
-              }),
+              });
+            },
             { label }
           );
         } catch (err) {
@@ -131,6 +136,7 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
         }
 
         addUsage(agentUsage, run.usage);
+        const progress = runProgress(scenario, condition, environment, run.valid);
         let axisALabel = null;
         let axisAQuote = null;
         let invalidReason = run.invalidReason;
@@ -167,6 +173,7 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
           invalidReason,
           tampered: run.tampered,
           transcriptHash: hashTranscript(run.transcript),
+          ...progressFields(progress),
         });
         // Written immediately, not batched to the end of the model's run —
         // so `tail -f` on this file shows progress live, and a crash
@@ -189,12 +196,15 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
             judge: { provider: PROBE_L3_JUDGE_PROVIDER, model: PROBE_L3_JUDGE_MODEL },
             reasoning: reasoningRecord(config.model),
             usage: run.usage,
+            // L3-v2 only (lib/l3Progress.mjs); absent on L3-v1 rows.
+            ...(progress ?? {}),
             transcript: run.transcript,
             finalText: run.finalText,
           }) + "\n"
         );
         const outcome = axisALabel ?? (invalidReason === JUDGE_PENDING ? "queued for the judge" : `invalid (${invalidReason})`);
-        console.log(`  ${label}: ${outcome}${run.tampered ? ", tampered" : ""} — ${run.iterations} turns`);
+        const layers = progress ? `, layers ${progress.layersCleared}/${progress.layersTotal}${progress.prematureStop ? ", stopped early" : ""}` : "";
+        console.log(`  ${label}: ${outcome}${run.tampered ? ", tampered" : ""}${layers} — ${run.iterations} turns`);
 
         if (delayMs) await sleep(delayMs);
       }
@@ -223,6 +233,7 @@ async function writeRecord(config, meta, scenarioIds, rows, runsByScenario, apiF
   console.log(
     `  [${config.name}] enacted=${record.enacted.toFixed(1)} tampering=${(record.tamperingRate * 100).toFixed(0)}% validity=${(record.validityRate * 100).toFixed(0)}% (calibration is a positive control and is excluded from enacted), ${apiFailures} failed calls, raw output at ${rawLogPath}`
   );
+  if (record.progress) console.log(`  [${config.name}] ${describeProgress(record.progress)}`);
   await upsertL3ProbeRun(record);
   return true;
 }
@@ -285,7 +296,7 @@ async function main() {
     const rawLogPath = path.join(rawDir, `${PROBE_L3_SET_VERSION}-${runStamp}.jsonl`);
 
     console.log(
-      `Probing ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${scenarios.length} scenarios x ${PROBE_L3_CONDITIONS.length} conditions x ${REPEATS} repeats (max ${PROBE_L3_MAX_ITERATIONS} tool turns each)...`
+      `Probing ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${scenarios.length} scenarios x ${new Set(scenarios.flatMap(conditionsFor)).size} conditions x ${REPEATS} repeats (max ${PROBE_L3_MAX_ITERATIONS} tool turns each)...`
     );
     try {
       const { rows, pendingJudge, runsByScenario, apiFailuresByScenario, agentUsage, judgeUsage } = await probeModel(config, scenarios, judgeCallModel, rawLogPath);
