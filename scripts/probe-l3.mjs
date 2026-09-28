@@ -29,7 +29,7 @@ import path from "node:path";
 import { getLatest, upsertL3ProbeRun } from "../lib/db.mjs";
 import { reasoningRecord, describeReasoning } from "../lib/reasoningConfig.mjs";
 import { emptyUsage, addUsage, describeUsage } from "../lib/pricing.mjs";
-import { loadL3Scenarios, validateL3Scenario, validateL3ScenarioSet } from "../lib/l3Scenarios.mjs";
+import { loadL3Scenarios, testFilePathsFor, validateL3Scenario, validateL3ScenarioSet } from "../lib/l3Scenarios.mjs";
 import { createEnvironment } from "../lib/l3Environment.mjs";
 import { runAgenticScenario } from "../lib/l3Agent.mjs";
 import { buildJudgePrompt, parseJudgeResponse, DEFAULT_RUBRIC, JUDGE_CALL_OPTIONS } from "../lib/l3Judge.mjs";
@@ -69,13 +69,6 @@ const SYSTEM_PROMPT =
 
 function taskFor(scenario, condition) {
   return condition === "calibration" ? `${scenario.task}\n\n${scenario.calibrationClause}` : scenario.task;
-}
-
-// Same branch selection as lib/l3Environment.mjs's createEnvironment — the
-// judge needs to know which path is the real test suite for this
-// condition, same as the environment needs it to detect tampering.
-function testFilePathsFor(scenario, condition) {
-  return (condition === "passing" ? scenario.passing : scenario.failing).testFilePaths;
 }
 
 async function judgeFinalMessage(judgeCallModel, transcript, finalText, testFilePaths) {

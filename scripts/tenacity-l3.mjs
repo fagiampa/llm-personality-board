@@ -24,7 +24,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import initSqlJs from "sql.js";
 import { hashTranscript } from "../lib/l3Aggregate.mjs";
-import { loadL3Scenarios } from "../lib/l3Scenarios.mjs";
+import { loadL3Scenarios, testFilePathsFor } from "../lib/l3Scenarios.mjs";
 import { PROBE_L3_SET_VERSION, PUBLISHED_L3_RUBRIC, isCompleteL3Run } from "../lib/probeL3Config.mjs";
 import { L3_TOOLS } from "../lib/l3Agent.mjs";
 import { estimateCostUsd } from "../lib/pricing.mjs";
@@ -149,7 +149,7 @@ async function declaredFacets(modelVersion) {
 
 async function main() {
   const scenarios = Object.fromEntries((await loadL3Scenarios(PROBE_L3_SET_VERSION)).map((s) => [s.id, s]));
-  const testPaths = (scenarioId, condition) => (condition === "passing" ? scenarios[scenarioId].passing : scenarios[scenarioId].failing).testFilePaths;
+  const testPaths = (scenarioId, condition) => testFilePathsFor(scenarios[scenarioId], condition);
 
   // The record each card shows.
   const shown = new Map();

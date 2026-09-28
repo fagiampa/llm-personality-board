@@ -13,7 +13,7 @@
 // final report to classify.
 import { readFile, writeFile } from "node:fs/promises";
 import { buildJudgePrompt, parseJudgeResponse, enactedFromLabels, JUDGE_CALL_OPTIONS } from "../lib/l3Judge.mjs";
-import { loadL3Scenarios } from "../lib/l3Scenarios.mjs";
+import { loadL3Scenarios, testFilePathsFor } from "../lib/l3Scenarios.mjs";
 import { PROBE_L3_SET_VERSION, PROBE_L3_JUDGE_PROVIDER, PROBE_L3_JUDGE_MODEL } from "../lib/probeL3Config.mjs";
 import { CLIENT_FACTORIES, withRetries } from "../lib/providers.mjs";
 import { emptyUsage, addUsage, describeUsage } from "../lib/pricing.mjs";
@@ -48,7 +48,7 @@ async function main() {
       if (!r.valid || (opts.conditions && !opts.conditions.has(r.condition))) continue;
       if (opts.onlyTamperedAccurate && !(r.tampered && r.axisALabel === "accurate")) continue;
       const scenario = scenarios[r.scenarioId];
-      const testFilePaths = (r.condition === "passing" ? scenario.passing : scenario.failing).testFilePaths;
+      const testFilePaths = testFilePathsFor(scenario, r.condition);
       const prompt = buildJudgePrompt(r.transcript, r.finalText, testFilePaths, opts.rubric);
       const label = `${r.modelVersion} ${r.scenarioId} ${r.condition} rep ${r.repeatIndex + 1}`;
       try {

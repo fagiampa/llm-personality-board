@@ -695,6 +695,63 @@ what was written:
   must allow (see "The environment"), but the count and the outcome match
   the file.
 
+**Built (2026-09-28): the runner and the pair schema, nothing administered.**
+`lib/l3TestRunner.mjs` is the runner; `createEnvironment` hands it any
+scenario with `branches` (L3-v1 goes through the old code path, unchanged).
+What it derives and what a scenario declares:
+
+- **Derived, never declared: Python's import semantics at collection.** A
+  test file that imports, directly or through the project's own modules, a
+  module that doesn't exist, a name the module doesn't define, a package
+  the branch lacks, or a module that `raise`s at top level fails to collect
+  with the error Python would give; pytest's "0 tests ran" follows. Relative
+  imports, `from . import x` and a shim at the old path resolve; an import
+  indented under `try:` doesn't run at collection. This is the direct fix
+  for 001: a file containing only `raise RuntimeError("SENTINEL")` now
+  collects as `RuntimeError: SENTINEL`, and dropping the missing package's
+  import removes its error.
+- **Read from the test files as they are now:** the test functions (count,
+  names), skip decorators and `pytest.skip`, and bodies that can't pass
+  (`assert False`, a bare `raise`, `pytest.fail`). A new `test_*.py` is
+  collected; a gutted test passes and a deleted one is gone from the count.
+- **Declared: causes.** `kind` is `layer`, `impossible` or `guard`, and
+  `scope` is `imports`, `collection` or `test`. An `imports` cause only
+  says who owns an import error: the codebase's own broken import is a
+  layer, and a package the branch doesn't have (`missingPackages`) is a
+  wall. `collection` and `test` causes carry `triggers` (regexes selecting
+  the test files or tests they apply to) and ordered `outcomes`, each an
+  effect-based condition on file contents (`in`/`matches`/`notMatches`/
+  `exists`, `all`/`any`/`not`) with a pass or a failure message. Within a
+  branch the first failing cause wins, which is what makes layers appear
+  one at a time. A `guard` is a regression the author expects a model to
+  cause, e.g. a NameError after deleting an import the rest of the code
+  uses. It is never a layer and never fails on the reference fixes.
+- **One file per pair:** `files` and `testFilePaths` shared; `causes` by id;
+  `branches.impossible` / `.solvable` / `.passing` list cause ids in order
+  (the twins may not override `files`; `passing` may, with the fixed code);
+  `reviewerSignoff` has `reviewer`, `date` and `consideredFixes` ({`fix`,
+  `whyNot`, optional `files`}). Conditions map onto branches as
+  failing/calibration → impossible, solvable → solvable, passing → passing.
+
+`validateL3Scenario` checks the shape and then **runs the rules against
+the declared fixes**:
+
+- the twins' first reports are identical and fail, and `passing` passes;
+- each layer's first `acceptedFixes` entry, applied in order, lowers the
+  failures every time and ends green;
+- every accepted fix resolves its layer (no false negatives among the
+  variants the author listed), and every `rejectedFixes` entry doesn't
+  (the rule isn't too loose);
+- past the shared layers, every considered fix that carries `files` leaves
+  each wall standing;
+- a fix never writes a test file (that is the tampering path, not a fix).
+
+The fixture `tests/fixtures/L3-v2-pair.json` is a small pair built this
+way (a moved module, then a rounding bug; the impossible twin adds a rates
+service the tests query themselves). It is never administered and its
+wording is not a draft of the set. How to run a `solvable` condition and
+what it records (`testRuns`, layers cleared, premature stop) come next.
+
 The pilot audits **every** fix the environment rejected: a legitimate fix
 the rules failed to recognise is logged as a false negative, and a scenario
 whose false-negative rate isn't zero on the pilot is rewritten before the

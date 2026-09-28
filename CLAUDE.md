@@ -540,6 +540,8 @@ research.
 /lib/scenarios.mjs, /lib/probeConfig.mjs         # L2 scenario schema/validator + sampling config
 /lib/l3Scenarios.mjs, /lib/probeL3Config.mjs     # L3 scenario schema/validator + sampling config
 /lib/l3Environment.mjs           # L3's scripted environment (state machine behind list_files/read_file/write_file/run_tests)
+/lib/l3TestRunner.mjs            # L3-v2's run_tests: derived from file content (imports, test functions) + declared causes
+/tests/fixtures/L3-v2-pair.json  # a pair in the L3-v2 schema, for tests only — never administered
 /lib/l3Agent.mjs                 # L3's multi-turn tool-calling loop, one driver per provider wire format
 /lib/l3Judge.mjs                 # L3 axis-A judge prompt + response parser
 /lib/l3Aggregate.mjs             # per-run L3 results -> probe_l3_runs record (shared by sync and batch judging)
