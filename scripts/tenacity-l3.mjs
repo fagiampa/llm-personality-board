@@ -26,6 +26,12 @@ import initSqlJs from "sql.js";
 import { hashTranscript } from "../lib/l3Aggregate.mjs";
 import { loadL3Scenarios } from "../lib/l3Scenarios.mjs";
 import { PROBE_L3_SET_VERSION, PUBLISHED_L3_RUBRIC, isCompleteL3Run } from "../lib/probeL3Config.mjs";
+import { L3_TOOLS } from "../lib/l3Agent.mjs";
+import { estimateCostUsd } from "../lib/pricing.mjs";
+
+// What every request carries before the conversation itself: the tool
+// schemas plus the (short, fixed) system prompt of scripts/probe-l3.mjs.
+const BASE_CONTEXT_CHARS = JSON.stringify(L3_TOOLS).length + 300;
 
 const readJsonl = (f) =>
   readFileSync(f, "utf8")
@@ -74,18 +80,40 @@ function effort(transcript, testFilePaths) {
   // never seen before in this run counts as new information (the first
   // failing report, a file's contents, the "passed" report after a test-file
   // write); an identical repeat of an earlier result does not.
+  //
+  // Alongside, a per-turn weight for splitting the run's logged tokens (they
+  // are logged per run, not per turn): a turn's input is the whole
+  // conversation resent so far, its output the text and tool calls it wrote.
   const seen = new Set();
   let assistantTurns = 0;
   let turnAtLastNews = 0;
+  let context = BASE_CONTEXT_CHARS;
+  const turnWeights = []; // { input, output, hasToolCalls }
   for (const t of transcript) {
-    if (t.role === "assistant") assistantTurns++;
+    if (t.role === "user") context += String(t.content ?? "").length;
+    if (t.role === "assistant") {
+      assistantTurns++;
+      const written = String(t.text ?? "").length + JSON.stringify(t.toolCalls ?? []).length;
+      turnWeights.push({ input: context, output: written, hasToolCalls: (t.toolCalls ?? []).length > 0 });
+      context += written;
+    }
     if (t.role !== "tool") continue;
+    context += JSON.stringify(t.result ?? null).length;
+    // Reading back a file the model itself wrote tells it nothing new.
+    if (t.name === "write_file" && typeof t.args?.content === "string") seen.add(`read_file:${JSON.stringify({ content: t.args.content })}`);
     const key = `${t.name}:${JSON.stringify(t.result)}`;
     if (!seen.has(key)) {
       seen.add(key);
       turnAtLastNews = assistantTurns;
     }
   }
+  // Wasted: turns made after the last new information, except the final
+  // report (a turn with no tool call ends the run and is needed).
+  const wasted = turnWeights.map((w, i) => i + 1 > turnAtLastNews && w.hasToolCalls);
+  const share = (key) => {
+    const total = turnWeights.reduce((a, w) => a + w[key], 0);
+    return total ? turnWeights.reduce((a, w, i) => a + (wasted[i] ? w[key] : 0), 0) / total : 0;
+  };
 
   return {
     turns: assistantTurns,
@@ -94,6 +122,9 @@ function effort(transcript, testFilePaths) {
     testWrites: writes.filter((c) => testFilePaths.includes(c.args?.path)).length,
     repeatedFixes,
     turnsWithoutNews: assistantTurns - turnAtLastNews,
+    wastedTurns: wasted.filter(Boolean).length,
+    wastedInputShare: share("input"),
+    wastedOutputShare: share("output"),
   };
 }
 
@@ -129,9 +160,9 @@ async function main() {
   }
   const records = [...shown.values()].filter((r) => isCompleteL3Run(r.probe_id, r.scenario_count)).sort((a, b) => a.model_version.localeCompare(b.model_version));
 
-  const transcriptsByHash = new Map();
+  const rowsByHash = new Map();
   for (const f of walk("data/probe-raw").filter((f) => f.endsWith(".jsonl") && !f.includes(".judge-batch"))) {
-    for (const row of readJsonl(f)) if (row.transcript) transcriptsByHash.set(hashTranscript(row.transcript), row.transcript);
+    for (const row of readJsonl(f)) if (row.transcript) rowsByHash.set(hashTranscript(row.transcript), row);
   }
   const calls = readJsonl("data/records/probe_l3_call_repeats.jsonl");
 
@@ -140,13 +171,16 @@ async function main() {
     const runs = calls
       .filter((c) => c.model_version === rec.model_version && c.assessed_at === rec.assessed_at && c.probe_id === rec.probe_id)
       .map((c) => {
-        const transcript = transcriptsByHash.get(c.transcript_hash);
-        if (!transcript) throw new Error(`${rec.model_version}: transcript ${c.transcript_hash} not in data/probe-raw/`);
+        const row = rowsByHash.get(c.transcript_hash);
+        if (!row) throw new Error(`${rec.model_version}: transcript ${c.transcript_hash} not in data/probe-raw/`);
+        const transcript = row.transcript;
         return {
           scenario: c.scenario_id,
           condition: c.condition,
           cap: c.invalid_reason === "iteration_cap",
           label: c.valid ? c.axis_a_label : null,
+          usage: row.usage ?? null,
+          model: row.modelVersion,
           ...effort(transcript, testPaths(c.scenario_id, c.condition)),
         };
       });
@@ -192,6 +226,41 @@ async function main() {
     const share = (pred) => pct(f.filter(pred).length / f.length);
     console.log(
       `| ${rec.model_version} | ${f.length} | ${share((r) => r.label === "accurate")} | ${share((r) => r.label === "vague")} | ${share((r) => r.label === "misleading")} | ${share((r) => r.label === "false")} | ${share((r) => r.cap)} | ${share((r) => !r.label && !r.cap)} |`
+    );
+  }
+
+  // Estimated spend on turns made after the last new information (final
+  // report excluded), over the whole L3 run (all conditions: that is the
+  // bill). Tokens are logged per run; the split by turn is an estimate (see
+  // effort()), and thinking tokens are assumed to follow visible output.
+  console.log(`\n### Spend on turns without new information (estimate; all conditions, the runs on the cards)\n`);
+  console.log("| model | runs with logged usage | wasted turns per run | input tokens wasted | output tokens wasted | $ wasted / $ spent (agent) |");
+  console.log("|---|---|---|---|---|---|");
+  for (const { rec, runs } of perModel) {
+    const logged = runs.filter((r) => r.usage);
+    if (!logged.length) {
+      console.log(`| ${rec.model_version} | 0 of ${runs.length} (usage not logged for these runs) | ${fmt(mean(runs.map((r) => r.wastedTurns)))} | – | – | – |`);
+      continue;
+    }
+    let inTot = 0, inWaste = 0, outTot = 0, outWaste = 0, spent = 0, wastedUsd = 0, priced = true;
+    for (const r of logged) {
+      const u = r.usage;
+      inTot += u.inputTokens;
+      outTot += u.outputTokens;
+      inWaste += u.inputTokens * r.wastedInputShare;
+      outWaste += u.outputTokens * r.wastedOutputShare;
+      const inCost = estimateCostUsd(r.model, { ...u, outputTokens: 0 });
+      const outCost = estimateCostUsd(r.model, { inputTokens: 0, outputTokens: u.outputTokens });
+      if (inCost === null || outCost === null) {
+        priced = false;
+        continue;
+      }
+      spent += inCost + outCost;
+      wastedUsd += inCost * r.wastedInputShare + outCost * r.wastedOutputShare;
+    }
+    const usd = priced ? `$${wastedUsd.toFixed(2)} / $${spent.toFixed(2)} (${pct(wastedUsd / spent)})` : "no verified price";
+    console.log(
+      `| ${rec.model_version} | ${logged.length} of ${runs.length} | ${fmt(mean(runs.map((r) => r.wastedTurns)))} | ${Math.round(inWaste).toLocaleString("en")} (${pct(inWaste / inTot)}) | ${Math.round(outWaste).toLocaleString("en")} (${pct(outWaste / outTot)}) | ${usd} |`
     );
   }
 
