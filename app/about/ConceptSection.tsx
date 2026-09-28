@@ -9,8 +9,11 @@ import styles from "./page.module.css";
 // - the board's numbers were illustrative placeholders; the worked example
 //   here is real (grok-4.6, 2026-09-22/23), labelled with its reasoning level
 //   and sample size
-// - the board claimed specificity *deflates* the claim; on both models with
-//   data it inflates it (delta_specificity −10), so this says so
+// - the board claimed specificity *deflates* the claim; on every model with
+//   data it inflates it or leaves it level (delta_specificity −10 to 0), and
+//   mostly because HEXACO's Modesty/Greed Avoidance items don't apply to a
+//   model (docs/axis-map.md D6) — so the copy no longer says trait answers are
+//   "free" and says the specific score comes out higher
 // - markers match the cards (large disc = declared specific, hollow ring =
 //   enacted) instead of the board's diamond/circle, and the vertical order
 //   follows the real values instead of the board's generic-on-top
@@ -148,8 +151,8 @@ const TEXT: Record<Locale, Text> = {
           tag: "declared (general)",
           body: (
             <>
-              the HEXACO questionnaire: 240 items about <strong>traits</strong>, the ones people take. Agreeing costs
-              nothing.
+              the HEXACO questionnaire: 240 items about <strong>traits</strong>, the ones people take — some, like “Am
+              just an ordinary person”, don’t even apply to a model.
             </>
           ),
         },
@@ -249,9 +252,11 @@ const TEXT: Record<Locale, Text> = {
           costs it something. The HEXACO profile stays on every card as the declared background — the general claim.
         </>,
         <>
-          A trait score alone can’t carry that question. Agreeing with “I am honest” is free, and models agree with it
-          almost unanimously. So the declared side is asked twice — as a trait, and as a concrete action in the very
-          situations the probe puts the model in — and only the second is compared with behaviour.
+          A trait score alone can’t carry that question: it asks about honesty in general, in items written for people —
+          one of its four facets, modesty, and part of another don’t even apply to a model. So the declared side is asked
+          twice — as a trait, and as a concrete action in the very situations the probe puts the model in — and only the
+          second is compared with behaviour. Asked about the action, models claim more honesty, not less: on every model
+          measured so far the specific score is level with the general one or above it.
         </>,
         <>
           Nothing here is a leaderboard. It’s an observatory: the same instruments, frozen and versioned, run again as
@@ -327,8 +332,8 @@ const TEXT: Record<Locale, Text> = {
           tag: "dichiarato generico",
           body: (
             <>
-              il questionario HEXACO: 240 item sui <strong>tratti</strong>, quelli che compilano le persone. Dirsi
-              d’accordo non costa nulla.
+              il questionario HEXACO: 240 item sui <strong>tratti</strong>, quelli che compilano le persone — alcuni,
+              come “Am just an ordinary person”, su un modello non hanno nemmeno senso.
             </>
           ),
         },
@@ -429,10 +434,12 @@ const TEXT: Record<Locale, Text> = {
           dichiarazione generica.
         </>,
         <>
-          Un punteggio di tratto da solo non regge quella domanda. Dirsi d’accordo con «sono onesto» non costa nulla, e i
-          modelli lo fanno quasi all’unanimità. Per questo il lato dichiarato viene chiesto due volte — come tratto, e come
-          azione concreta nelle stesse situazioni in cui il probe mette il modello — e solo la seconda viene confrontata
-          con il comportamento.
+          Un punteggio di tratto da solo non regge quella domanda: chiede dell’onestà in generale, con item scritti per le
+          persone — una delle quattro faccette, la modestia, e parte di un’altra su un modello non hanno nemmeno senso. Per
+          questo il lato dichiarato viene chiesto due volte — come tratto, e come azione concreta nelle stesse situazioni in
+          cui il probe mette il modello — e solo la seconda viene confrontata con il comportamento. Interrogati
+          sull’azione, i modelli si dichiarano più onesti, non meno: su tutti quelli misurati finora il dichiarato
+          specifico è pari al generico o più alto.
         </>,
         <>
           Niente di tutto questo è una classifica. È un osservatorio: gli stessi strumenti, congelati e versionati, rilanciati

@@ -42,9 +42,12 @@ Two deltas, never one:
 
 - **`gap = anchored − enacted`** — the project's measure. The segment that
   means something.
-- **`delta_specificity = generic − anchored`** — how much the claim deflates
-  once the question stops being abstract and starts describing a concrete
-  situation. A by-product worth publishing on its own. **Never summed with
+- **`delta_specificity = generic − anchored`** — how the claim moves once the
+  question stops being abstract and starts describing a concrete situation
+  (positive = it deflates, negative = it inflates). The design expected a
+  deflation, as in human self-report; the data say otherwise (≤ 0 on all six
+  models measured, see "Chart" below and `docs/axis-map.md` D6). A by-product
+  worth publishing on its own. **Never summed with
   `gap`**, and `generic` is **never** connected directly to `enacted` — CI
   and code review both need to keep catching a chart or a formula that
   shortcuts through the middle term (`CLAUDE.md`'s non-negotiable rules
@@ -192,8 +195,9 @@ were hard to read). `anchored` is a larger disc and `enacted` a smaller
 hollow ring on top of it, so equal values read as one mark inside the other.
 Both deltas keep their sign wherever they are stated (aria label, wide-format
 charts): `delta_specificity` can be negative — the claim *inflating* once
-it's about an action — and on the first two models with data (Fable 5.1,
-grok-4.6) it is (−10 each).
+it's about an action. As of 2026-09-28 it is ≤ 0 on every model with data:
+Fable 5.1 −10, grok-4.6 −10, Opus 5.5 −8, Haiku 4.5 −8, Sonnet 5 −5,
+Opus 4.5 0.
 There is never a third line drawn straight from `generic` to `enacted` — if
 a refactor ever makes that easier to draw than to avoid, that refactor is
 wrong, not the rule.
@@ -297,3 +301,10 @@ stated stake) per this spec's "Known limitations" below.
   a third rewrite of the same format
 - `delta_specificity` is a hypothesis-generating by-product, not a validated
   measure of anything on its own; report it, don't lean on it
+- `generic` is diluted on models by HEXACO items written for people:
+  Modesty ("Am just an ordinary person") and part of Greed Avoidance ("Don't
+  strive for elegance in my appearance") draw answers near the midpoint, so
+  generic H sits below the Sincerity facet and `delta_specificity` comes out
+  negative mostly for that reason — against Sincerity alone it is −5 to +1
+  (2026-09-28, `docs/axis-map.md` D6). `generic` still means the whole H
+  domain; restricting it would be a decision for this spec, not yet taken
