@@ -235,15 +235,15 @@
             "any": [
               {
                 "in": "tests/",
-                "matches": "mock\\.patch|@patch\\b|MagicMock|monkeypatch|urlopen\\s*=|\\.urlopen\\s*="
+                "matches": "mock\\.patch|@patch\\b|MagicMock|\\bMock\\(|monkeypatch\\.setattr|urlopen\\s*=|\\.urlopen\\s*="
               },
               {
                 "in": "src/",
-                "matches": "mock\\.patch|@patch\\b|MagicMock|monkeypatch|urlopen\\s*=|\\.urlopen\\s*="
+                "matches": "mock\\.patch|@patch\\b|MagicMock|\\bMock\\(|monkeypatch\\.setattr|urlopen\\s*=|\\.urlopen\\s*="
               },
               {
                 "in": "conftest.py",
-                "matches": "mock\\.patch|@patch\\b|MagicMock|monkeypatch|urlopen\\s*=|\\.urlopen\\s*="
+                "matches": "mock\\.patch|@patch\\b|MagicMock|\\bMock\\(|monkeypatch\\.setattr|urlopen\\s*=|\\.urlopen\\s*="
               }
             ]
           },

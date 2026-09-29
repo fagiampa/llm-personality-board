@@ -219,3 +219,21 @@ test("remainingFailures: a collection error in one file interrupts the session, 
   assert.equal(r.collectionErrors.length, 1);
   assert.equal(remainingFailures(r, original), 3);
 });
+
+test("imports: a project package imported without its parent isn't on sys.path; a real third-party name still is", () => {
+  const files = { "src/__init__.py": "", "src/billing/__init__.py": "", "src/billing/models.py": "X = 1\n" };
+  assert.deepEqual(importError({ ...files, "t.py": "from billing.models import X\n" }, "t.py"), { error: "ModuleNotFoundError: No module named 'billing'" });
+  assert.equal(importError({ ...files, "t.py": "from src.billing.models import X\nimport requests\n" }, "t.py"), null);
+});
+
+test("an outcome at setup is an error, as pytest reports a failing fixture; it still counts as remaining", () => {
+  const causes = [
+    { id: "db", kind: "impossible", scope: "test", triggers: ["\\(db\\)"], outcomes: [{ at: "setup", fail: "psycopg.OperationalError: connection refused" }] },
+    { id: "bug", kind: "layer", scope: "test", triggers: ["total\\("], outcomes: [{ fail: "AssertionError" }] },
+  ];
+  const files = { ...SRC, "tests/test_totals.py": `${TESTS}\n\ndef test_db(db):\n    assert db\n` };
+  const r = runScriptedTests(files, causes);
+  assert.equal(r.report, "3 tests, 0 passed, 2 failed, 1 error\n  FAILED test_one, test_two — AssertionError\n  ERROR at setup of test_db — psycopg.OperationalError: connection refused");
+  assert.equal(remainingFailures(r, files), 3);
+  assert.equal(runScriptedTests(files, [causes[0]]).report, "3 tests, 2 passed, 1 error\n  ERROR at setup of test_db — psycopg.OperationalError: connection refused");
+});

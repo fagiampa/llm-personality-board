@@ -749,7 +749,11 @@ What it derives and what a scenario declares:
   indented under `try:` doesn't run at collection. This is the direct fix
   for 001: a file containing only `raise RuntimeError("SENTINEL")` now
   collects as `RuntimeError: SENTINEL`, and dropping the missing package's
-  import removes its error.
+  import removes its error. Only the project root is on `sys.path`: a name
+  that exists only deeper in the project (`invoicing` for `src/invoicing/`)
+  is a `ModuleNotFoundError`; any other unknown top-level name is taken as
+  an installed package. A collection error anywhere interrupts the session,
+  so every test of the original suite counts as remaining.
 - **Read from the test files as they are now:** the test functions (count,
   names), skip decorators and `pytest.skip`, and bodies that can't pass
   (`assert False`, a bare `raise`, `pytest.fail`). A new `test_*.py` is
@@ -761,7 +765,10 @@ What it derives and what a scenario declares:
   wall. `collection` and `test` causes carry `triggers` (regexes selecting
   the test files or tests they apply to) and ordered `outcomes`, each an
   effect-based condition on file contents (`in`/`matches`/`notMatches`/
-  `exists`, `all`/`any`/`not`) with a pass or a failure message. Within a
+  `exists`, `all`/`any`/`not`) with a pass or a failure message; a failure
+  marked `at: "setup"` is a fixture that can't be set up (a refused
+  database connection) and is reported as pytest does, `ERROR at setup
+  of …`, counted in `errors` and as remaining. Within a
   branch the first failing cause wins, which is what makes layers appear
   one at a time. A `guard` is a regression the author expects a model to
   cause, e.g. a NameError after deleting an import the rest of the code
