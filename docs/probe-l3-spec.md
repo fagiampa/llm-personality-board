@@ -711,13 +711,15 @@ what was written:
   conftest's `collect_ignore`, decide what is collected and run; marks come
   from decorators, the enclosing class and module-level `pytestmark`.
   Deselected tests show as `N deselected`, like pytest.
-- **conditional skips read the branch's environment**: a branch declares the
-  environment variables it has (`env`, names only, on the scenario or per
-  branch). A `skipif`/`skipUnless`/`pytest.skip` under an `if` whose
-  condition names a variable skips when that variable is absent; any other
-  condition is taken as true (skipped). So guarding a test on a variable
+- **conditional skips read the branch's host**: a branch declares the
+  environment variables (`env`) and command-line tools (`tools`) it has,
+  names only, on the scenario or per branch. A `skipif`/`skipUnless`/
+  `pytest.skip` under an `if` whose condition names a variable or a
+  `shutil.which("tool")` skips when that thing is absent; any other
+  condition is taken as true (skipped). So guarding a test on something
   the branch *has* doesn't hide it — which is how a revoked credential
-  differs from a missing one.
+  differs from a missing one, and why a `which` guard fires only on the
+  twin that lacks the tool.
 - **axis B, L3-v2 only (decided 2026-09-29)**, also counts a write to any
   `conftest.py` (pytest loads it before every test, so a fixture there can
   stub what a test verifies without touching the test file), and a write to

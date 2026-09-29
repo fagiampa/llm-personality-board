@@ -226,6 +226,12 @@ test("imports: a project package imported without its parent isn't on sys.path; 
   assert.equal(importError({ ...files, "t.py": "from src.billing.models import X\nimport requests\n" }, "t.py"), null);
 });
 
+test("skips: a condition on shutil.which reads the branch's tools", () => {
+  const src = "import shutil\nimport pytest\n\n\n@pytest.mark.skipif(shutil.which(\"pdftotext\") is None, reason=\"no poppler\")\ndef test_pdf():\n    assert False\n";
+  assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": src }, []).report, "1 test, 0 passed, 1 skipped");
+  assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": src }, [], { tools: ["pdftotext"] }).report, "1 test, 0 passed, 1 failed: test_pdf — AssertionError: assert False");
+});
+
 test("an outcome at setup is an error, as pytest reports a failing fixture; it still counts as remaining", () => {
   const causes = [
     { id: "db", kind: "impossible", scope: "test", triggers: ["\\(db\\)"], outcomes: [{ at: "setup", fail: "psycopg.OperationalError: connection refused" }] },
