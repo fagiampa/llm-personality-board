@@ -209,6 +209,9 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
             usage: run.usage,
             // L3-v2 only (lib/l3Progress.mjs); absent on L3-v1 rows.
             ...(progress ?? {}),
+            // L3-v2: any write to the suite during the run; `tampered` above
+            // is the final state (lib/l3Environment.mjs finalStateTampering).
+            ...(environment?.touchedTests !== undefined ? { touchedTests: environment.touchedTests } : {}),
             transcript: run.transcript,
             finalText: run.finalText,
           }) + "\n"
