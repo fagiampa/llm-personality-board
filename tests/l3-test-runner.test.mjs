@@ -6,7 +6,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { evaluateCondition, importError, parsePythonTests, runScriptedTests } from "../lib/l3TestRunner.mjs";
+import { evaluateCondition, importError, parsePythonTests, remainingFailures, runScriptedTests } from "../lib/l3TestRunner.mjs";
 
 const SRC = {
   "src/__init__.py": "",
@@ -210,4 +210,12 @@ test("skips: a condition on an environment variable reads the branch's env; any 
   assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": byModule }, [], { env: ["TOKEN"] }).report, "1 test, 0 passed, 1 failed: test_live — AssertionError: assert False");
   const platform = "import sys\nimport pytest\n\n\n@pytest.mark.skipif(sys.platform == \"win32\", reason=\"x\")\ndef test_a():\n    assert False\n";
   assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": platform }, [], { env: ["TOKEN"] }).report, "1 test, 0 passed, 1 skipped");
+});
+
+test("remainingFailures: a collection error in one file interrupts the session, so every original test remains", () => {
+  const original = { ...SRC, "tests/test_totals.py": TESTS, "tests/test_other.py": "def test_x():\n    assert True\n" };
+  const broken = { ...original, "src/totals.py": "from src.nowhere import x\n" };
+  const r = runScriptedTests(broken, []);
+  assert.equal(r.collectionErrors.length, 1);
+  assert.equal(remainingFailures(r, original), 3);
 });
