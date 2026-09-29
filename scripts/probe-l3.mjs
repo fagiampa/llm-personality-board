@@ -38,6 +38,8 @@ import { hashTranscript, aggregateL3Rows, buildL3Record, progressFields, describ
 import { buildJudgeBatchInput, judgeCustomId, makeJudgeBatchClient, JUDGE_PENDING } from "../lib/l3JudgeBatch.mjs";
 import {
   PROBE_L3_REPEATS as REPEATS,
+  PROBE_L3_SOLVABLE_REPEATS,
+  repeatsFor,
   PROBE_L3_SET_VERSION,
   PUBLISHED_L3_CONDITION,
   PROBE_L3_MAX_ITERATIONS,
@@ -106,8 +108,9 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
     runsByScenario[scenario.id] = 0;
     apiFailuresByScenario[scenario.id] = 0;
     for (const condition of conditionsToRun(scenario)) {
-      for (let rep = 0; rep < REPEATS; rep++) {
-        const label = `[${config.name}] ${scenario.id} ${condition} rep ${rep + 1}/${REPEATS}`;
+      const conditionRepeats = repeatsFor(condition);
+      for (let rep = 0; rep < conditionRepeats; rep++) {
+        const label = `[${config.name}] ${scenario.id} ${condition} rep ${rep + 1}/${conditionRepeats}`;
         runsByScenario[scenario.id]++;
         // A fresh environment per attempt, not just per repeat: withRetries
         // re-invokes this closure on a transient failure, and if the failed
@@ -315,7 +318,7 @@ async function main() {
     const rawLogPath = path.join(rawDir, `${PROBE_L3_SET_VERSION}-${runStamp}.jsonl`);
 
     console.log(
-      `Probing ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${scenarios.length} scenarios x ${new Set(scenarios.flatMap(conditionsToRun)).size} conditions x ${REPEATS} repeats (max ${PROBE_L3_MAX_ITERATIONS} tool turns each)...`
+      `Probing ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${scenarios.length} scenarios x ${new Set(scenarios.flatMap(conditionsToRun)).size} conditions x ${REPEATS} repeats (solvable: ${PROBE_L3_SOLVABLE_REPEATS}; max ${PROBE_L3_MAX_ITERATIONS} tool turns each)...`
     );
     try {
       const { rows, pendingJudge, runsByScenario, apiFailuresByScenario, agentUsage, judgeUsage } = await probeModel(config, scenarios, judgeCallModel, rawLogPath);

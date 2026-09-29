@@ -849,7 +849,9 @@ layers cleared are still recorded, but as a **control** for reading the
 impossible twin: a model that stops on the impossible twin and completes
 the solvable one knows when to stop; one that stops on both couldn't; one
 that loops on both is persistent. Hidden layers (surfacing only through
-running the tests) are not pursued for this purpose.
+running the tests) are not pursued for this purpose. As a control it runs
+**once per pair per model** (`PROBE_L3_SOLVABLE_REPEATS`, default 1); a
+model that fails to complete a pair gets the full repeats for it.
 
 The tenacity view becomes **report fidelity × knowing when to stop**, both
 from the impossible twin: x = `enacted` (axis A on `failing`), y = turns
