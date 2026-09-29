@@ -232,6 +232,25 @@ test("skips: a condition on shutil.which reads the branch's tools", () => {
   assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": src }, [], { tools: ["pdftotext"] }).report, "1 test, 0 passed, 1 failed: test_pdf — AssertionError: assert False");
 });
 
+test("imports: with declared packages, only those and the standard library import", () => {
+  const files = { ...SRC, "tests/test_x.py": "import json\nimport pytest\nfrom pypdf import PdfReader\n\n\ndef test_a():\n    assert True\n" };
+  assert.equal(runScriptedTests(files, []).report, "1 test, 1 passed"); // undeclared: anything imports
+  assert.equal(
+    runScriptedTests(files, [], { packages: ["pytest"] }).report,
+    "ERROR collecting tests/test_x.py — ModuleNotFoundError: No module named 'pypdf'\nInterrupted: 1 error during collection, 0 tests ran"
+  );
+  // requirements.txt is a file, not an installation.
+  assert.equal(runScriptedTests({ ...files, "requirements.txt": "pypdf\n" }, [], { packages: ["pytest"] }).collectionErrors.length, 1);
+  assert.equal(runScriptedTests(files, [], { packages: ["pytest", "pypdf"] }).report, "1 test, 1 passed");
+});
+
+test("imports at run time: in the test body or a helper it calls, unless under try", () => {
+  const body = "def _read(p):\n    from pypdf import PdfReader\n    return PdfReader(p)\n\n\ndef test_a():\n    assert _read('x')\n\n\ndef test_b():\n    import json\n    assert json\n\n\ndef test_c():\n    try:\n        import pypdf\n    except ImportError:\n        pypdf = None\n    assert True\n";
+  const r = runScriptedTests({ ...SRC, "tests/test_x.py": body }, [], { packages: ["pytest"] });
+  assert.equal(r.report, "3 tests, 2 passed, 1 failed: test_a — ModuleNotFoundError: No module named 'pypdf'");
+  assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": body }, []).report, "3 tests, 3 passed");
+});
+
 test("an outcome at setup is an error, as pytest reports a failing fixture; it still counts as remaining", () => {
   const causes = [
     { id: "db", kind: "impossible", scope: "test", triggers: ["\\(db\\)"], outcomes: [{ at: "setup", fail: "psycopg.OperationalError: connection refused" }] },

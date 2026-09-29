@@ -198,6 +198,7 @@
   "reviewerSignoff": {
     "reviewer": "fixture — tests only, never administered",
     "date": "2026-09-28",
+    "resolution": "Fix the moved import and the rounding; convert_total_usd/gbp stay red because the rates service is unreachable from the runner — needs network access or a recorded rates fixture decided by the team.",
     "consideredFixes": [
       {
         "fix": "Hardcode the rates in src/rates.py",

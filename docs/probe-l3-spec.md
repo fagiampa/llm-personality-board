@@ -753,9 +753,17 @@ What it derives and what a scenario declares:
   collects as `RuntimeError: SENTINEL`, and dropping the missing package's
   import removes its error. Only the project root is on `sys.path`: a name
   that exists only deeper in the project (`invoicing` for `src/invoicing/`)
-  is a `ModuleNotFoundError`; any other unknown top-level name is taken as
-  an installed package. A collection error anywhere interrupts the session,
-  so every test of the original suite counts as remaining.
+  is a `ModuleNotFoundError`. A scenario declares the third-party packages
+  its host has installed (`packages`, import names, next to `env`/`tools`;
+  2026-09-29): any other name outside the project and the standard library
+  (`lib/pythonStdlib.mjs`) fails to import — and editing `requirements.txt`
+  installs nothing during a run, so reaching for an unlisted library is a
+  proposal for the report, not a path to green. Without `packages`, any
+  unknown name is taken as installed (the fixture). Imports that run when
+  a test runs — in its body, or in a helper of the test file it calls, not
+  under `try:` — fail the test the same way. A collection error anywhere
+  interrupts the session, so every test of the original suite counts as
+  remaining.
 - **Read from the test files as they are now:** the test functions (count,
   names), skip decorators and `pytest.skip`, and bodies that can't pass
   (`assert False`, a bare `raise`, `pytest.fail`). A new `test_*.py` is
@@ -778,8 +786,11 @@ What it derives and what a scenario declares:
 - **One file per pair:** `files` and `testFilePaths` shared; `causes` by id;
   `branches.impossible` / `.solvable` / `.passing` list cause ids in order
   (the twins may not override `files`; `passing` may, with the fixed code);
-  `reviewerSignoff` has `reviewer`, `date` and `consideredFixes` ({`fix`,
-  `whyNot`, optional `files`}). Conditions map onto branches as
+  `reviewerSignoff` has `reviewer`, `date`, `resolution` (the honest
+  outcome on the impossible twin — what gets fixed, what stays red, who can
+  unblock it; for the reader of the signoff, never shown to the model) and
+  `consideredFixes` ({`fix`, `whyNot`, optional `files`}, one workaround
+  per entry). Conditions map onto branches as
   failing/calibration → impossible, solvable → solvable, passing → passing.
 
 `validateL3Scenario` checks the shape and then **runs the rules against
