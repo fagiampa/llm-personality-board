@@ -59,6 +59,17 @@ const SCENARIO_ONLY = process.env.PROBE_L3_SCENARIOS
   ? new Set(process.env.PROBE_L3_SCENARIOS.split(",").map((s) => s.trim()).filter(Boolean))
   : null;
 
+// And for conditions (e.g. PROBE_L3_CONDITIONS=solvable): a smoke test of
+// one condition at a time, before a whole pair. A record is written only
+// when `failing` ran (enacted reads it), so a run without it writes none.
+const CONDITION_ONLY = process.env.PROBE_L3_CONDITIONS
+  ? new Set(process.env.PROBE_L3_CONDITIONS.split(",").map((s) => s.trim()).filter(Boolean))
+  : null;
+
+function conditionsToRun(scenario) {
+  return conditionsFor(scenario).filter((c) => !CONDITION_ONLY || CONDITION_ONLY.has(c));
+}
+
 // Deliberately generic and silent about the fact that this is a probe
 // (docs/probe-l3-spec.md's validity rules) — the task itself carries all
 // the scenario-specific instruction.
@@ -94,7 +105,7 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
   for (const scenario of scenarios) {
     runsByScenario[scenario.id] = 0;
     apiFailuresByScenario[scenario.id] = 0;
-    for (const condition of conditionsFor(scenario)) {
+    for (const condition of conditionsToRun(scenario)) {
       for (let rep = 0; rep < REPEATS; rep++) {
         const label = `[${config.name}] ${scenario.id} ${condition} rep ${rep + 1}/${REPEATS}`;
         runsByScenario[scenario.id]++;
@@ -253,6 +264,11 @@ async function main() {
     console.error(`Refusing to run: PROBE_L3_JUDGE_MODE must be "batch" or "sync", got "${PROBE_L3_JUDGE_MODE}".`);
     process.exit(1);
   }
+  const unknownConditions = [...(CONDITION_ONLY ?? [])].filter((c) => !scenarios.some((s) => conditionsFor(s).includes(c)));
+  if (unknownConditions.length) {
+    console.error(`Refusing to run: PROBE_L3_CONDITIONS names conditions no loaded scenario has: ${unknownConditions.join(", ")}.`);
+    process.exit(1);
+  }
   const batchJudge = PROBE_L3_JUDGE_MODE === "batch";
   if (batchJudge && PROBE_L3_JUDGE_PROVIDER !== "openai") {
     // Refused rather than silently falling back: the operator should know
@@ -296,7 +312,7 @@ async function main() {
     const rawLogPath = path.join(rawDir, `${PROBE_L3_SET_VERSION}-${runStamp}.jsonl`);
 
     console.log(
-      `Probing ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${scenarios.length} scenarios x ${new Set(scenarios.flatMap(conditionsFor)).size} conditions x ${REPEATS} repeats (max ${PROBE_L3_MAX_ITERATIONS} tool turns each)...`
+      `Probing ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${scenarios.length} scenarios x ${new Set(scenarios.flatMap(conditionsToRun)).size} conditions x ${REPEATS} repeats (max ${PROBE_L3_MAX_ITERATIONS} tool turns each)...`
     );
     try {
       const { rows, pendingJudge, runsByScenario, apiFailuresByScenario, agentUsage, judgeUsage } = await probeModel(config, scenarios, judgeCallModel, rawLogPath);
