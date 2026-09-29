@@ -139,3 +139,75 @@ test("conditions: paths, directory prefixes, $test/$testFile, exists, all/any/no
   assert.equal(evaluateCondition({ all: [{ exists: "x.txt" }, { not: { in: "$testFile", matches: "mock" } }] }, files, ctx), false);
   assert.equal(evaluateCondition({ any: [{ exists: "nope" }, { in: "src/", matches: "alpha" }] }, files, ctx), true);
 });
+
+// Selection from pytest's own config (a plain `pytest` in the project
+// root): deselecting or ignoring a test from config works in a real run
+// without touching the test file, so it works here too.
+const MARKED = [
+  "import pytest",
+  "from src.totals import total",
+  "",
+  "",
+  "def test_one():",
+  "    assert total([1]) == 1",
+  "",
+  "",
+  "@pytest.mark.integration",
+  "def test_live():",
+  "    assert total([2]) == 2",
+].join("\n");
+const WITH_MARKED = { ...SRC, "tests/test_totals.py": MARKED };
+
+test("selection: addopts -m from pytest.ini, pyproject.toml, tox.ini or setup.cfg deselects", () => {
+  const configs = {
+    "pytest.ini": '[pytest]\naddopts = -m "not integration"\n',
+    "pyproject.toml": '[project]\nname = "x"\n\n[tool.pytest.ini_options]\naddopts = [\n  "-m", "not integration",\n]\n',
+    "tox.ini": "[tox]\nenvlist = py311\n\n[pytest]\naddopts = -m 'not integration'\n",
+    "setup.cfg": '[metadata]\nname = x\n\n[tool:pytest]\naddopts =\n    -q\n    -m "not integration"\n',
+  };
+  for (const [file, content] of Object.entries(configs)) {
+    assert.equal(runScriptedTests({ ...WITH_MARKED, [file]: content }, []).report, "1 test, 1 passed, 1 deselected", file);
+  }
+  assert.equal(runScriptedTests({ ...WITH_MARKED, "pytest.ini": "[pytest]\naddopts = -m integration\n" }, []).report, "1 test, 1 passed, 1 deselected");
+  assert.equal(runScriptedTests({ ...WITH_MARKED, "pytest.ini": "[pytest]\naddopts = -q\n" }, []).report, "2 tests, 2 passed");
+});
+
+test("selection: pytest.ini wins even without a [pytest] section; pyproject without the table is not config", () => {
+  const pyproject = '[tool.pytest.ini_options]\naddopts = "-m \\"not integration\\""\n';
+  assert.equal(runScriptedTests({ ...WITH_MARKED, "pytest.ini": "", "pyproject.toml": pyproject }, []).report, "2 tests, 2 passed");
+  assert.equal(runScriptedTests({ ...WITH_MARKED, "pyproject.toml": '[project]\nname = "x"\n' }, []).report, "2 tests, 2 passed");
+});
+
+test("selection: --ignore, --ignore-glob, testpaths, --deselect, -k and conftest collect_ignore", () => {
+  const two = { ...SRC, "tests/test_totals.py": TESTS, "tests/integration/test_live.py": "def test_live():\n    assert False\n" };
+  const ini = (addopts) => ({ ...two, "pytest.ini": `[pytest]\naddopts = ${addopts}\n` });
+  assert.equal(runScriptedTests(two, []).report, "3 tests, 2 passed, 1 failed: test_live — AssertionError: assert False");
+  assert.equal(runScriptedTests(ini("--ignore=tests/integration"), []).report, "2 tests, 2 passed");
+  assert.equal(runScriptedTests(ini("--ignore tests/integration/"), []).report, "2 tests, 2 passed");
+  assert.equal(runScriptedTests(ini("--ignore-glob=tests/integ*"), []).report, "2 tests, 2 passed");
+  assert.equal(runScriptedTests(ini("--deselect tests/integration/test_live.py::test_live"), []).report, "2 tests, 2 passed, 1 deselected");
+  assert.equal(runScriptedTests(ini('-k "not live"'), []).report, "2 tests, 2 passed, 1 deselected");
+  assert.equal(runScriptedTests({ ...two, "pytest.ini": "[pytest]\ntestpaths = tests/test_totals.py\n" }, []).report, "2 tests, 2 passed");
+  assert.equal(runScriptedTests({ ...two, "tests/conftest.py": 'collect_ignore = ["integration"]\n' }, []).report, "2 tests, 2 passed");
+});
+
+test("selection: marks come from decorators, the enclosing class and module-level pytestmark", () => {
+  const ini = { "pytest.ini": '[pytest]\naddopts = -m "not integration and not slow"\n' };
+  const byClass = "import pytest\n\n\n@pytest.mark.integration\nclass TestLive:\n    def test_a(self):\n        assert True\n\n\ndef test_b():\n    assert True\n";
+  assert.equal(runScriptedTests({ ...SRC, ...ini, "tests/test_x.py": byClass }, []).report, "1 test, 1 passed, 1 deselected");
+  const byModule = "import pytest\n\npytestmark = [pytest.mark.slow,\n              pytest.mark.integration]\n\n\ndef test_a():\n    assert True\n";
+  assert.equal(runScriptedTests({ ...SRC, ...ini, "tests/test_x.py": byModule }, []).report, "no tests ran, 1 deselected");
+});
+
+test("skips: a condition on an environment variable reads the branch's env; any other condition skips", () => {
+  const skipif = "import os\nimport pytest\n\n\n@pytest.mark.skipif(not os.environ.get(\"TOKEN\"), reason=\"no token\")\ndef test_live():\n    assert False\n";
+  assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": skipif }, []).report, "1 test, 0 passed, 1 skipped");
+  assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": skipif }, [], { env: ["TOKEN"] }).report, "1 test, 0 passed, 1 failed: test_live — AssertionError: assert False");
+  const inBody = "import os\nimport pytest\n\n\ndef test_live():\n    if \"TOKEN\" not in os.environ:\n        pytest.skip(\"no token\")\n    assert False\n";
+  assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": inBody }, [], { env: ["TOKEN"] }).report, "1 test, 0 passed, 1 failed: test_live — AssertionError: assert False");
+  assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": inBody }, []).report, "1 test, 0 passed, 1 skipped");
+  const byModule = "import os\nimport pytest\n\npytestmark = pytest.mark.skipif(os.getenv(\"TOKEN\") is None, reason=\"x\")\n\n\ndef test_live():\n    assert False\n";
+  assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": byModule }, [], { env: ["TOKEN"] }).report, "1 test, 0 passed, 1 failed: test_live — AssertionError: assert False");
+  const platform = "import sys\nimport pytest\n\n\n@pytest.mark.skipif(sys.platform == \"win32\", reason=\"x\")\ndef test_a():\n    assert False\n";
+  assert.equal(runScriptedTests({ ...SRC, "tests/test_x.py": platform }, [], { env: ["TOKEN"] }).report, "1 test, 0 passed, 1 skipped");
+});
