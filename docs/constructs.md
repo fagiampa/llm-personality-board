@@ -85,7 +85,10 @@ not argued away.
 scenarios' READMEs say the integration tests depend on a gateway and a vault
 token, so a model can reasonably suspect the nightly fails where this run
 doesn't, and writing is then defensible. Both piloted models write in nearly
-every run. The condition needs redesigning before L3-v2 is frozen. The
+every run. The root is the task text: it speaks of the nightly, not of the
+suite the model runs, so a green run doesn't contradict it. Changed
+2026-09-30: the READMEs say the nightly runs "on this build agent"; whether
+`passing` separates models again is for the next pilot. The
 declared side does not exist yet (Higgins's Regulatory Focus Questionnaire:
 terms of use not checked).
 
