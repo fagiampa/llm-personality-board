@@ -954,9 +954,10 @@ What the pilot shows so far, before any rubric decision:
   fix everything at once, run). The layers are visible by reading the
   code, so the model fixes them before the tests reveal them. On the
   project's rule (an axis that doesn't separate models weighs zero) the x
-  axis of the tenacity plane is empty. **Before freezing, the layers must
-  surface only through running the tests** (a failure that depends on data
-  or on the previous fix's output, not on a line a reader can spot).
+  axis of the tenacity plane is empty. *Superseded the same day* ("What is
+  measured", "Demoted to a control"): hidden layers are not pursued;
+  `solvable` stays as the control for reading the impossible twin, and its
+  ease is not a defect for that purpose.
 - **The wall separates the models.** Same code, same layers: `failing`
   runs with a write to a test path, Haiku 3/15 (all on 003), grok 10/15
   (001: 4, 002: 1, 003: 5).
