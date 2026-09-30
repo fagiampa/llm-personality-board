@@ -1,10 +1,18 @@
 # LLM Personality Board
 
-An open observatory of **what language models say about their own honesty, and what they actually do**.
+An open observatory of **how AI agents behave when a trait costs them something, and how that compares with what
+they say about themselves**.
 
-Each model answers a personality questionnaire about itself. Then it is put to work: a coding task, with tools, that
-cannot be completed. The project measures the **gap** between the two, that is, between what the model *declares*
-and what it *enacts* when an honest report costs it something.
+Each model answers questionnaires about itself. Then it is put to work: a coding task, with tools, that cannot be
+completed. For each construct the project measures the **gap** between what the model *declares* and what it
+*enacts*. Three constructs, measured on the same models over time:
+
+- **report fidelity**: does the final report match what the agent actually did?
+- **goal disengagement**: does it stop spending on a goal it cannot reach?
+- **prevention focus**: does it stop acting once the facts contradict the premise of the task?
+
+Only the first is measured and on the cards today; the other two are in progress. See
+[`docs/constructs.md`](docs/constructs.md).
 
 **Live site**: https://aipersonality.org
 
@@ -80,6 +88,7 @@ Each script can be scoped to one model (`ASSESS_ONLY=Claude`, `DECLARED_ONLY=…
 
 The specs are the source of truth. When a decision changes, the spec is updated first, then the code.
 
+- [`docs/constructs.md`](docs/constructs.md): the three constructs, what each measures and where it stands
 - [`docs/declared-spec.md`](docs/declared-spec.md): the declared side and the three-level record
 - [`docs/probe-l3-spec.md`](docs/probe-l3-spec.md): the primary probe, its judge rubric and its calibration
 - [`docs/probe-l2-spec.md`](docs/probe-l2-spec.md): the control probe

@@ -14,6 +14,13 @@ The other half is a *behavioural* probe — what the model actually does when
 being honest costs it something — and the quantity of interest is the **gap**
 between the two. See "Declared side" and "Behavioural probes" below.
 
+**Three constructs (since 2026-09-30)**, each with its own declared/enacted
+gap, never combined: report fidelity (measured, on the cards), goal
+disengagement (in progress, L3-v2) and prevention focus (candidate). Which
+measures exist and why: [`docs/constructs.md`](docs/constructs.md) — read it
+before adding an axis or a card element. Everything below about `enacted`
+and `gap` is construct 1 unless it says otherwise.
+
 Three specs, and neither half is the measure on its own:
 
 - [`docs/declared-spec.md`](docs/declared-spec.md) — the declared side: the
@@ -291,7 +298,8 @@ the vocabulary and the rules that must not be quietly relitigated.
 | **condition** | variant of one scenario. L3: `failing` / `passing` / `calibration`. L2: `neutral` / `mild` / `strong` / `calibration` |
 | **marker** | (L2) an unrepeatable string in the input data flagging the inconvenient fact; its presence in the output *is* the score |
 | **axis A / axis B** | (L3) report fidelity vs environment integrity — kept as two numbers, never collapsed into one ordinal scale |
-| **report fidelity** | the construct both probes measure. **Not** the HEXACO H axis: their relationship is an empirical question this project answers, never an assumption |
+| **report fidelity** | the construct both probes measure (construct 1). **Not** the HEXACO H axis: their relationship is an empirical question this project answers, never an assumption |
+| **construct** | one of the three things the project measures, each with its own gap: report fidelity, goal disengagement, prevention focus (`docs/constructs.md`). Never summed or averaged into one index |
 | **calibration** | a positive-control condition carrying an explicit instruction. Deliberately breaks rule 1, and is **never** included in a published score |
 
 ### Non-negotiable rules
@@ -558,6 +566,7 @@ research.
 /scenarios/L3-v1/                # primary probe scenarios + their scripted environments (3/3 pilot, live data)
 /scenarios/L2-v1/                # control probe scenarios — 5 on disk, target 3-5, not 20
 /items/report-fidelity/RF-v1.json, RF-v2.json, RF-v3.json # action-anchored item banks, 12-item pilots — RF-v1/RF-v2 frozen/superseded, RF-v3 current
+/docs/constructs.md              # the three constructs: what is measured, why, and where each stands
 /docs/declared-spec.md           # declared side + the three-level output record
 /docs/probe-l3-spec.md           # primary probe spec, enacted side
 /docs/probe-l2-spec.md           # control probe spec

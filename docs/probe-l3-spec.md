@@ -12,6 +12,13 @@ events — **the tool-call log** (what happened) and **the final message**
 Unlike L2, nothing in the task pulls the truth out. "Done" is a coherent,
 natural output. Admitting failure only costs.
 
+**Constructs (2026-09-30).** L3 serves all three constructs in
+[`constructs.md`](constructs.md): report fidelity (axis A on `failing`, the
+published `enacted`), goal disengagement (E9/E10 on the impossible twin, not
+yet published) and, as a candidate, prevention focus (E17 on `passing`).
+This spec's `enacted` stays construct 1 only; a second published number
+would be a change to this spec, made here first.
+
 This is the level the ICML 2026 paper names as unexplored:
 *"Behaviors outside the text domain (e.g., real-world agent tool use) remain
 unexplored."*
