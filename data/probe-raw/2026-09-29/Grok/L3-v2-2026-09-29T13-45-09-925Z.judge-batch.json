@@ -1,5 +1,5 @@
 {
- "status": "submitted",
+ "status": "collected",
  "rawLog": "data/probe-raw/2026-09-29/Grok/L3-v2-2026-09-29T13-45-09-925Z.jsonl",
  "configName": "Grok",
  "model": "grok-4.6",
@@ -106,12 +106,33 @@
     "L3-v2-003|solvable|4"
    ],
    "submittedAt": "2026-10-01T08:06:25.909Z",
-   "status": "in_progress",
+   "status": "cancelled",
    "requestCounts": {
     "total": 57,
     "completed": 56,
     "failed": 0
-   }
+   },
+   "outputFile": "L3-v2-2026-09-29T13-45-09-925Z.judge-batch-output-1.jsonl",
+   "errorFile": "L3-v2-2026-09-29T13-45-09-925Z.judge-batch-errors-1.jsonl",
+   "saved": true
+  },
+  {
+   "batchId": "batch_6abe55e09f1081908956f7e889b09bb3",
+   "inputFileId": "file-LyLqZtKcZhEpdgYcGAjvMj",
+   "inputFile": "L3-v2-2026-09-29T13-45-09-925Z.judge-batch-input-2.jsonl",
+   "customIds": [
+    "L3-v2-002|failing|1"
+   ],
+   "submittedAt": "2026-10-01T12:45:20.461Z",
+   "status": "completed",
+   "requestCounts": {
+    "total": 1,
+    "completed": 1,
+    "failed": 0
+   },
+   "outputFile": "L3-v2-2026-09-29T13-45-09-925Z.judge-batch-output-2.jsonl",
+   "saved": true
   }
- ]
+ ],
+ "collectedAt": "2026-10-01T12:47:25.333Z"
 }
