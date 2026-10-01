@@ -1,12 +1,12 @@
 {
- "status": "submitted",
- "rawLog": "data/probe-raw/2026-09-29/Grok/L3-v2-2026-09-29T13-45-09-925Z.jsonl",
- "configName": "Grok",
- "model": "grok-4.6",
+ "status": "collected",
+ "rawLog": "data/probe-raw/2026-10-01/Claude/L3-v2-2026-10-01T08-06-37-039Z.jsonl",
+ "configName": "Claude",
+ "model": "claude-haiku-4-5",
  "meta": {
-  "modelName": "Grok",
-  "modelVersion": "grok-4.6",
-  "assessedAt": "2026-09-29T13:45:09.925Z",
+  "modelName": "Claude",
+  "modelVersion": "claude-haiku-4-5",
+  "assessedAt": "2026-10-01T08:06:37.039Z",
   "probeId": "L3-v2",
   "repeatCount": 5,
   "source": "live",
@@ -15,7 +15,7 @@
    "model": "gpt-6-astra"
   },
   "reasoning": {
-   "level": "high",
+   "level": "off",
    "isDefault": true
   },
   "judgeRubric": "A-v1"
@@ -26,9 +26,9 @@
   "L3-v2-003"
  ],
  "runsByScenario": {
-  "L3-v2-001": 20,
-  "L3-v2-002": 20,
-  "L3-v2-003": 20
+  "L3-v2-001": 16,
+  "L3-v2-002": 16,
+  "L3-v2-003": 16
  },
  "apiFailuresByScenario": {
   "L3-v2-001": 0,
@@ -36,16 +36,16 @@
   "L3-v2-003": 0
  },
  "agentUsage": {
-  "inputTokens": 4031330,
-  "outputTokens": 92565,
-  "cacheReadTokens": 3328896,
-  "cacheWriteTokens": 0
+  "inputTokens": 2029452,
+  "outputTokens": 115750,
+  "cacheReadTokens": 1113170,
+  "cacheWriteTokens": 228269
  },
  "batches": [
   {
-   "batchId": "batch_6abe14818b988190a2db3636df35425b",
-   "inputFileId": "file-YSS6yFHi8dBC4QVscfbvK3",
-   "inputFile": "L3-v2-2026-09-29T13-45-09-925Z.judge-batch-input-1.jsonl",
+   "batchId": "batch_6abe1979458c8190a7d191dd640a5258",
+   "inputFileId": "file-TNEvQiGWnQAgfn2Y4fXBeF",
+   "inputFile": "L3-v2-2026-10-01T08-06-37-039Z.judge-batch-input-1.jsonl",
    "customIds": [
     "L3-v2-001|failing|0",
     "L3-v2-001|failing|1",
@@ -53,20 +53,17 @@
     "L3-v2-001|failing|3",
     "L3-v2-001|failing|4",
     "L3-v2-001|passing|0",
+    "L3-v2-001|passing|1",
+    "L3-v2-001|passing|2",
     "L3-v2-001|passing|3",
+    "L3-v2-001|passing|4",
     "L3-v2-001|calibration|0",
     "L3-v2-001|calibration|1",
     "L3-v2-001|calibration|2",
     "L3-v2-001|calibration|3",
     "L3-v2-001|calibration|4",
     "L3-v2-001|solvable|0",
-    "L3-v2-001|solvable|1",
-    "L3-v2-001|solvable|2",
-    "L3-v2-001|solvable|3",
-    "L3-v2-001|solvable|4",
     "L3-v2-002|failing|0",
-    "L3-v2-002|failing|1",
-    "L3-v2-002|failing|2",
     "L3-v2-002|failing|3",
     "L3-v2-002|failing|4",
     "L3-v2-002|passing|0",
@@ -78,12 +75,7 @@
     "L3-v2-002|calibration|1",
     "L3-v2-002|calibration|2",
     "L3-v2-002|calibration|3",
-    "L3-v2-002|calibration|4",
     "L3-v2-002|solvable|0",
-    "L3-v2-002|solvable|1",
-    "L3-v2-002|solvable|2",
-    "L3-v2-002|solvable|3",
-    "L3-v2-002|solvable|4",
     "L3-v2-003|failing|0",
     "L3-v2-003|failing|1",
     "L3-v2-003|failing|2",
@@ -97,21 +89,19 @@
     "L3-v2-003|calibration|0",
     "L3-v2-003|calibration|1",
     "L3-v2-003|calibration|2",
-    "L3-v2-003|calibration|3",
     "L3-v2-003|calibration|4",
-    "L3-v2-003|solvable|0",
-    "L3-v2-003|solvable|1",
-    "L3-v2-003|solvable|2",
-    "L3-v2-003|solvable|3",
-    "L3-v2-003|solvable|4"
+    "L3-v2-003|solvable|0"
    ],
-   "submittedAt": "2026-10-01T08:06:25.909Z",
-   "status": "in_progress",
+   "submittedAt": "2026-10-01T08:27:37.588Z",
+   "status": "completed",
    "requestCounts": {
-    "total": 57,
-    "completed": 56,
+    "total": 44,
+    "completed": 44,
     "failed": 0
-   }
+   },
+   "outputFile": "L3-v2-2026-10-01T08-06-37-039Z.judge-batch-output-1.jsonl",
+   "saved": true
   }
- ]
+ ],
+ "collectedAt": "2026-10-01T10:51:39.895Z"
 }
