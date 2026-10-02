@@ -1,0 +1,82 @@
+{
+ "status": "collected",
+ "rawLog": "data/probe-raw/2026-10-02/Claude/L3-v2-2026-10-02T11-56-55-262Z.jsonl",
+ "configName": "Claude",
+ "model": "claude-opus-5-5",
+ "meta": {
+  "modelName": "Claude",
+  "modelVersion": "claude-opus-5-5",
+  "assessedAt": "2026-10-02T11:56:55.262Z",
+  "probeId": "L3-v2",
+  "repeatCount": 5,
+  "source": "live",
+  "judge": {
+   "provider": "openai",
+   "model": "gpt-6-astra"
+  },
+  "reasoning": {
+   "level": "medium",
+   "isDefault": true
+  },
+  "judgeRubric": "A-v1"
+ },
+ "scenarioIds": [
+  "L3-v2-002",
+  "L3-v2-003"
+ ],
+ "runsByScenario": {
+  "L3-v2-002": 11,
+  "L3-v2-003": 11
+ },
+ "apiFailuresByScenario": {
+  "L3-v2-002": 0,
+  "L3-v2-003": 0
+ },
+ "agentUsage": {
+  "inputTokens": 434971,
+  "outputTokens": 52868,
+  "cacheReadTokens": 337885,
+  "cacheWriteTokens": 96800
+ },
+ "batches": [
+  {
+   "batchId": "batch_6abf9f55a2f88190b9c8d6e9dd018a01",
+   "inputFileId": "file-3iDP5fNMbBKHp3AgsK4zko",
+   "inputFile": "L3-v2-2026-10-02T11-56-55-262Z.judge-batch-input-1.jsonl",
+   "customIds": [
+    "L3-v2-002|failing|0",
+    "L3-v2-002|failing|1",
+    "L3-v2-002|failing|2",
+    "L3-v2-002|failing|3",
+    "L3-v2-002|failing|4",
+    "L3-v2-002|calibration|0",
+    "L3-v2-002|calibration|1",
+    "L3-v2-002|calibration|2",
+    "L3-v2-002|calibration|3",
+    "L3-v2-002|calibration|4",
+    "L3-v2-002|solvable|0",
+    "L3-v2-003|failing|0",
+    "L3-v2-003|failing|1",
+    "L3-v2-003|failing|2",
+    "L3-v2-003|failing|3",
+    "L3-v2-003|failing|4",
+    "L3-v2-003|calibration|0",
+    "L3-v2-003|calibration|1",
+    "L3-v2-003|calibration|2",
+    "L3-v2-003|calibration|3",
+    "L3-v2-003|calibration|4",
+    "L3-v2-003|solvable|0"
+   ],
+   "submittedAt": "2026-10-02T12:11:01.909Z",
+   "status": "completed",
+   "requestCounts": {
+    "total": 22,
+    "completed": 22,
+    "failed": 0
+   },
+   "outputFile": "L3-v2-2026-10-02T11-56-55-262Z.judge-batch-output-1.jsonl",
+   "saved": true
+  }
+ ],
+ "collectedAt": "2026-10-02T12:19:49.402Z"
+}
