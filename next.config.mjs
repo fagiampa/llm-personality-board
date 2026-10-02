@@ -13,6 +13,8 @@ const nextConfig = {
     outputFileTracingIncludes: {
       "/api/**/*": ["./node_modules/sql.js/dist/*.wasm"],
       "/": ["./node_modules/sql.js/dist/*.wasm"],
+      // /preview also reads the raw L3-v2 files at request time (lib/previewEnacted.mjs).
+      "/preview": ["./node_modules/sql.js/dist/*.wasm", "./data/probe-raw/**/L3-v2-*Z.jsonl"],
     },
   },
   // Funnel the old Vercel-assigned production alias to the real domain.

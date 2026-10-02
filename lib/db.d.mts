@@ -146,3 +146,9 @@ export function upsertL3ProbeRun(record: L3ProbeRunRecord): Promise<void>;
 export function getL3ProbeForAssessment(modelName: string, assessedAt: string | null): Promise<L3ProbeScore | undefined>;
 export function upsertDeclaredAnchoredRun(record: DeclaredAnchoredRunRecord): Promise<void>;
 export function getDeclaredAnchoredForAssessment(modelName: string, assessedAt: string | null): Promise<AnchoredScore | undefined>;
+export interface PreviewDeclared {
+  modelVersion: string;
+  hexaco: ModelScore | undefined;
+  declared: Record<string, { anchored: number; margin?: number; assessedAt: string }>;
+}
+export function getPreviewDeclared(modelVersions: string[], itemSetVersions: string[]): Promise<PreviewDeclared[]>;
