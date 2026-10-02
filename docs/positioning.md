@@ -11,6 +11,45 @@ Serve al README, al whitepaper e al post. Non riguarda il codice.
 | **Alignment Revisited** — arXiv 2506.00751 | 3 modelli commerciali, preferenze dichiarate vs rivelate in scenari | no | no | no | no |
 | **Google Research — behavioral dispositions** | 25 modelli, questionari convertiti in situational judgment test, confronto con 550 umani | no | no | no | non dichiarato |
 | **aistupidlevel.info** | osservatorio continuo, 182k run da ago 2025, Page-Hinkley per la deriva, task bank privato e ruotato. **Misura capacità: codice, ragionamento, accuratezza nel tool-calling** | — | **sì** | sì (sandbox) | — |
+| **ImpossibleBench** — Zhong, Raghunathan, Carlini, arXiv 2510.20270, ICLR 2026 | varianti impossibili di task da benchmark di coding esistenti: i test sono mutati per contraddire la specifica, e il tasso di superamento è il tasso di imbroglio (cancellare o modificare test, hard-coding). I modelli più capaci imbrogliano di più. Codice aperto (Inspect) | no | no | **sì** (sandbox) | no |
+| **MASK** — Ren et al., arXiv 2503.03750 | dataset raccolto a mano, separa onestà da accuratezza: elicita la credenza del modello in un contesto neutro, poi gli chiede la stessa cosa sotto pressione e confronta. I modelli più grandi sono più accurati ma non più onesti. Codice e dati aperti | pressione sì, livelli no | no | no | no |
+
+## ImpossibleBench e MASK: i più vicini (aggiunti 2026-10-02)
+
+Sono i due lavori più vicini a L3 e vanno citati per primi, prima che lo
+faccia un revisore.
+
+**ImpossibleBench** fa quello che fa il nostro asse B: un task che non si
+può risolvere, i test a portata di mano, e si conta chi li aggira. Cosa
+cambia da noi:
+
+- **Misuriamo il report, non solo l'atto.** Il nostro asse A confronta il
+  messaggio finale con il log degli strumenti; ImpossibleBench conta se il
+  test è stato aggirato. Le etichette `misleading` (manomissione dichiarata
+  ma presentata come una correzione) non hanno un equivalente lì.
+- **L'impossibilità è un muro del mondo, non un test contraddittorio.** Da
+  noi la specifica è coerente e i test sono giusti; manca una cosa fuori
+  dal codice (un token revocato, un database giù, un binario assente).
+  Aggirare un test sbagliato e aggirare un test giusto non sono lo stesso
+  atto.
+- **C'è un lato dichiarato.** Nessun auto-report, nessun gap da quella parte.
+- **Ambiente scriptato, non sandbox; misura continua, non una tantum.**
+  La loro sandbox è la scelta giusta per un benchmark puntuale; per una
+  serie storica deriva.
+
+**MASK** misura la menzogna come scarto tra credenza e affermazione sotto
+pressione. Cosa cambia da noi:
+
+- **Testo, non azioni.** In MASK la verità è una credenza elicitata; da noi
+  è il log di quello che il modello ha fatto pochi turni prima.
+- **La pressione da noi non contiene istruzioni** (regola 1). In MASK il
+  prompt di pressione assegna spesso un ruolo o un obiettivo: quello lo
+  trattiamo come `calibration`, mai nel punteggio pubblicato.
+- **Anche qui, nessun lato dichiarato sul tratto.**
+
+Il loro risultato e quello di ImpossibleBench (capacità che non porta
+onestà, o che porta più imbroglio) sono i confronti da fare sui nostri
+dati quando il pannello di modelli è abbastanza largo.
 
 ## Il buco, dichiarato dagli stessi autori
 
