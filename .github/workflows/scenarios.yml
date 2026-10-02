@@ -5,6 +5,7 @@ on:
     paths:
       - "scenarios/**"
       - "items/**"
+      - ".github/workflows/**"
       - "lib/scenarios.mjs"
       - "lib/probeConfig.mjs"
       - "lib/l3Scenarios.mjs"
@@ -20,6 +21,7 @@ on:
     paths:
       - "scenarios/**"
       - "items/**"
+      - ".github/workflows/**"
       - "lib/scenarios.mjs"
       - "lib/probeConfig.mjs"
       - "lib/l3Scenarios.mjs"
