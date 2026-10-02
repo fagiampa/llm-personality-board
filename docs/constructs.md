@@ -57,10 +57,13 @@ solvable task has no variance on current models (L3-v2 pilot: 30/30
 that tells "knew when to stop" from "couldn't do it". HEXACO Diligence
 rewards not stopping and is the wrong declared pairing (axis-map D4).
 
-**Declared.** None yet. The published scales above have no public terms of
-use; IPIP public-domain analogs exist for a generic level. The specific level
-will be our own action-anchored items, written, frozen and versioned like
-RF-v3 (axis-map, "Tenacity: what could sit on its declared side").
+**Declared.** `GD-v1`, our own action-anchored bank (12 items, frozen and
+versioned like RF-v3; the published scales above have no public terms of
+use). Piloted 2026-10-02 on Haiku 4.5, Opus 5.5 and grok-4.6: 63 / 79 / 66.
+It does not saturate, and the prediction was wrong in sign: the models
+declare less stopping than they enact (gap −37, −21, −14). No generic level
+yet; IPIP public-domain analogs are the candidates
+([`declared-spec.md`](declared-spec.md), "Constructs 2 and 3").
 
 ## 3. Prevention focus
 
@@ -113,9 +116,16 @@ against the evidence, whatever the reason. The number is reported with
 that limit written next to it. It is a behavioural reading of Higgins's
 vigilance-versus-eagerness choice in one situation, not his
 questionnaire, which treats prevention and promotion as two independent
-orientations. The
-declared side does not exist yet (Higgins's Regulatory Focus Questionnaire:
-terms of use not checked).
+orientations.
+
+**Declared.** `PF-v1`, our own action-anchored bank (12 items; Higgins's
+Regulatory Focus Questionnaire is cited, not reproduced, terms of use not
+checked). Piloted 2026-10-02: Haiku 69, Opus 89, grok 94. It saturates:
+grok answers 5.0 on 8 of 12 items, reverse ones included, Opus on 5, and
+only 004 and 010 spread across the three. grok's gap of +47 against 46.7
+enacted is right in sign and inflated in size. `PF-v2` is drafted to
+remove that ceiling, not yet administered
+([`declared-spec.md`](declared-spec.md), "Constructs 2 and 3").
 
 ## Rules shared by all three
 

@@ -246,7 +246,7 @@ I belongs in the specs and the paper, never on the cards.
   disclosing the consequence costs something can tell the two apart.
 - **Pursue, construct 2 (since 2026-09-30)** — E9/E10, goal disengagement,
   measured on L3-v2's impossible twin once L3-v2 is frozen, with `solvable`
-  (E8) as the control. The declared side is still to be written.
+  (E8) as the control. Declared side: `GD-v1`, piloted 2026-10-02 (`declared-spec.md`).
 - **Test first, construct 3 (since 2026-09-30)** — E17, acting after
   disconfirmation. L3-v1 separates the models; L3-v2's `passing` needs a
   redesign first (notes above).
