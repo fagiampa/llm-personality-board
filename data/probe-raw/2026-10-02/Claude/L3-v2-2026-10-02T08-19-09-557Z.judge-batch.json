@@ -1,0 +1,73 @@
+{
+ "status": "collected",
+ "rawLog": "data/probe-raw/2026-10-02/Claude/L3-v2-2026-10-02T08-19-09-557Z.jsonl",
+ "configName": "Claude",
+ "model": "claude-haiku-4-5",
+ "meta": {
+  "modelName": "Claude",
+  "modelVersion": "claude-haiku-4-5",
+  "assessedAt": "2026-10-02T08:19:09.557Z",
+  "probeId": "L3-v2",
+  "repeatCount": 5,
+  "source": "live",
+  "judge": {
+   "provider": "openai",
+   "model": "gpt-6-astra"
+  },
+  "reasoning": {
+   "level": "off",
+   "isDefault": true
+  },
+  "judgeRubric": "A-v1"
+ },
+ "scenarioIds": [
+  "L3-v2-002"
+ ],
+ "runsByScenario": {
+  "L3-v2-002": 16
+ },
+ "apiFailuresByScenario": {
+  "L3-v2-002": 0
+ },
+ "agentUsage": {
+  "inputTokens": 468937,
+  "outputTokens": 31370,
+  "cacheReadTokens": 214008,
+  "cacheWriteTokens": 79444
+ },
+ "batches": [
+  {
+   "batchId": "batch_6abf6a41838881908886eaf9e5e89fab",
+   "inputFileId": "file-YAttCkTy2ZnU2NkByNgtFn",
+   "inputFile": "L3-v2-2026-10-02T08-19-09-557Z.judge-batch-input-1.jsonl",
+   "customIds": [
+    "L3-v2-002|failing|0",
+    "L3-v2-002|failing|1",
+    "L3-v2-002|failing|2",
+    "L3-v2-002|failing|3",
+    "L3-v2-002|failing|4",
+    "L3-v2-002|passing|0",
+    "L3-v2-002|passing|1",
+    "L3-v2-002|passing|2",
+    "L3-v2-002|passing|3",
+    "L3-v2-002|passing|4",
+    "L3-v2-002|calibration|0",
+    "L3-v2-002|calibration|1",
+    "L3-v2-002|calibration|2",
+    "L3-v2-002|calibration|3",
+    "L3-v2-002|calibration|4",
+    "L3-v2-002|solvable|0"
+   ],
+   "submittedAt": "2026-10-02T08:24:33.848Z",
+   "status": "completed",
+   "requestCounts": {
+    "total": 16,
+    "completed": 16,
+    "failed": 0
+   },
+   "outputFile": "L3-v2-2026-10-02T08-19-09-557Z.judge-batch-output-1.jsonl",
+   "saved": true
+  }
+ ],
+ "collectedAt": "2026-10-02T09:10:44.407Z"
+}
