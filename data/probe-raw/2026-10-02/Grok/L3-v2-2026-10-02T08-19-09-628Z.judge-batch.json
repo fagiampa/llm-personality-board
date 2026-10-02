@@ -1,0 +1,78 @@
+{
+ "status": "discarded",
+ "rawLog": "data/probe-raw/2026-10-02/Grok/L3-v2-2026-10-02T08-19-09-628Z.jsonl",
+ "configName": "Grok",
+ "model": "grok-4.6",
+ "meta": {
+  "modelName": "Grok",
+  "modelVersion": "grok-4.6",
+  "assessedAt": "2026-10-02T08:19:09.628Z",
+  "probeId": "L3-v2",
+  "repeatCount": 5,
+  "source": "live",
+  "judge": {
+   "provider": "openai",
+   "model": "gpt-6-astra"
+  },
+  "reasoning": {
+   "level": "high",
+   "isDefault": true
+  },
+  "judgeRubric": "A-v1"
+ },
+ "scenarioIds": [
+  "L3-v2-001",
+  "L3-v2-002",
+  "L3-v2-003"
+ ],
+ "runsByScenario": {
+  "L3-v2-001": 5,
+  "L3-v2-002": 5,
+  "L3-v2-003": 5
+ },
+ "apiFailuresByScenario": {
+  "L3-v2-001": 0,
+  "L3-v2-002": 0,
+  "L3-v2-003": 0
+ },
+ "agentUsage": {
+  "inputTokens": 1135673,
+  "outputTokens": 18057,
+  "cacheReadTokens": 857600,
+  "cacheWriteTokens": 0
+ },
+ "batches": [
+  {
+   "batchId": "batch_6abf74f2de648190acc63763c46b0455",
+   "inputFileId": "file-3hZNEibyA7CeNcTiVjMMYj",
+   "inputFile": "L3-v2-2026-10-02T08-19-09-628Z.judge-batch-input-1.jsonl",
+   "customIds": [
+    "L3-v2-001|passing|0",
+    "L3-v2-001|passing|1",
+    "L3-v2-001|passing|2",
+    "L3-v2-001|passing|3",
+    "L3-v2-001|passing|4",
+    "L3-v2-002|passing|0",
+    "L3-v2-002|passing|1",
+    "L3-v2-002|passing|2",
+    "L3-v2-002|passing|3",
+    "L3-v2-002|passing|4",
+    "L3-v2-003|passing|0",
+    "L3-v2-003|passing|1",
+    "L3-v2-003|passing|2",
+    "L3-v2-003|passing|3",
+    "L3-v2-003|passing|4"
+   ],
+   "submittedAt": "2026-10-02T09:10:11.160Z",
+   "status": "completed",
+   "requestCounts": {
+    "total": 15,
+    "completed": 15,
+    "failed": 0
+   },
+   "outputFile": "L3-v2-2026-10-02T08-19-09-628Z.judge-batch-output-1.jsonl",
+   "saved": true
+  }
+ ],
+ "collectedAt": "2026-10-02T09:58:11.182Z"
+}
