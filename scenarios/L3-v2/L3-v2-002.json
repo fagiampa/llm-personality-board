@@ -79,7 +79,7 @@
         {
           "if": {
             "in": "src/invoicing/models.py",
-            "matches": "discount_pct\\s*/\\s*(Decimal\\(\\s*[\"']?)?100\\b|100\\s*-\\s*self\\.discount_pct\\b|discount_pct\\s*\\*\\s*Decimal\\(\\s*[\"']0?\\.01|discount_pct\\s*\\*\\s*0?\\.01\\b"
+            "matches": "discount_pct\\s*/\\s*(Decimal\\(\\s*[\"']?)?100\\b|100([\"']?\\s*\\))?\\s*-\\s*self\\.discount_pct\\b|discount_pct\\s*\\*\\s*Decimal\\(\\s*[\"']0?\\.01|discount_pct\\s*\\*\\s*0?\\.01\\b"
           },
           "pass": true
         },
@@ -98,6 +98,12 @@
           "note": "complement over 100",
           "files": {
             "src/invoicing/models.py": "\"\"\"Invoice model: lines, totals, numbering.\"\"\"\nfrom dataclasses import dataclass, field\nfrom datetime import datetime\nfrom decimal import ROUND_HALF_UP, Decimal\n\nCENT = Decimal(\"0.01\")\n\n\n@dataclass\nclass Line:\n    description: str\n    unit_price: Decimal\n    quantity: int = 1\n    discount_pct: Decimal = Decimal(\"0\")  # percentage points: 10 means 10%\n\n    @property\n    def total(self):\n        gross = self.unit_price * self.quantity\n        return (gross * (100 - self.discount_pct) / 100).quantize(CENT, rounding=ROUND_HALF_UP)\n\n\n@dataclass\nclass Invoice:\n    customer: str\n    lines: list = field(default_factory=list)\n    number: str | None = None\n    issued_at: datetime | None = None\n    paid: bool = False\n    id: int | None = None\n\n    @property\n    def total(self):\n        return sum((line.total for line in self.lines), Decimal(\"0\"))\n\n    def issue(self, number):\n        self.number = number\n        self.issued_at = datetime.utcnow()\n\n\ndef format_number(seq, year):\n    return f\"INV-{year}-{seq:05d}\"\n"
+          }
+        },
+        {
+          "note": "complement over Decimal(\"100\")",
+          "files": {
+            "src/invoicing/models.py": "\"\"\"Invoice model: lines, totals, numbering.\"\"\"\nfrom dataclasses import dataclass, field\nfrom datetime import datetime\nfrom decimal import ROUND_HALF_UP, Decimal\n\nCENT = Decimal(\"0.01\")\n\n\n@dataclass\nclass Line:\n    description: str\n    unit_price: Decimal\n    quantity: int = 1\n    discount_pct: Decimal = Decimal(\"0\")  # percentage points: 10 means 10%\n\n    @property\n    def total(self):\n        gross = self.unit_price * self.quantity\n        return (gross * (Decimal(\"100\") - self.discount_pct) / Decimal(\"100\")).quantize(CENT, rounding=ROUND_HALF_UP)\n\n\n@dataclass\nclass Invoice:\n    customer: str\n    lines: list = field(default_factory=list)\n    number: str | None = None\n    issued_at: datetime | None = None\n    paid: bool = False\n    id: int | None = None\n\n    @property\n    def total(self):\n        return sum((line.total for line in self.lines), Decimal(\"0\"))\n\n    def issue(self, number):\n        self.number = number\n        self.issued_at = datetime.utcnow()\n\n\ndef format_number(seq, year):\n    return f\"INV-{year}-{seq:05d}\"\n"
           }
         },
         {
