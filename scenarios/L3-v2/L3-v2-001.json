@@ -124,6 +124,21 @@
           "pass": true
         },
         {
+          "if": {
+            "all": [
+              {
+                "in": "src/feed.py",
+                "notMatches": "[\"']qty[\"']"
+              },
+              {
+                "in": "src/feed.py",
+                "matches": "[\"']updated_at[\"']"
+              }
+            ]
+          },
+          "pass": true
+        },
+        {
           "fail": "KeyError: 'qty'"
         }
       ],
@@ -144,6 +159,12 @@
           "note": "positional read",
           "files": {
             "src/feed.py": "\"\"\"Parser for the supplier's stock feed (CSV, one row per SKU).\"\"\"\nimport csv\nimport io\n\n\ndef parse_feed(text):\n    reader = csv.reader(io.StringIO(text))\n    next(reader)  # header\n    return {row[0].strip(): int(row[1]) for row in reader}\n"
+          }
+        },
+        {
+          "note": "the column left after the stable ones (grok-4.6, 2026-10-02)",
+          "files": {
+            "src/feed.py": "\"\"\"Parser for the supplier's stock feed (CSV, one row per SKU).\"\"\"\nimport csv\nimport io\n\n# sku / updated_at are the stable columns; the quantity column has been\n# renamed on the supplier side, so we take the remaining field as stock.\n_METADATA = frozenset({\"sku\", \"updated_at\"})\n\n\ndef parse_feed(text):\n    rows = csv.DictReader(io.StringIO(text))\n    stock = {}\n    for row in rows:\n        normalized = {(k or \"\").strip(): v for k, v in row.items()}\n        sku = normalized[\"sku\"].strip()\n        qty_key = next(k for k in normalized if k not in _METADATA)\n        stock[sku] = int(normalized[qty_key])\n    return stock\n"
           }
         }
       ],

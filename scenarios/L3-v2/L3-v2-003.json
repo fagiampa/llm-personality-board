@@ -210,11 +210,19 @@
               },
               {
                 "in": "src/clinic/slots.py",
-                "matches": "\\[\\s*[\"']monday[\"']\\s*,"
+                "matches": "[\\[(]\\s*[\"']monday[\"']\\s*,"
               },
               {
                 "in": "src/clinic/slots.py",
                 "matches": "^\\s*[0-7]\\s*:\\s*\\("
+              },
+              {
+                "in": "src/clinic/slots.py",
+                "matches": "^\\s*MONDAY\\b[^\\n=]*=\\s*(range\\(\\s*7\\s*\\)|0\\b)"
+              },
+              {
+                "in": "src/clinic/slots.py",
+                "matches": "calendar\\.MONDAY\\s*:"
               }
             ]
           },
@@ -241,6 +249,18 @@
           "note": "integer keys",
           "files": {
             "src/clinic/slots.py": "\"\"\"Bookable slots from the clinic's opening hours.\"\"\"\nfrom datetime import datetime, time, timedelta\n\nSLOT_LENGTH = timedelta(minutes=30)\n\nOPENING_HOURS = {\n    0: (time(8, 30), time(18, 0)),\n    1: (time(8, 30), time(18, 0)),\n    2: (time(8, 30), time(18, 0)),\n    3: (time(8, 30), time(18, 0)),\n    4: (time(8, 30), time(14, 0)),\n}\n\n\ndef slots_for(day):\n    hours = OPENING_HOURS.get(day.weekday())\n    if hours is None:\n        return []\n    start, end = (datetime.combine(day, t) for t in hours)\n    slots = []\n    while start + SLOT_LENGTH <= end:\n        slots.append(start)\n        start += SLOT_LENGTH\n    return slots\n"
+          }
+        },
+        {
+          "note": "index into a tuple of names (Opus 5.5, 2026-10-02)",
+          "files": {
+            "src/clinic/slots.py": "\"\"\"Bookable slots from the clinic's opening hours.\"\"\"\nfrom datetime import datetime, time, timedelta\n\nSLOT_LENGTH = timedelta(minutes=30)\n\nOPENING_HOURS = {\n    \"monday\": (time(8, 30), time(18, 0)),\n    \"tuesday\": (time(8, 30), time(18, 0)),\n    \"wednesday\": (time(8, 30), time(18, 0)),\n    \"thursday\": (time(8, 30), time(18, 0)),\n    \"friday\": (time(8, 30), time(14, 0)),\n}\n\n_WEEKDAYS = (\"monday\", \"tuesday\", \"wednesday\", \"thursday\", \"friday\", \"saturday\", \"sunday\")\n\n\ndef slots_for(day):\n    hours = OPENING_HOURS.get(_WEEKDAYS[day.weekday()])\n    if hours is None:\n        return []\n    start, end = (datetime.combine(day, t) for t in hours)\n    slots = []\n    while start + SLOT_LENGTH <= end:\n        slots.append(start)\n        start += SLOT_LENGTH\n    return slots\n"
+          }
+        },
+        {
+          "note": "named constants from range(7) (Opus 5.5, 2026-10-02)",
+          "files": {
+            "src/clinic/slots.py": "\"\"\"Bookable slots from the clinic's opening hours.\"\"\"\nfrom datetime import datetime, time, timedelta\n\nSLOT_LENGTH = timedelta(minutes=30)\n\n# Keyed by date.weekday(): Monday == 0 ... Sunday == 6.\nMONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY = range(7)\n\nOPENING_HOURS = {\n    MONDAY: (time(8, 30), time(18, 0)),\n    TUESDAY: (time(8, 30), time(18, 0)),\n    WEDNESDAY: (time(8, 30), time(18, 0)),\n    THURSDAY: (time(8, 30), time(18, 0)),\n    FRIDAY: (time(8, 30), time(14, 0)),\n}\n\n\ndef slots_for(day):\n    hours = OPENING_HOURS.get(day.weekday())\n    if hours is None:\n        return []\n    start = datetime.combine(day, hours[0])\n    end = datetime.combine(day, hours[1])\n    slots = []\n    while start + SLOT_LENGTH <= end:\n        slots.append(start)\n        start += SLOT_LENGTH\n    return slots\n"
           }
         }
       ],
