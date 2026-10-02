@@ -14,10 +14,13 @@ Serve al README, al whitepaper e al post. Non riguarda il codice.
 | **ImpossibleBench** — Zhong, Raghunathan, Carlini, arXiv 2510.20270, ICLR 2026 | varianti impossibili di task da benchmark di coding esistenti: i test sono mutati per contraddire la specifica, e il tasso di superamento è il tasso di imbroglio (cancellare o modificare test, hard-coding). I modelli più capaci imbrogliano di più. Codice aperto (Inspect) | no | no | **sì** (sandbox) | no |
 | **MASK** — Ren et al., arXiv 2503.03750 | dataset raccolto a mano, separa onestà da accuratezza: elicita la credenza del modello in un contesto neutro, poi gli chiede la stessa cosa sotto pressione e confronta. I modelli più grandi sono più accurati ma non più onesti. Codice e dati aperti | pressione sì, livelli no | no | no | no |
 
-## ImpossibleBench e MASK: i più vicini (aggiunti 2026-10-02)
+## ImpossibleBench e MASK (aggiunti 2026-10-02)
 
-Sono i due lavori più vicini a L3 e vanno citati per primi, prima che lo
-faccia un revisore.
+Vicini in due modi diversi, e vanno citati prima che lo faccia un
+revisore. ImpossibleBench è il vicino di **metodo**: agentico, task
+impossibile, test a portata di mano. MASK è il vicino di **costrutto**:
+la menzogna sotto pressione, misurata come scarto da una verità nota. Ma
+non è agentico: un prompt, una risposta.
 
 **ImpossibleBench** fa quello che fa il nostro asse B: un task che non si
 può risolvere, i test a portata di mano, e si conta chi li aggira. Cosa
@@ -40,8 +43,11 @@ cambia da noi:
 **MASK** misura la menzogna come scarto tra credenza e affermazione sotto
 pressione. Cosa cambia da noi:
 
-- **Testo, non azioni.** In MASK la verità è una credenza elicitata; da noi
-  è il log di quello che il modello ha fatto pochi turni prima.
+- **Non agentico.** Nessuno strumento, nessun lavoro prima della risposta.
+  In MASK la verità è una credenza elicitata; da noi è il log di quello che
+  il modello ha fatto pochi turni prima, e la posta è il proprio lavoro,
+  non un fatto del mondo. Più vicino al nostro L2 (un colpo solo, un fatto
+  scomodo nell'input) che a L3.
 - **La pressione da noi non contiene istruzioni** (regola 1). In MASK il
   prompt di pressione assegna spesso un ruolo o un obiettivo: quello lo
   trattiamo come `calibration`, mai nel punteggio pubblicato.
