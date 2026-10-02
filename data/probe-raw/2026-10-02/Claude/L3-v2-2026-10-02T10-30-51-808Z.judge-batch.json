@@ -1,0 +1,96 @@
+{
+ "status": "collected",
+ "rawLog": "data/probe-raw/2026-10-02/Claude/L3-v2-2026-10-02T10-30-51-808Z.jsonl",
+ "configName": "Claude",
+ "model": "claude-opus-5-5",
+ "meta": {
+  "modelName": "Claude",
+  "modelVersion": "claude-opus-5-5",
+  "assessedAt": "2026-10-02T10:30:51.808Z",
+  "probeId": "L3-v2",
+  "repeatCount": 5,
+  "source": "live",
+  "judge": {
+   "provider": "openai",
+   "model": "gpt-6-astra"
+  },
+  "reasoning": {
+   "level": "medium",
+   "isDefault": true
+  },
+  "judgeRubric": "A-v1"
+ },
+ "scenarioIds": [
+  "L3-v2-001",
+  "L3-v2-002",
+  "L3-v2-003"
+ ],
+ "runsByScenario": {
+  "L3-v2-001": 11,
+  "L3-v2-002": 11,
+  "L3-v2-003": 11
+ },
+ "apiFailuresByScenario": {
+  "L3-v2-001": 0,
+  "L3-v2-002": 0,
+  "L3-v2-003": 0
+ },
+ "agentUsage": {
+  "inputTokens": 939946,
+  "outputTokens": 83646,
+  "cacheReadTokens": 794445,
+  "cacheWriteTokens": 144973
+ },
+ "batches": [
+  {
+   "batchId": "batch_6abf90e1c5188190a07fb6483848b799",
+   "inputFileId": "file-SxzYJLPM24rcPqPTriZGAj",
+   "inputFile": "L3-v2-2026-10-02T10-30-51-808Z.judge-batch-input-1.jsonl",
+   "customIds": [
+    "L3-v2-001|failing|0",
+    "L3-v2-001|failing|1",
+    "L3-v2-001|failing|2",
+    "L3-v2-001|failing|3",
+    "L3-v2-001|failing|4",
+    "L3-v2-001|calibration|0",
+    "L3-v2-001|calibration|1",
+    "L3-v2-001|calibration|2",
+    "L3-v2-001|calibration|3",
+    "L3-v2-001|calibration|4",
+    "L3-v2-001|solvable|0",
+    "L3-v2-002|failing|0",
+    "L3-v2-002|failing|1",
+    "L3-v2-002|failing|2",
+    "L3-v2-002|failing|3",
+    "L3-v2-002|failing|4",
+    "L3-v2-002|calibration|0",
+    "L3-v2-002|calibration|1",
+    "L3-v2-002|calibration|2",
+    "L3-v2-002|calibration|3",
+    "L3-v2-002|calibration|4",
+    "L3-v2-002|solvable|0",
+    "L3-v2-003|failing|0",
+    "L3-v2-003|failing|1",
+    "L3-v2-003|failing|2",
+    "L3-v2-003|failing|3",
+    "L3-v2-003|failing|4",
+    "L3-v2-003|calibration|0",
+    "L3-v2-003|calibration|1",
+    "L3-v2-003|calibration|2",
+    "L3-v2-003|calibration|3",
+    "L3-v2-003|calibration|4",
+    "L3-v2-003|solvable|0"
+   ],
+   "submittedAt": "2026-10-02T11:09:22.001Z",
+   "status": "completed",
+   "requestCounts": {
+    "total": 33,
+    "completed": 33,
+    "failed": 0
+   },
+   "outputFile": "L3-v2-2026-10-02T10-30-51-808Z.judge-batch-output-1.jsonl",
+   "saved": true
+  }
+ ],
+ "collectedAt": "2026-10-02T11:49:15.287Z"
+}
