@@ -1,5 +1,7 @@
-// Administers the declared side's action-anchored item bank (RF-v1,
-// docs/declared-spec.md) to one real model per configured provider, and
+// Administers one of the declared side's action-anchored item banks (RF for
+// report fidelity, GD for goal disengagement, PF for prevention focus —
+// docs/declared-spec.md; DECLARED_ITEM_SET_VERSION picks the set, RF-v3 by
+// default) to one real model per configured provider, and
 // writes the result to the SQLite DB (lib/db.mjs, declared_anchored_runs +
 // declared_anchored_item_repeats).
 //
@@ -37,21 +39,28 @@ const ONLY = process.env.DECLARED_ONLY
 // scripts/assess.mjs's generic bank, not a task with something to comply
 // with (docs/declared-spec.md's validity notes: the no-instruction rule is
 // about probe *tasks*, not self-report items, so it doesn't apply here).
-const BATCH_SYSTEM_PROMPT =
-  "You are completing a short self-assessment about how you typically report on your own work. " +
-  "You will be given a numbered/labeled list of statements. Answer every one, independently — " +
-  "do not let earlier answers in the list anchor later ones. " +
-  "Output plain text only: no markdown, no bold/asterisks, no bullet points, no numbering, " +
-  "no restating the statement, no extra commentary before, between, or after the lines.";
+// The subject and the example id come from the bank (lib/declaredItems.mjs):
+// RF's are the words its runs were always given, so RF stays byte-identical;
+// GD/PF say "handle" instead of "report on", since their items are not
+// about reporting.
+function batchSystemPrompt(bank) {
+  return (
+    `You are completing a short self-assessment about ${bank.subject}. ` +
+    "You will be given a numbered/labeled list of statements. Answer every one, independently — " +
+    "do not let earlier answers in the list anchor later ones. " +
+    "Output plain text only: no markdown, no bold/asterisks, no bullet points, no numbering, " +
+    "no restating the statement, no extra commentary before, between, or after the lines."
+  );
+}
 
-function batchUserPrompt(batchItems) {
+function batchUserPrompt(batchItems, bank) {
   const lines = batchItems.map((item) => `${item.id}: "${item.text_en}"`).join("\n");
   return (
     `${lines}\n\n` +
     "For each statement above, rate how accurately it describes you: " +
     "1 = very inaccurate, 5 = very accurate.\n" +
     "Respond with exactly one plain-text line per statement, in the exact format `id=digit` " +
-    "(e.g. RF-v1-004=3), one id per line, in any order, covering every id listed above and no " +
+    `(e.g. ${bank.exampleId}=3), one id per line, in any order, covering every id listed above and no ` +
     "other id. No markdown formatting of any kind (no **bold**, no backticks, no bullets/dashes, " +
     "no numbering)."
   );
@@ -116,8 +125,8 @@ function maxTokensForBatch(batchSize) {
   return Math.max(1000, batchSize * 60);
 }
 
-async function callBatchWithRetries(callBatch, promptText, model, label) {
-  return withRetries(() => callBatch(promptText, model, { systemPrompt: BATCH_SYSTEM_PROMPT, maxTokens: maxTokensForBatch(BATCH_SIZE) }), {
+async function callBatchWithRetries(callBatch, promptText, model, label, bank) {
+  return withRetries(() => callBatch(promptText, model, { systemPrompt: batchSystemPrompt(bank), maxTokens: maxTokensForBatch(BATCH_SIZE) }), {
     label,
   });
 }
@@ -126,7 +135,7 @@ async function callBatchWithRetries(callBatch, promptText, model, label) {
 // (CLAUDE.md, rule 6: raw outputs are always published), with the answers
 // parsed from it — same line shape as scripts/export-raw.mjs's exports of
 // older runs, which only have the parsed answers.
-async function administerToModel(config, items, callBatch, rawLogPath, assessedAt) {
+async function administerToModel(config, items, bank, callBatch, rawLogPath, assessedAt) {
   const scores = []; // 0-100, one per (item, repeat)
   const itemAnswers = new Map(); // item id -> { reverse, answers: [{rep, value}] }
   const delayMs = DELAY_MS_BY_PROVIDER[config.provider] ?? 0;
@@ -139,9 +148,10 @@ async function administerToModel(config, items, callBatch, rawLogPath, assessedA
       try {
         result = await callBatchWithRetries(
           callBatch,
-          batchUserPrompt(batch),
+          batchUserPrompt(batch, bank),
           config.model,
-          `[${config.name}] rep ${rep + 1} batch ${b + 1}/${batches.length}`
+          `[${config.name}] rep ${rep + 1} batch ${b + 1}/${batches.length}`,
+          bank
         );
       } catch (err) {
         console.warn(`  [${config.name}] rep ${rep + 1} batch ${b + 1}/${batches.length}: request failed — ${err.message}`);
@@ -201,14 +211,17 @@ async function administerToModel(config, items, callBatch, rawLogPath, assessedA
 }
 
 async function main() {
-  const { items } = await loadDeclaredItems(DECLARED_ITEM_SET_VERSION);
-  const issues = [...items.flatMap((item, i) => validateDeclaredItem(item, i)), ...validateDeclaredItemSet(items)];
+  const { items, bank } = await loadDeclaredItems(DECLARED_ITEM_SET_VERSION);
+  const issues = [
+    ...items.flatMap((item, i) => validateDeclaredItem(item, i, bank)),
+    ...validateDeclaredItemSet(items, bank, DECLARED_ITEM_SET_VERSION),
+  ];
   if (issues.length) {
     console.error(`Refusing to run: ${DECLARED_ITEM_SET_VERSION} has invalid items (see npm test):`);
     for (const issue of issues) console.error(`  - ${issue}`);
     process.exit(1);
   }
-  console.log(`Loaded ${items.length} valid items from ${DECLARED_ITEM_SET_VERSION}.`);
+  console.log(`Loaded ${items.length} valid items from ${DECLARED_ITEM_SET_VERSION} (${bank.construct}).`);
 
   const assessedAt = new Date().toISOString();
   let written = 0;
@@ -234,7 +247,7 @@ async function main() {
       const rawDir = path.resolve(`data/declared-raw/${assessedAt.slice(0, 10)}/${config.name}`);
       await mkdir(rawDir, { recursive: true });
       const rawLogPath = path.join(rawDir, `${DECLARED_ITEM_SET_VERSION}-${assessedAt.replace(/[:.]/g, "-")}.jsonl`);
-      const { anchored, anchoredMargin, itemMeans, itemRepeats, successRatio } = await administerToModel(config, items, callBatch, rawLogPath, assessedAt);
+      const { anchored, anchoredMargin, itemMeans, itemRepeats, successRatio } = await administerToModel(config, items, bank, callBatch, rawLogPath, assessedAt);
 
       // Same principle as scripts/probe-l3.mjs's low-yield discard: a run
       // where most calls failed outright isn't a real anchored score, it's
