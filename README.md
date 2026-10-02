@@ -108,6 +108,11 @@ Issues and pull requests are welcome. This is meant to be a community-run instru
 scenario is a one-file pull request. See [`CONTRIBUTING.md`](./CONTRIBUTING.md), including the notes on AI-assisted
 contributions.
 
+## Support
+
+The project is funded by donations. Lightning Network: `tennicodabar@getalby.com` (a Lightning Address: paste it into
+any wallet that supports them).
+
 ## Licenza
 
 LLM Personality Board © 2026 il tennico (tennicodabar@gmail.com). Distribuito sotto GNU AGPL v3.0 o successive. Vedi il file [LICENSE](./LICENSE).

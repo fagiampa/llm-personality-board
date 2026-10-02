@@ -1,0 +1,44 @@
+.footer {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 20px 24px 32px;
+  border-top: 1px solid oklch(90% 0.01 75);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  font-size: 12px;
+  color: oklch(45% 0.02 75);
+}
+
+.link {
+  color: inherit;
+}
+
+.support {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
+
+.address {
+  color: oklch(50% 0.14 265);
+  overflow-wrap: anywhere;
+}
+
+.copy {
+  font: inherit;
+  font-size: 11px;
+  color: oklch(35% 0.02 75);
+  background: #fff;
+  border: 1px solid oklch(88% 0.01 75);
+  border-radius: 999px;
+  padding: 1px 9px;
+  cursor: pointer;
+}
+
+.copy:focus-visible {
+  outline: 2px solid oklch(35% 0.02 75);
+  outline-offset: 2px;
+}

@@ -5,6 +5,7 @@ import { resolveLocale } from "@/lib/i18n/locale";
 import { LocaleProvider } from "@/lib/i18n/context";
 import { dict } from "@/lib/i18n/dictionaries";
 import { buildMetadata } from "@/lib/seo";
+import SiteFooter from "@/components/SiteFooter";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -34,7 +35,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang={locale} className={`${spaceGrotesk.variable} ${ibmPlexSans.variable}`}>
       <body>
-        <LocaleProvider locale={locale}>{children}</LocaleProvider>
+        <LocaleProvider locale={locale}>
+          {children}
+          <SiteFooter />
+        </LocaleProvider>
       </body>
     </html>
   );

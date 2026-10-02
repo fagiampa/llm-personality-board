@@ -10,4 +10,7 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://llm-person
 
 export const SITE_NAME = "LLM Personality Board";
 
+// Donations, Lightning Network (LUD-16 address). Shown in the site footer and README.
+export const LIGHTNING_ADDRESS = "tennicodabar@getalby.com";
+
 export const GITHUB_URL = "https://github.com/fagiampa/llm-personality-board";

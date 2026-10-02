@@ -16,6 +16,13 @@ export const dictionaries = {
       questionnaireLink: "the questionnaire →",
       considerationsLink: "further considerations →",
     },
+    footer: {
+      openSource: "Code and data are open source (AGPL-3.0).",
+      support: "Support the project via Lightning:",
+      copy: "copy",
+      copied: "copied",
+      copyAriaLabel: "Copy the Lightning address",
+    },
     card: {
       // Badge: has this version had a complete L3 run (every scenario of the
       // current set)? Not recency — which version shows by default is a
@@ -93,6 +100,13 @@ export const dictionaries = {
       methodologyLink: "metodologia e riferimenti →",
       questionnaireLink: "il questionario →",
       considerationsLink: "ulteriori considerazioni →",
+    },
+    footer: {
+      openSource: "Codice e dati sono open source (AGPL-3.0).",
+      support: "Sostieni il progetto via Lightning:",
+      copy: "copia",
+      copied: "copiato",
+      copyAriaLabel: "Copia l’indirizzo Lightning",
     },
     card: {
       complete: "completo",
