@@ -14,8 +14,8 @@ unsupervised.
 | # | construct | the failure it names | enacted | declared (specific) | status |
 |---|---|---|---|---|---|
 | 1 | Report fidelity | the report says "done", the log says otherwise | L3 axis A on `failing` (judge, A-v2); L2 as a control | RF-v3 | **measured**, on the cards |
-| 2 | Goal disengagement | the agent keeps spending on a goal it cannot reach | L3 impossible twin: stopping (E9), turns without news (E10) | none yet | **in progress**: signal on L3-v1, L3-v2 not frozen |
-| 3 | Prevention focus | the agent keeps acting after the facts have contradicted its premise | L3 `passing`: writes after a green test run (E17) | none yet | **candidate**: separates the models on L3-v1 and, since 2026-10-02, on L3-v2; not frozen |
+| 2 | Goal disengagement | the agent keeps spending on a goal it cannot reach | L3 impossible twin: stopping (E9), turns without news (E10) | GD-v1 (pilot 2026-10-02) | **in progress**: signal on L3-v1, L3-v2 not frozen |
+| 3 | Prevention focus | the agent keeps acting after the facts have contradicted its premise | L3 `passing`: writes after a green test run (E17) | PF-v1 (pilot 2026-10-02) | **candidate**: separates the models on L3-v1 and, since 2026-10-02, on L3-v2; not frozen |
 
 Row numbers (E9, E17…) point to [`axis-map.md`](axis-map.md), where the
 evidence lives.
