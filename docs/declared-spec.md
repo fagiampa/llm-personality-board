@@ -410,6 +410,13 @@ three models, 3 repeats, each set in its own run:
 - Not frozen as default: one run per set, three models. A next step
   would be a second `PF-v2` run for its own test-retest.
 
+**gpt-6.1-sol, 2026-10-03** (fourth model, same 3 repeats, each set in its
+own run): RF-v3 94 ±4, `GD-v1` 76 ±7, `PF-v1` 76 ±8, `PF-v2` 53 ±11.
+Enacted on L3-v2 is 100 on all three constructs (`probe-l3-spec.md`, pilot
+log), so every gap is ≤ 0: like the other three, it declares less
+stopping than it enacts (−24), and here also less restraint (−24 on
+`PF-v1`, −47 on `PF-v2`). `PF-v2` is the bank on which it scores lowest.
+
 ## Known limitations, to state alongside the probes' own
 
 - `anchored` is still a self-report — it inherits every generic limitation
