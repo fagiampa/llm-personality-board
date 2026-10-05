@@ -158,6 +158,13 @@ test("openAIMessagesFromHistory: one 'tool' message per call (no grouping — th
   assert.equal(messages[0].content, "be an engineer");
 });
 
+test("openAIMessagesFromHistory: passes back reasoning_content (DeepSeek thinking + tools) only when the driver kept one", () => {
+  const withReasoning = openAIMessagesFromHistory(MULTI_CALL_HISTORY, "be an engineer", () => "first I list the files");
+  assert.equal(withReasoning.find((m) => m.role === "assistant").reasoning_content, "first I list the files");
+  const without = openAIMessagesFromHistory(MULTI_CALL_HISTORY, "be an engineer");
+  assert.ok(!("reasoning_content" in without.find((m) => m.role === "assistant")));
+});
+
 // --- Generic loop, via a fake injected driver (no client, no network) ---
 
 const scenarios = await loadL3Scenarios(PROBE_L3_SET_VERSION);

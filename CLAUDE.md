@@ -417,6 +417,13 @@ files' comments and in `tests/l3-agent.test.mjs`'s regression tests.
   The OpenAI L3 driver is on the Responses API because `gpt-6-astra` refuses
   tools + reasoning on Chat Completions. The judge passes `reasoning: false`
   and is never pinned.
+- **DeepSeek (`deepseek-flash`, V4.1 Flash) thinks by default** (effort
+  high, pinned). With tools in the request every earlier assistant turn's
+  `reasoning_content` must go back, or it 400s — the Chat Completions driver
+  keeps it per turn (`openAIMessagesFromHistory`'s third param). The id is
+  an alias with no dated variant (it moved V4 → V4.1 on 2026-09-10): a
+  silent vendor upgrade lands under the same `model_version`. Prices have a
+  peak tier; `lib/pricing.mjs` lists it, so estimates are upper bounds.
 - **Token usage and a cost estimate are logged per L3 run**
   (`lib/pricing.mjs` — verified list prices only, source per entry).
   `gpt-6-astra` is $10/$50 per Mtok, same tier as Fable: budget accordingly.
