@@ -278,12 +278,127 @@
   background: oklch(96% 0.005 75);
 }
 
+/* a family with several versions: the cards under the top one show as two
+   edges below it; open, it is the crossing of the row and the column */
+.stage {
+  position: relative;
+}
+
+.deck {
+  box-shadow:
+    0 4px 0 -1px #fff,
+    0 4px 0 0 oklch(86% 0.01 75),
+    0 8px 0 -3px #fff,
+    0 8px 0 -2px oklch(86% 0.01 75);
+}
+
+.deckOpen {
+  border-color: oklch(45% 0.02 75);
+  box-shadow: 0 0 0 1px oklch(45% 0.02 75);
+}
+
+.deckToggle {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1;
+  color: oklch(35% 0.02 75);
+  background: #fff;
+  border: 1px solid oklch(86% 0.01 75);
+  border-radius: 999px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+
+.deckToggle:hover {
+  background: oklch(96% 0.005 75);
+}
+
+.deckToggle[aria-expanded="true"] {
+  border-color: oklch(45% 0.02 75);
+}
+
+/* the column's window: three slots tall, clips the strip above and below
+   (not sideways, where the cards' shadows go) */
+.colWindow {
+  position: absolute;
+  z-index: 2;
+  clip-path: inset(-10px -40px);
+}
+
+.colCard {
+  position: absolute;
+  box-shadow: 0 8px 22px oklch(20% 0.02 75 / 0.14);
+  transition: transform 0.28s ease, opacity 0.28s ease;
+}
+
+.colCard.deckOpen {
+  box-shadow:
+    0 0 0 1px oklch(45% 0.02 75),
+    0 8px 22px oklch(20% 0.02 75 / 0.14);
+}
+
+.under {
+  visibility: hidden;
+}
+
+.vnav {
+  position: absolute;
+  z-index: 2;
+  transition: opacity 0.28s ease;
+}
+
+.dim {
+  opacity: 0.35;
+  transition: opacity 0.2s ease;
+}
+
 .reset:focus-visible,
+.deckToggle:focus-visible,
 .nav:focus-visible,
 .dot:focus-visible,
 .grip:focus-visible {
   outline: 2px solid oklch(22% 0.02 75);
   outline-offset: 2px;
+}
+
+/* short card, while a deck is open: what the cross needs to fit a low
+   window — no legend, a one-line header, the chart scaled down with --s */
+.short .card {
+  padding: 8px 8px 4px;
+  gap: 4px;
+}
+
+.short .header {
+  flex-direction: row;
+  gap: 6px;
+  max-width: calc(100% - 96px);
+}
+
+.short .mono {
+  width: 24px;
+  height: 24px;
+  font-size: 9px;
+}
+
+.short .name {
+  font-size: 13px;
+}
+
+.short .cardlegend,
+.short .deckWord {
+  display: none;
+}
+
+.short .grip,
+.short .deckToggle {
+  top: 6px;
 }
 
 /* compact card: a third of a phone screen */
@@ -306,8 +421,25 @@
   gap: 3px;
 }
 
+/* on a phone the short card keeps the compact header: no room for a row */
+.compact.short .header {
+  flex-direction: column;
+  max-width: 100%;
+}
+
 .compact .name {
   font-size: 11.5px;
+}
+
+.compact .deckWord {
+  display: none;
+}
+
+.compact .deckToggle {
+  top: 3px;
+  right: 3px;
+  padding: 3px 5px;
+  font-size: 10px;
 }
 
 .compact .grip {
@@ -339,7 +471,10 @@
   .rail {
     scroll-behavior: auto;
   }
-  .track {
+  .track,
+  .colCard,
+  .vnav,
+  .dim {
     transition: none;
   }
 }

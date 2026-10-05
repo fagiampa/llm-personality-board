@@ -91,6 +91,7 @@ export default async function PreviewPage() {
     const anchored = (set: string) => d.declared[set]?.anchored ?? null;
     return {
       name: e.modelVersion,
+      family: d.hexaco?.name ?? e.modelVersion,
       monogram: d.hexaco?.monogram ?? e.modelVersion.slice(0, 2).toUpperCase(),
       hue: d.hexaco?.hue ?? 75,
       scores: d.hexaco?.scores ?? null,

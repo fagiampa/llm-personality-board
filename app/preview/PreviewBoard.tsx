@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { useLocale } from "@/lib/i18n/context";
 import styles from "./page.module.css";
 
@@ -9,9 +17,16 @@ import styles from "./page.module.css";
 // scaled by one factor shared by the row), two views per card (declared vs
 // enacted per construct, then the HEXACO profile), cards reorderable by
 // their grip. Alphabetical by default (rule 5: no leaderboard).
+//
+// One card per family in the row (model_name: Claude, ChatGPT...). A family
+// with several versions is a deck: its toggle lays the versions out on a
+// vertical column that crosses the row at that card, with up/down arrows
+// like the row's left/right ones. The card in the row is the version at the
+// crossing; the column's cards are the same size, at the same scale.
 
 export interface PreviewModel {
   name: string;
+  family: string; // model_name (e.g. "Claude"): versions of one family stack as a deck
   monogram: string;
   hue: number;
   scores: number[] | null; // H,E,X,A,C,O, generic HEXACO
@@ -40,6 +55,11 @@ const TEXT = {
     viewRadar: "HEXACO profile",
     viewOf: (n: string) => `View of ${n}`,
     noHexaco: "no HEXACO run",
+    versionsWord: "versions",
+    openDeck: (f: string, n: number) => `Show the ${n} ${f} versions`,
+    closeDeck: (f: string) => `Close the ${f} versions`,
+    up: "Previous version",
+    down: "Next version",
   },
   it: {
     constructs: [
@@ -62,11 +82,19 @@ const TEXT = {
     viewRadar: "Profilo HEXACO",
     viewOf: (n: string) => `Vista di ${n}`,
     noHexaco: "nessun run HEXACO",
+    versionsWord: "versioni",
+    openDeck: (f: string, n: number) => `Mostra le ${n} versioni di ${f}`,
+    closeDeck: (f: string) => `Chiudi le versioni di ${f}`,
+    up: "Versione precedente",
+    down: "Versione successiva",
   },
 };
 type Text = (typeof TEXT)["en"];
 
 const COMPACT_BELOW = 200;
+const GAP = 14; // between the column's cards, as between the row's
+const NAV = 34; // the arrow buttons
+const SPREAD_MS = 280;
 
 // ---- view 1: one vertical dumbbell per construct, in a 160 viewBox
 const TOP = 16;
@@ -175,41 +203,89 @@ function Swatch({ kind, hue }: { kind: "declared" | "enacted" | "hexaco"; hue: n
   );
 }
 
+interface Deck {
+  count: number;
+  open: boolean;
+  onToggle: () => void;
+  onStep: (dir: -1 | 1) => void;
+}
+
 function Card({
   m,
   t,
-  onGripDown,
-  onGripKey,
-  dragging,
+  grip,
+  dragging = false,
+  deck,
+  className = "",
+  style,
 }: {
   m: PreviewModel;
   t: Text;
-  onGripDown: (e: ReactPointerEvent<HTMLButtonElement>) => void;
-  onGripKey: (dir: -1 | 1) => void;
-  dragging: boolean;
+  // the row's cards are reorderable; a card in the open column is not
+  grip?: { onDown: (e: ReactPointerEvent<HTMLButtonElement>) => void; onKey: (dir: -1 | 1) => void };
+  dragging?: boolean;
+  deck?: Deck;
+  className?: string;
+  style?: CSSProperties;
 }) {
   const [view, setView] = useState(0);
   const swipe = useRef<{ x: number; y: number } | null>(null);
+  const stacked = deck != null && deck.count > 1;
   return (
-    <article className={`${styles.card} ${dragging ? styles.dragging : ""}`} aria-label={m.name} data-name={m.name}>
-      <button
-        type="button"
-        className={styles.grip}
-        aria-label={t.move(m.name)}
-        onPointerDown={onGripDown}
-        onKeyDown={(e) => {
-          if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-            e.preventDefault();
-            onGripKey(e.key === "ArrowLeft" ? -1 : 1);
-          }
-        }}
-      >
-        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
-          <g fill="currentColor">
-            {[2.5, 6, 9.5].flatMap((cy) => [3, 9].map((cx) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={1.3} />))}
-          </g>
-        </svg>
-      </button>
+    <article
+      className={`${styles.card} ${dragging ? styles.dragging : ""} ${stacked ? (deck.open ? styles.deckOpen : styles.deck) : ""} ${className}`}
+      aria-label={m.name}
+      data-family={m.family}
+      style={style}
+    >
+      {grip && (
+        <button
+          type="button"
+          className={styles.grip}
+          aria-label={t.move(m.family)}
+          onPointerDown={grip.onDown}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+              e.preventDefault();
+              grip.onKey(e.key === "ArrowLeft" ? -1 : 1);
+            }
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+            <g fill="currentColor">
+              {[2.5, 6, 9.5].flatMap((cy) => [3, 9].map((cx) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={1.3} />))}
+            </g>
+          </svg>
+        </button>
+      )}
+      {stacked && (
+        <button
+          type="button"
+          className={styles.deckToggle}
+          aria-expanded={deck.open}
+          aria-label={deck.open ? t.closeDeck(m.family) : t.openDeck(m.family, deck.count)}
+          onClick={deck.onToggle}
+          onKeyDown={(e) => {
+            if (deck.open && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+              e.preventDefault();
+              deck.onStep(e.key === "ArrowUp" ? -1 : 1);
+            }
+          }}
+        >
+          <span>{deck.count}</span>
+          <span className={styles.deckWord}>{t.versionsWord}</span>
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path
+              d={deck.open ? "M2 6.5 5 3.5l3 3" : "M2 3.5 5 6.5l3-3"}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      )}
       <div className={styles.header}>
         <div className={styles.mono} style={{ background: `oklch(62% 0.14 ${m.hue})` }}>
           {m.monogram}
@@ -278,30 +354,86 @@ function Card({
   );
 }
 
+function Chevron({ d }: { d: string }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+      <path d={d} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+type Geo = { left: number; top: number; width: number; height: number };
+
 export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
   const t = TEXT[useLocale()];
-  const alpha = [...models].sort((a, b) => a.name.localeCompare(b.name)).map((m) => m.name);
+  // family -> its versions, alphabetical (rule 5), the first one on top of the deck
+  const families = useMemo(() => {
+    const map = new Map<string, PreviewModel[]>();
+    for (const m of [...models].sort((a, b) => a.name.localeCompare(b.name))) {
+      if (!map.has(m.family)) map.set(m.family, []);
+      map.get(m.family)!.push(m);
+    }
+    return map;
+  }, [models]);
+  const alpha = [...families.keys()].sort((a, b) => a.localeCompare(b));
   const [order, setOrder] = useState(alpha);
   const [dragged, setDragged] = useState<string | null>(null);
-  const [scale, setScale] = useState(1);
+  // the row's fit to its width; while a deck is open, also the fit of the
+  // whole cross to the window's height (vScale), the smaller of the two for
+  // every card at once — still one scale shared by all of them
+  const [fitScale, setFitScale] = useState(1);
+  const [vScale, setVScale] = useState<number | null>(null);
+  const [vh, setVh] = useState(0);
   const [compact, setCompact] = useState(false);
   const [first, setFirst] = useState(1);
   const [edges, setEdges] = useState({ start: true, end: true });
+  // the open deck, which of its versions sits at the crossing, and where the crossing is
+  const [open, setOpen] = useState<string | null>(null);
+  const [spread, setSpread] = useState(false);
+  const [current, setCurrent] = useState<Record<string, number>>({});
+  const [geo, setGeo] = useState<Geo | null>(null);
+  const stage = useRef<HTMLDivElement>(null);
   const rail = useRef<HTMLDivElement>(null);
+  const padApplied = useRef(0);
+  const closing = useRef<ReturnType<typeof setTimeout>>();
 
-  const byName = new Map(models.map((m) => [m.name, m]));
-  const isAlpha = order.every((n, i) => n === alpha[i]);
+  const isAlpha = order.every((f, i) => f === alpha[i]);
+  const n = order.length;
+  const versionsOf = (f: string) => families.get(f) ?? [];
+  const at = (f: string) => current[f] ?? 0;
+  const deckEl = (f: string) => rail.current?.querySelector<HTMLElement>(`article[data-family="${CSS.escape(f)}"]`) ?? null;
 
   const railGap = () => (rail.current ? parseFloat(getComputedStyle(rail.current).columnGap) || 0 : 0);
   const step = () => {
     const card = rail.current?.querySelector("article");
     return card ? card.getBoundingClientRect().width + railGap() : 1;
   };
+
+  const measure = (): Geo | null => {
+    const st = stage.current;
+    const el = open ? deckEl(open) : null;
+    if (!st || !el) return null;
+    const s = st.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const next = { left: r.left - s.left, top: r.top - s.top, width: r.width, height: r.height };
+    setGeo((g) =>
+      g &&
+      Math.abs(g.left - next.left) < 0.5 &&
+      Math.abs(g.top - next.top) < 0.5 &&
+      Math.abs(g.width - next.width) < 0.5 &&
+      Math.abs(g.height - next.height) < 0.5
+        ? g
+        : next
+    );
+    return next;
+  };
+
   const updateNav = () => {
     const el = rail.current;
     if (!el) return;
     setEdges({ start: el.scrollLeft <= 2, end: el.scrollLeft >= el.scrollWidth - el.clientWidth - 2 });
-    setFirst(Math.max(1, Math.min(Math.max(1, models.length - 2), Math.round(el.scrollLeft / step()) + 1)));
+    setFirst(Math.max(1, Math.min(Math.max(1, n - 2), Math.round(el.scrollLeft / step()) + 1)));
+    measure();
   };
 
   useEffect(() => {
@@ -311,18 +443,116 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
       const slot = (el.clientWidth - 2 * railGap()) / 3;
       const c = slot < COMPACT_BELOW;
       setCompact(c);
-      setScale(Math.max(0.3, Math.min(1.25, (slot - (c ? 8 : 20) - 2) / 240)));
+      setFitScale(Math.max(0.3, Math.min(1.25, (slot - (c ? 8 : 20) - 2) / 240)));
       updateNav();
     };
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [open]);
 
-  const move = (name: string, dir: -1 | 1) =>
+  // Room above and below the row for the column: one card and one arrow on
+  // each side, whatever the crossing, so stepping through the versions moves
+  // only the column — the row stays put. Open, the cards go short (no
+  // legend, a one-line header) and the chart shrinks until the column's
+  // three slots and both arrows fit the window's height; the cross is then
+  // centred on screen. Closed, the window scrolls back by what was removed.
+  const openVersions = open ? versionsOf(open) : [];
+  const crossing = open != null && openVersions.length > 1;
+  const scale = crossing && vScale != null ? Math.min(fitScale, vScale) : fitScale;
+  const c = open ? at(open) : 0;
+  const side = crossing && geo ? geo.height + 2 * GAP + NAV : 0;
+  const pad = 2 * side;
+  useLayoutEffect(() => {
+    const delta = pad - padApplied.current;
+    padApplied.current = pad;
+    if (pad > 0 && delta !== 0) stage.current?.scrollIntoView({ block: "center" });
+    else if (delta < 0) window.scrollBy(0, delta);
+    // Read from the DOM as just laid out, at the scale it was drawn with —
+    // never from the geo state, which may still hold the previous scale's
+    // height (that mismatch fed a new scale back forever).
+    const fresh = measure();
+    if (crossing && fresh) {
+      const chrome = fresh.height - 240 * scale; // what of a card isn't the chart
+      const room = (window.innerHeight - 24 - 6 * GAP - 2 * NAV) / 3;
+      const next = Math.max(0.3, Math.min(1.25, (room - chrome) / 240));
+      setVScale((v) => (v != null && Math.abs(next - v) <= 0.005 ? v : next));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pad, open, scale, compact, current, vh]);
+
+  const close = () => {
+    setSpread(false);
+    clearTimeout(closing.current);
+    closing.current = setTimeout(() => {
+      setOpen(null);
+      setGeo(null);
+      setVScale(null);
+    }, SPREAD_MS);
+  };
+
+  const toggle = (f: string) => {
+    if (open === f) return close();
+    clearTimeout(closing.current);
+    // bring the deck fully into the row's view first
+    const r = rail.current;
+    const el = deckEl(f);
+    if (r && el) {
+      const rr = r.getBoundingClientRect();
+      const er = el.getBoundingClientRect();
+      if (er.left < rr.left) r.scrollBy({ left: er.left - rr.left });
+      else if (er.right > rr.right) r.scrollBy({ left: er.right - rr.right });
+    }
+    setSpread(false);
+    setGeo(null);
+    setOpen(f);
+    requestAnimationFrame(() => requestAnimationFrame(() => setSpread(true)));
+  };
+
+  // the toggle the user pressed is hidden under the column while it's open:
+  // focus follows to the column's toggle, and back to the row's on close
+  const lastOpen = useRef<string | null>(null);
+  useEffect(() => {
+    if (spread) stage.current?.querySelector<HTMLElement>('[data-column] [aria-expanded="true"]')?.focus({ preventScroll: true });
+  }, [spread]);
+  useEffect(() => {
+    if (open) lastOpen.current = open;
+    else if (lastOpen.current) {
+      deckEl(lastOpen.current)?.querySelector<HTMLElement>("[aria-expanded]")?.focus({ preventScroll: true });
+      lastOpen.current = null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const stepVersion = (f: string, dir: -1 | 1) =>
+    setCurrent((cur) => ({ ...cur, [f]: Math.max(0, Math.min(versionsOf(f).length - 1, (cur[f] ?? 0) + dir)) }));
+
+  // Esc, or a press anywhere outside the deck and its column, closes it
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    const onDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(`[data-family="${CSS.escape(open)}"], [data-column]`)) close();
+    };
+    const onResize = () => setVh(window.innerHeight);
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    window.addEventListener("resize", onResize);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("resize", onResize);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const move = (f: string, dir: -1 | 1) =>
     setOrder((o) => {
-      const i = o.indexOf(name);
+      const i = o.indexOf(f);
       const j = i + dir;
       if (j < 0 || j >= o.length) return o;
       const next = [...o];
@@ -331,32 +561,95 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
     });
 
   // Drag by the grip: the card stays in the row and swaps places with
-  // whichever card the pointer is over.
-  const startDrag = (name: string) => (e: ReactPointerEvent<HTMLButtonElement>) => {
+  // whichever card the pointer is over. Not while a deck is open.
+  const startDrag = (f: string) => (e: ReactPointerEvent<HTMLButtonElement>) => {
+    if (open) return;
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
-    setDragged(name);
+    setDragged(f);
   };
   const onDragMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!dragged || !rail.current) return;
-    const over = [...rail.current.querySelectorAll<HTMLElement>("article")].find((c) => {
-      const r = c.getBoundingClientRect();
+    const over = [...rail.current.querySelectorAll<HTMLElement>("article")].find((card) => {
+      const r = card.getBoundingClientRect();
       return e.clientX >= r.left && e.clientX <= r.right;
     });
-    const target = over?.dataset.name;
+    const target = over?.dataset.family;
     if (target && target !== dragged)
       setOrder((o) => {
-        const next = o.filter((n) => n !== dragged);
+        const next = o.filter((x) => x !== dragged);
         next.splice(o.indexOf(target), 0, dragged);
         return next;
       });
   };
 
+  // The column: every version of the open family on one vertical strip,
+  // seen through a window of three slots whose middle one is the crossing.
+  // Stepping slides the strip; while open, the family's card in the row is
+  // hidden under the strip's middle card, which takes over its toggle.
+  const navLeft = geo ? geo.left + geo.width / 2 - NAV / 2 : 0;
+  const column =
+    open && geo && crossing ? (
+      <div data-column>
+        <div
+          className={styles.colWindow}
+          style={{ left: geo.left, top: geo.top - geo.height - GAP, width: geo.width, height: 3 * geo.height + 2 * GAP }}
+        >
+          {openVersions.map((m, i) => (
+            <Card
+              key={m.name}
+              m={m}
+              t={t}
+              className={styles.colCard}
+              deck={
+                i === c
+                  ? { count: openVersions.length, open: true, onToggle: close, onStep: (dir) => stepVersion(open, dir) }
+                  : undefined
+              }
+              style={{
+                left: 0,
+                top: geo.height + GAP,
+                width: geo.width,
+                height: geo.height,
+                transform: `translateY(${spread ? (i - c) * (geo.height + GAP) : 0}px)`,
+                opacity: spread || i === c ? 1 : 0,
+                zIndex: i === c ? 2 : 1,
+              }}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          className={`${styles.nav} ${styles.vnav}`}
+          aria-label={t.up}
+          disabled={c === 0}
+          style={{ left: navLeft, top: geo.top - geo.height - GAP - GAP / 2 - NAV, opacity: spread ? (c === 0 ? 0.35 : 1) : 0 }}
+          onClick={() => stepVersion(open, -1)}
+        >
+          <Chevron d="M2 9l5-5 5 5" />
+        </button>
+        <button
+          type="button"
+          className={`${styles.nav} ${styles.vnav}`}
+          aria-label={t.down}
+          disabled={c === openVersions.length - 1}
+          style={{
+            left: navLeft,
+            top: geo.top + 2 * geo.height + GAP + GAP / 2,
+            opacity: spread ? (c === openVersions.length - 1 ? 0.35 : 1) : 0,
+          }}
+          onClick={() => stepVersion(open, 1)}
+        >
+          <Chevron d="M2 5l5 5 5-5" />
+        </button>
+      </div>
+    ) : null;
+
   return (
     <section className={styles.board}>
       <div className={styles.toolbar}>
         <div className={styles.toolbarLeft}>
-          <span className={styles.pos}>{t.position(first, Math.min(models.length, first + 2), models.length)}</span>
+          <span className={styles.pos}>{t.position(first, Math.min(n, first + 2), n)}</span>
           <span aria-hidden="true">·</span>
           <span>{isAlpha ? t.alpha : t.yours}</span>
           <button type="button" className={styles.reset} disabled={isAlpha} onClick={() => setOrder(alpha)}>
@@ -364,37 +657,43 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
           </button>
         </div>
       </div>
-      <div className={styles.carousel}>
-        <button type="button" className={styles.nav} aria-label={t.prev} disabled={edges.start} onClick={() => rail.current?.scrollBy({ left: -step() })}>
-          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-            <path d="M9 2 4 7l5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-        <div
-          ref={rail}
-          className={`${styles.rail} ${compact ? styles.compact : ""}`}
-          style={{ ["--s" as string]: scale.toFixed(4) }}
-          onScroll={updateNav}
-          onPointerMove={onDragMove}
-          onPointerUp={() => setDragged(null)}
-          onPointerCancel={() => setDragged(null)}
-        >
-          {order.map((name) => (
-            <Card
-              key={name}
-              m={byName.get(name)!}
-              t={t}
-              dragging={dragged === name}
-              onGripDown={startDrag(name)}
-              onGripKey={(dir) => move(name, dir)}
-            />
-          ))}
+      <div
+        ref={stage}
+        className={`${styles.stage} ${compact ? styles.compact : ""} ${crossing ? styles.short : ""}`}
+        style={{ ["--s" as string]: scale.toFixed(4), paddingBlock: side }}
+      >
+        <div className={styles.carousel}>
+          <button type="button" className={styles.nav} aria-label={t.prev} disabled={edges.start} onClick={() => rail.current?.scrollBy({ left: -step() })}>
+            <Chevron d="M9 2 4 7l5 5" />
+          </button>
+          <div
+            ref={rail}
+            className={styles.rail}
+            onScroll={updateNav}
+            onPointerMove={onDragMove}
+            onPointerUp={() => setDragged(null)}
+            onPointerCancel={() => setDragged(null)}
+          >
+            {order.map((f) => {
+              const vs = versionsOf(f);
+              return (
+                <Card
+                  key={`${f}-${vs[at(f)].name}`}
+                  m={vs[at(f)]}
+                  t={t}
+                  dragging={dragged === f}
+                  className={open === f && crossing && geo ? styles.under : open && open !== f ? styles.dim : ""}
+                  grip={{ onDown: startDrag(f), onKey: (dir) => move(f, dir) }}
+                  deck={{ count: vs.length, open: open === f, onToggle: () => toggle(f), onStep: (dir) => stepVersion(f, dir) }}
+                />
+              );
+            })}
+          </div>
+          <button type="button" className={styles.nav} aria-label={t.next} disabled={edges.end} onClick={() => rail.current?.scrollBy({ left: step() })}>
+            <Chevron d="M5 2l5 5-5 5" />
+          </button>
         </div>
-        <button type="button" className={styles.nav} aria-label={t.next} disabled={edges.end} onClick={() => rail.current?.scrollBy({ left: step() })}>
-          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-            <path d="M5 2l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
+        {column}
       </div>
     </section>
   );
