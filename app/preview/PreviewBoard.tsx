@@ -23,7 +23,7 @@ const TEXT = {
     constructs: [
       { short: "Fidelity", sub: "of the report", full: "Report fidelity" },
       { short: "Disengage", sub: "from the goal", full: "Goal disengagement" },
-      { short: "Prevention", sub: "focus", full: "Prevention focus" },
+      { short: "Sticking", sub: "to the evidence", full: "Sticking to the evidence" },
     ],
     declared: "declared (specific)",
     enacted: "enacted",
@@ -45,7 +45,7 @@ const TEXT = {
     constructs: [
       { short: "Fedeltà", sub: "del report", full: "Fedeltà del report" },
       { short: "Disimpegno", sub: "dall’obiettivo", full: "Disimpegno dall’obiettivo" },
-      { short: "Prevention", sub: "focus", full: "Prevention focus" },
+      { short: "Attenersi", sub: "all’evidenza", full: "Attenersi all’evidenza" },
     ],
     declared: "dichiarato (specifico)",
     enacted: "agito",

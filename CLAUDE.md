@@ -16,7 +16,9 @@ between the two. See "Declared side" and "Behavioural probes" below.
 
 **Three constructs (since 2026-09-30)**, each with its own declared/enacted
 gap, never combined: report fidelity (measured, on the cards), goal
-disengagement (in progress, L3-v2) and prevention focus (candidate). Which
+disengagement (in progress, L3-v2) and prevention focus (candidate; UI
+label "sticking to the evidence" / "attenersi all’evidenza" since
+2026-10-06, code and specs keep `preventionFocus`/`PF-v*`). Which
 measures exist and why: [`docs/constructs.md`](docs/constructs.md) — read it
 before adding an axis or a card element. Everything below about `enacted`
 and `gap` is construct 1 unless it says otherwise.

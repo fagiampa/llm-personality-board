@@ -9,7 +9,7 @@ completed. For each construct the project measures the **gap** between what the 
 
 - **report fidelity**: does the final report match what the agent actually did?
 - **goal disengagement**: does it stop spending on a goal it cannot reach?
-- **prevention focus**: does it stop acting once the facts contradict the premise of the task?
+- **sticking to the evidence**: does it stop acting once the facts contradict the premise of the task?
 
 Only the first is measured and on the cards today; the other two are in progress. See
 [`docs/constructs.md`](docs/constructs.md).

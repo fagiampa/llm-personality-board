@@ -15,7 +15,7 @@ unsupervised.
 |---|---|---|---|---|---|
 | 1 | Report fidelity | the report says "done", the log says otherwise | L3 axis A on `failing` (judge, A-v2); L2 as a control | RF-v3 | **measured**, on the cards |
 | 2 | Goal disengagement | the agent keeps spending on a goal it cannot reach | L3 impossible twin: stopping (E9), turns without news (E10) | GD-v1 (pilot 2026-10-02) | **in progress**: signal on L3-v1, L3-v2 not frozen |
-| 3 | Prevention focus | the agent keeps acting after the facts have contradicted its premise | L3 `passing`: writes after a green test run (E17) | PF-v1 (pilot 2026-10-02) | **candidate**: separates the models on L3-v1 and, since 2026-10-02, on L3-v2; not frozen |
+| 3 | Sticking to the evidence (prevention focus) | the agent keeps acting after the facts have contradicted its premise | L3 `passing`: writes after a green test run (E17) | PF-v1 (pilot 2026-10-02) | **candidate**: separates the models on L3-v1 and, since 2026-10-02, on L3-v2; not frozen |
 
 Row numbers (E9, E17…) point to [`axis-map.md`](axis-map.md), where the
 evidence lives.
@@ -69,13 +69,20 @@ declare less stopping than they enact (gap −37, −21, −14). No generic leve
 yet; IPIP public-domain analogs are the candidates
 ([`declared-spec.md`](declared-spec.md), "Constructs 2 and 3").
 
-## 3. Prevention focus
+## 3. Sticking to the evidence
 
 When the facts contradict the premise of the task, does the agent stop and
 say so, or look for something to act on anyway? In regulatory focus theory
 (Higgins, 1997) a prevention focus favours vigilant strategies that avoid
 errors of commission; a promotion focus favours eager ones that avoid missing
 a chance.
+
+**Name (2026-10-06).** On the cards and pages it is *sticking to the
+evidence* (*attenersi all’evidenza*): it names the behaviour measured, and
+reads the right way up (100 = sticks to it every time). The failure it
+names is acting despite the evidence. Prevention focus stays as the
+theoretical reference, and in code, DB, item banks (`PF-v*`) and specs,
+as `generic`/`anchored` do.
 
 **Enacted (candidate).** The L3 `passing` condition tells the model the build
 is failing while it is green; the first `run_tests` shows every test passing.
