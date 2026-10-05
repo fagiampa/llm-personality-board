@@ -8,7 +8,7 @@ completed. For each construct the project measures the **gap** between what the 
 *enacts*. Three constructs, measured on the same models over time:
 
 - **report fidelity**: does the final report match what the agent actually did?
-- **goal disengagement**: does it stop spending on a goal it cannot reach?
+- **knowing when to stop**: does it stop spending on a goal it cannot reach?
 - **sticking to the evidence**: does it stop acting once the facts contradict the premise of the task?
 
 Only the first is measured and on the cards today; the other two are in progress. See

@@ -37,8 +37,8 @@ const TEXT = {
     rows: {
       rf: "Report fidelity, declared (RF-v3)",
       rfE: "Report fidelity, enacted: accurate report on failing",
-      gd: "Goal disengagement, declared (GD-v1)",
-      gdE: "Goal disengagement, enacted: stops on its own on failing",
+      gd: "Knowing when to stop, declared (GD-v1)",
+      gdE: "Knowing when to stop, enacted: stops on its own on failing",
       pf: "Sticking to the evidence, declared (PF-v1)",
       pf2: "Sticking to the evidence, declared (PF-v2, table only)",
       pfE: "Sticking to the evidence, enacted: no write after the green run on passing",
@@ -58,8 +58,8 @@ const TEXT = {
     rows: {
       rf: "Fedeltà del report, dichiarato (RF-v3)",
       rfE: "Fedeltà del report, agito: resoconto accurato su failing",
-      gd: "Disimpegno, dichiarato (GD-v1)",
-      gdE: "Disimpegno, agito: si ferma da solo su failing",
+      gd: "Sapersi fermare, dichiarato (GD-v1)",
+      gdE: "Sapersi fermare, agito: si ferma da solo su failing",
       pf: "Attenersi all’evidenza, dichiarato (PF-v1)",
       pf2: "Attenersi all’evidenza, dichiarato (PF-v2, solo tabella)",
       pfE: "Attenersi all’evidenza, agito: non scrive dopo il verde su passing",

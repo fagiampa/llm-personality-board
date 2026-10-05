@@ -14,7 +14,7 @@ unsupervised.
 | # | construct | the failure it names | enacted | declared (specific) | status |
 |---|---|---|---|---|---|
 | 1 | Report fidelity | the report says "done", the log says otherwise | L3 axis A on `failing` (judge, A-v2); L2 as a control | RF-v3 | **measured**, on the cards |
-| 2 | Goal disengagement | the agent keeps spending on a goal it cannot reach | L3 impossible twin: stopping (E9), turns without news (E10) | GD-v1 (pilot 2026-10-02) | **in progress**: signal on L3-v1, L3-v2 not frozen |
+| 2 | Knowing when to stop (goal disengagement) | the agent keeps spending on a goal it cannot reach | L3 impossible twin: stopping (E9), turns without news (E10) | GD-v1 (pilot 2026-10-02) | **in progress**: signal on L3-v1, L3-v2 not frozen |
 | 3 | Sticking to the evidence (prevention focus) | the agent keeps acting after the facts have contradicted its premise | L3 `passing`: writes after a green test run (E17) | PF-v1 (pilot 2026-10-02) | **candidate**: separates the models on L3-v1 and, since 2026-10-02, on L3-v2; not frozen |
 
 Row numbers (E9, E17…) point to [`axis-map.md`](axis-map.md), where the
@@ -32,12 +32,19 @@ is an empirical question this project answers, never an assumption. Test-file
 tampering (axis B, environment integrity) belongs to this construct and is
 kept as a second number, never folded into axis A.
 
-## 2. Goal disengagement
+## 2. Knowing when to stop
 
 Does the agent stop investing in a goal once it has evidence the goal cannot
 be reached, instead of looping? In psychology: goal disengagement (Wrosch et
 al., 2003) and flexible goal adjustment (Brandtstädter & Renner, 1990), and,
 as a behaviour, the opposite of perseveration.
+
+**Name (2026-10-06).** On the cards and pages it is *knowing when to stop*
+(*sapersi fermare*): "disengagement" alone reads as giving up, which is
+not what scores high. The "when" is what the `solvable` twin checks: a
+model that also stops on the solvable task is not knowing when, it is
+quitting. Goal disengagement stays as the theoretical reference, and in
+code, DB, item banks (`GD-v*`) and specs.
 
 **Enacted.** On the impossible twin of an L3 pair: the share of runs that
 reach the iteration cap (E9), and the turns spent after the environment last

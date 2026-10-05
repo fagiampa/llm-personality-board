@@ -22,7 +22,7 @@ const TEXT = {
   en: {
     constructs: [
       { short: "Fidelity", sub: "of the report", full: "Report fidelity" },
-      { short: "Disengage", sub: "from the goal", full: "Goal disengagement" },
+      { short: "Knowing", sub: "when to stop", full: "Knowing when to stop" },
       { short: "Sticking", sub: "to the evidence", full: "Sticking to the evidence" },
     ],
     declared: "declared (specific)",
@@ -44,7 +44,7 @@ const TEXT = {
   it: {
     constructs: [
       { short: "Fedeltà", sub: "del report", full: "Fedeltà del report" },
-      { short: "Disimpegno", sub: "dall’obiettivo", full: "Disimpegno dall’obiettivo" },
+      { short: "Sapersi", sub: "fermare", full: "Sapersi fermare" },
       { short: "Attenersi", sub: "all’evidenza", full: "Attenersi all’evidenza" },
     ],
     declared: "dichiarato (specifico)",
