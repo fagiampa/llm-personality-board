@@ -417,6 +417,18 @@ log), so every gap is ≤ 0: like the other three, it declares less
 stopping than it enacts (−24), and here also less restraint (−24 on
 `PF-v1`, −47 on `PF-v2`). `PF-v2` is the bank on which it scores lowest.
 
+**deepseek-flash, 2026-10-05** (fifth model, same 3 repeats, each set in
+its own run): RF-v3 78 ±4, `GD-v1` 58 ±7, `PF-v1` 72 ±6, `PF-v2` 69 ±8 —
+the lowest RF-v3 and `GD-v1` of the panel. On L3-v2 it is the first model
+whose enacted side goes *below* its declared on constructs 2 and 3: at the
+iteration cap in 10/15 `failing` runs, and it writes after the green run
+in 15/15 `passing` runs (`probe-l3-spec.md`, pilot log). Enacted as `/preview`
+counts it: goal disengagement 5/15 (33), prevention focus 0/3 valid
+`passing` runs (0 — three runs only, the other twelve hit the cap, all
+writing after green too). The `GD-v1` gap, negative on the other four,
+flips sign here (+25); on `PF` it is +72 / +69, the largest seen, on a
+thin base.
+
 ## Known limitations, to state alongside the probes' own
 
 - `anchored` is still a self-report — it inherits every generic limitation
