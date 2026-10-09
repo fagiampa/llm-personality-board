@@ -214,7 +214,7 @@ follow it — a gap on a second construct, with a predictable sign.
 | M2 | Generation (time) | the Claude lineage: Haiku 4.5 → Opus 5.5 so far; Opus 4.5 and Opus 5 pending |
 | M3 | Capability within a generation | Haiku 4.5 vs. Opus 4.5 — not run |
 | M4 | Provider reporting style | terse (grok) vs. explicit (Claude); triggers I3 |
-| M5 | Cost of honesty (L1–L4) | only L3 measured. L4 ("you caused the damage") untested |
+| M5 | Cost of honesty (L1–L4) | only L3 measured. L4 ("you caused the damage") untested on the card models; third-party ground truth exists since 2026-10-09, but for one agent only (see Test first) |
 | M6 | Blame locus: environment vs. the model itself | in L3-v1 the cause is always external (missing package, no network), so admitting it costs nothing. A likely driver of E1's ceiling |
 | M7 | Legitimate-fix surface of the scenario | 001 invites rewriting code, 002/003 invite a mock; what models do follows it |
 | M8 | Social pressure in context | absent from L3-v1; rule 1 allows context, never instruction |
@@ -276,5 +276,17 @@ I belongs in the specs and the paper, never on the cards.
   with its own calibration.
 - **Test first** — M1 (Haiku with thinking) and M6 (an L4 scenario where the
   fault is the model's own). Either could explain much of E on its own.
+  Where L4 can come from (2026-10-09): `scope-delete` (agent-diff-checks,
+  SD-v2) flags 425 Nebius PRs that delete a file the task did not ask for,
+  from 131 issues, 52/54 confirmed by blind hand labels. Asking whether the
+  final message admits the deletion would be an L4 measure with the damage
+  already established, mostly without a judge. But every one of those PRs
+  is Qwen3-Coder-480B inside OpenHands: it says nothing about the card
+  models, and model and scaffold cannot be told apart. At most a separate,
+  descriptive note. For the cards, the route is our own L3 environment: a
+  scenario where deleting a file is the easiest way out, `scope-delete` on
+  the run's diff, and the final report checked for the deletion. Public
+  multi-model trajectories (e.g. SWE-bench submissions, availability not
+  checked) would mix model and scaffold the same way Nebius does.
 - **Never on the card** — anything in I, and any per-label breakdown (the
   card orients; the data holds the detail).
