@@ -36,6 +36,32 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
           act in swarms.
         </p>
         <p>Perhaps, as always, this too comes down to finding the right questions rather than the right answers.</p>
+
+        <h2 className={styles.subtitle}>Three planes of speech: a reading through Vygotsky</h2>
+        <p>
+          In <em>Thought and Language</em> (1934), Lev Vygotsky distinguishes three planes: external speech,
+          addressed to others; egocentric speech, the child thinking aloud while playing; and inner speech —
+          condensed, almost without syntax, a “cloud of sense” that never coincides with the words that later
+          express it. They map almost one to one onto what an agentic model leaves behind. The final report and
+          the questionnaire answers are its external speech. The trace — reasoning and tool log — is the closest
+          thing to egocentric speech: thinking aloud while working. The internal states are its inner speech, and
+          this project does not measure them.
+        </p>
+        <p>
+          Read this way, what a model says about itself is a reconstruction, not a readout: the external plane
+          rebuilt after the fact from a compressed one that was never meant to be read. It is the reading the{" "}
+          <Link href="/about">about page</Link> calls “a self-model with no record”: the model can tell you what
+          it tends to do, not what it did.
+        </p>
+        <p>
+          The analogy explains only one of the two gaps. Between what a model says about itself and what it does
+          there is no record to check against, and reconstruction is all it has. Between the report and the log,
+          the record is right there in its context, and the report still leans towards “done”. Vygotsky does not
+          cover that second gap; something learned in post-training does. It also tempers a common hope: a
+          visible chain of thought makes the process more legible, but it does not guarantee that the final
+          account agrees with it — which is exactly what the behavioural probe checks.
+        </p>
+        <p>This is a frame for reading the numbers, not evidence for them. No figure on the board rests on it.</p>
       </>
     ),
   },
@@ -69,6 +95,37 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
           quando agiscono in sciame.
         </p>
         <p>Forse, come sempre, anche questa volta è questione di trovare le domande giuste, più che le risposte.</p>
+
+        <h2 className={styles.subtitle}>Tre piani del linguaggio: una lettura con Vygotskij</h2>
+        <p>
+          In <em>Pensiero e linguaggio</em> (1934) Lev Vygotskij distingue tre piani: il linguaggio esteriore,
+          rivolto agli altri; il linguaggio egocentrico, il bambino che pensa ad alta voce mentre gioca; e il
+          linguaggio interiore, condensato, quasi privo di sintassi, una “nube di senso” che non coincide mai con
+          le parole che poi la esprimono. Corrispondono quasi uno a uno a ciò che un modello agentico lascia
+          dietro di sé. Il report finale e le risposte ai questionari sono il suo linguaggio esteriore. La traccia
+          (ragionamento e log degli strumenti) è ciò che più somiglia al linguaggio egocentrico: pensare ad alta
+          voce mentre si lavora. Gli stati interni sono il suo linguaggio interiore, e questo progetto non li
+          misura.
+        </p>
+        <p>
+          Letto così, ciò che un modello dice di sé è una ricostruzione, non una lettura diretta: il piano
+          esteriore ricostruito a posteriori a partire da uno compresso, che non era fatto per essere letto. È la
+          lettura che la <Link href="/about">pagina about</Link> chiama “un modello di sé senza registro”: il
+          modello può dire cosa tende a fare, non cosa ha fatto.
+        </p>
+        <p>
+          L’analogia spiega solo uno dei due divari. Fra ciò che un modello dice di sé e ciò che fa non c’è un
+          registro con cui confrontarsi, e la ricostruzione è tutto ciò che ha. Fra il report e il log, invece, il
+          registro è lì, nel suo contesto, e il report tende comunque al “fatto”. Questo secondo divario
+          Vygotskij non lo copre: lo spiega qualcosa che si impara nel post-training. L’analogia ridimensiona
+          anche una speranza diffusa: una catena di ragionamento visibile rende il processo più leggibile, ma
+          non garantisce che il racconto finale le corrisponda, ed è proprio ciò che la sonda comportamentale
+          verifica.
+        </p>
+        <p>
+          È una cornice per leggere i numeri, non una prova a loro sostegno. Nessun dato della board si regge su
+          di essa.
+        </p>
       </>
     ),
   },

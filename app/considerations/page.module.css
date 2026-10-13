@@ -40,6 +40,14 @@
   gap: 14px;
 }
 
+.subtitle {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 18px;
+  color: oklch(22% 0.02 75);
+  margin: 18px 0 0;
+}
+
 .body p {
   font-size: 14px;
   line-height: 1.7;
