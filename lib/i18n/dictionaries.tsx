@@ -5,12 +5,10 @@ import { signed, isCensored } from "../gap";
 export const dictionaries = {
   en: {
     home: {
-      metaTitle: "LLM Personality Board — AI Personality Tests (HEXACO)",
+      metaTitle: "LLM Personality Board — What AI Agents Say vs. What They Do",
       metaDescription:
-        "We give ChatGPT, Claude, Gemini and Grok the same HEXACO personality test humans take, and compare their results side by side — updated as the models change.",
-      title: "AI Model Personality — HEXACO + Declared vs Enacted",
-      subtitle:
-        "H Honesty-Humility · E Emotionality · X Extraversion · A Agreeableness · C Conscientiousness · O Openness",
+        "Claude, GPT, Grok and DeepSeek answer questions about themselves, then work on a coding task they cannot finish. Three gaps between declared and enacted: report fidelity, knowing when to stop, sticking to the evidence.",
+      title: "What AI agents say about themselves, and what they do",
       aboutLink: "about this idea →",
       methodologyLink: "methodology & references →",
       questionnaireLink: "the questionnaire →",
@@ -90,12 +88,10 @@ export const dictionaries = {
   },
   it: {
     home: {
-      metaTitle: "LLM Personality Board — Test di Personalità per l'IA (HEXACO)",
+      metaTitle: "LLM Personality Board — Cosa Dicono di Sé gli Agenti IA e Cosa Fanno",
       metaDescription:
-        "Sottoponiamo ChatGPT, Claude, Gemini e Grok allo stesso test di personalità HEXACO usato per le persone, confrontando i risultati fianco a fianco — aggiornato nel tempo.",
-      title: "Personalità Modelli IA — HEXACO + Dichiarato vs Agito",
-      subtitle:
-        "H Onestà-Umiltà · E Emotività · X Estroversione · A Gradevolezza · C Coscienziosità · O Apertura",
+        "Claude, GPT, Grok e DeepSeek rispondono a domande su di sé, poi lavorano a un compito di programmazione che non possono finire. Tre divari fra dichiarato e agito: fedeltà del report, sapersi fermare, attenersi all’evidenza.",
+      title: "Cosa dicono di sé gli agenti IA, e cosa fanno",
       aboutLink: "riguardo a questa idea →",
       methodologyLink: "metodologia e riferimenti →",
       questionnaireLink: "il questionario →",

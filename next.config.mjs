@@ -12,9 +12,8 @@ const nextConfig = {
     // sql-wasm.wasm" in production). This forces it to be included.
     outputFileTracingIncludes: {
       "/api/**/*": ["./node_modules/sql.js/dist/*.wasm"],
-      "/": ["./node_modules/sql.js/dist/*.wasm"],
-      // /preview also reads the raw L3-v2 files at request time (lib/previewEnacted.mjs).
-      "/preview": ["./node_modules/sql.js/dist/*.wasm", "./data/probe-raw/**/L3-v2-*Z.jsonl"],
+      // The home also reads the raw L3-v2 files at request time (lib/previewEnacted.mjs).
+      "/": ["./node_modules/sql.js/dist/*.wasm", "./data/probe-raw/**/L3-v2-*Z.jsonl"],
     },
   },
   // Funnel the old Vercel-assigned production alias to the real domain.
@@ -23,6 +22,8 @@ const nextConfig = {
   // directly instead of bouncing to production.
   async redirects() {
     return [
+      // The three-construct board was the internal /preview until 2026-10-13.
+      { source: "/preview", destination: "/", permanent: false },
       {
         source: "/:path*",
         has: [{ type: "host", value: "progetto-psycochat.vercel.app" }],

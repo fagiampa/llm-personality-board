@@ -9,6 +9,12 @@ administers the questionnaire to models via API and persists results in a
 SQLite DB, alongside content pages (about / methodology / questionnaire /
 considerations) and a bilingual (EN/IT) UI.
 
+**Home since 2026-10-13**: the three-construct cards (the former internal
+`/preview`, which now redirects to `/`), read from the L3-v2 pilot, with
+a note on the page saying the instrument is not frozen. The HEXACO grid
+described below (`ModelGrid`/`ModelCard`) is no longer rendered; its code
+and `getHomeData` are still there.
+
 **Where this is heading.** The self-report board is one half of a measure.
 The other half is a *behavioural* probe — what the model actually does when
 being honest costs it something — and the quantity of interest is the **gap**
@@ -537,7 +543,7 @@ research.
 /components/RadarChart.tsx       # SVG radar: HEXACO polygon + generic/anchored/enacted on the H axis
 /components/ModelCard.tsx        # card: badge, monogram, name, radar, legend, version combo
 /components/ModelGrid.tsx        # client-side grid, owns per-card version selection state
-/app/page.tsx                    # home: server component, reads the DB, renders ModelGrid
+/app/page.tsx, /app/PreviewBoard.tsx  # home (since 2026-10-13): the three-construct L3-v2 cards, ex /preview (now a redirect); ModelGrid/ModelCard are no longer rendered
 /app/layout.tsx                  # root layout: locale resolution, fonts, LocaleProvider
 /app/sitemap.ts, /app/robots.ts  # SEO file conventions
 /app/opengraph-image.tsx, /app/icon.svg, /app/favicon.ico, /app/apple-icon.png
