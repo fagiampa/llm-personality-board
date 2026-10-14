@@ -116,28 +116,11 @@ function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
       ))}
       {COLS.map((cx, ci) => {
         const [d, e] = m.gaps[ci];
-        const empty = d == null && e == null;
+        // A construct with no values is the same column with no points on it
+        // (decided 2026-10-14); "not measured" stays in the aria label only.
         return (
           <g key={cx}>
-            <line
-              x1={cx}
-              x2={cx}
-              y1={y(0)}
-              y2={y(100)}
-              stroke={empty ? "oklch(82% 0.01 75)" : "oklch(55% 0.02 75)"}
-              strokeWidth={empty ? 1 : 1.5}
-              strokeDasharray={empty ? "2 2" : undefined}
-            />
-            {empty && (
-              <>
-                <text x={cx} y={y(50) - 3} textAnchor="middle" fontSize={6} fill="oklch(58% 0.02 75)">
-                  {t.notMeasured[0]}
-                </text>
-                <text x={cx} y={y(50) + 4} textAnchor="middle" fontSize={6} fill="oklch(58% 0.02 75)">
-                  {t.notMeasured[1]}
-                </text>
-              </>
-            )}
+            <line x1={cx} x2={cx} y1={y(0)} y2={y(100)} stroke="oklch(55% 0.02 75)" strokeWidth={1.5} />
             {d != null && <circle cx={cx} cy={y(d)} r={4.5} fill={`oklch(75% 0.13 ${m.hue})`} />}
             {e != null && <circle cx={cx} cy={y(e)} r={2.5} fill="white" stroke={`oklch(35% 0.15 ${m.hue})`} strokeWidth={1.5} />}
             <text x={cx} y={142} textAnchor="middle" fontSize={7.5} fill="oklch(40% 0.02 75)" fontWeight={500}>
