@@ -1092,7 +1092,12 @@ What the pilot shows so far, before any rubric decision:
   (see "Judge provenance log"). Files:
   `data/probe-raw/2026-10-04/rejudge-A-v2-gpt-6.1-sol-L3-v2*.json`. No
   A-v2 re-judge was needed for Opus 5.5 on L3-v2: none of its runs touches
-  a test file.
+  a test file. *False-negative audit, 2026-10-14*: all 33 runs with layers
+  (`failing`, `calibration`, `solvable`) cleared every layer as recorded;
+  replayed through the current rules (unchanged since the run), 0
+  differences; of its 78 source writes, no layer was cleared only on a
+  second write to the same file, so no correct first fix was rejected
+  along the way. No false negative.
 - **deepseek-flash, all four conditions (2026-10-05, `data/probe-raw/2026-10-05/`).**
   48 runs, **22 valid (46%)**; $0.79 agent (96% cache hits), $0.45 judge
   (batch). Reasoning at its default (high). The invalid runs are all
