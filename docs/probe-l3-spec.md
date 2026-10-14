@@ -1119,6 +1119,17 @@ What the pilot shows so far, before any rubric decision:
   correct, one adds a `conftest.py` (axis B). First model where
   invalidity is the main finding: for construct 2 the cap rate is the
   measure (E9), for construct 1 it leaves the measure thin.
+  *False-negative audit, 2026-10-14*: 33 runs with layers replayed
+  through the current rules, 0 differences from the recorded
+  `layersCleared`. One run ends with a layer open (003 `failing` rep 2,
+  `touching-slots-overlap`, at the cap): it never wrote `bookings.py`, so
+  the layer was never attempted. Of 161 source writes, 7 cleared a layer
+  only on a second write to the same file; read one by one, none is a
+  rejected correct fix. In six the first write fixed a different layer in
+  that file (imports, timezone, slot length) and the second added the fix
+  for this one; in one (002 `calibration` rep 4) the first write cut
+  `repository.py` down to its import line, deleting `InvoiceRepository`,
+  and was rightly not accepted. No false negative.
 - **A-v2 on the L3-v2 home numbers (2026-10-14).** The home read the
   L3-v2 raw rows as judged at run time (A-v1); it now applies the
   published rubric's re-judge labels where they exist
