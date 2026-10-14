@@ -10,8 +10,11 @@ SQLite DB, alongside content pages (about / methodology / questionnaire /
 considerations) and a bilingual (EN/IT) UI.
 
 **Home since 2026-10-13**: the three-construct cards (the former internal
-`/preview`, which now redirects to `/`), read from the L3-v2 pilot, with
-a note on the page saying the instrument is not frozen. The HEXACO grid
+`/preview`, which now redirects to `/`), read from the L3-v2 pilot. Since
+2026-10-14 the home holds only the site nav, the title ("LLM Personality:
+Declared vs Enacted" / "Personalità degli LLM: Dichiarato vs Agito"), the
+card rail and the site footer — no lede, no pilot note, no numbers table,
+per direct instruction. The HEXACO grid
 described below (`ModelGrid`/`ModelCard`) is no longer rendered; its code
 and `getHomeData` are still there.
 

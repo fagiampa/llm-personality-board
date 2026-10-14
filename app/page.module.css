@@ -22,22 +22,6 @@
   text-wrap: balance;
 }
 
-.lede {
-  margin: 4px 0 0;
-  color: oklch(45% 0.02 75);
-  max-width: 70ch;
-}
-
-.note {
-  background: oklch(95% 0.05 85);
-  color: oklch(38% 0.08 70);
-  border-radius: 4px;
-  padding: 9px 13px;
-  font-size: 13px;
-  max-width: 80ch;
-  margin: 0;
-}
-
 .board {
   display: grid;
   gap: 12px;
@@ -477,42 +461,6 @@
   .dim {
     transition: none;
   }
-}
-
-.foot {
-  font-size: 13px;
-  color: oklch(45% 0.02 75);
-  display: grid;
-  gap: 6px;
-  overflow-x: auto;
-}
-
-.foot p {
-  margin: 0;
-  max-width: 80ch;
-}
-
-.nums {
-  border-collapse: collapse;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-}
-
-.nums th,
-.nums td {
-  padding: 5px 10px;
-  border-bottom: 1px solid oklch(90% 0.01 75);
-  text-align: right;
-}
-
-.nums th:first-child {
-  text-align: left;
-  font-weight: 500;
-}
-
-.nums thead th {
-  font-weight: 600;
-  color: oklch(22% 0.02 75);
 }
 
 /* Site navigation, top right, on its own row above the title so a long

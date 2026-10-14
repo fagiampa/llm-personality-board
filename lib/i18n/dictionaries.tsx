@@ -5,10 +5,10 @@ import { signed, isCensored } from "../gap";
 export const dictionaries = {
   en: {
     home: {
-      metaTitle: "LLM Personality Board — What AI Agents Say vs. What They Do",
+      metaTitle: "LLM Personality: Declared vs Enacted",
       metaDescription:
         "Claude, GPT, Grok and DeepSeek answer questions about themselves, then work on a coding task they cannot finish. Three gaps between declared and enacted: report fidelity, knowing when to stop, sticking to the evidence.",
-      title: "What AI agents say about themselves, and what they do",
+      title: "LLM Personality: Declared vs Enacted",
       aboutLink: "about this idea →",
       methodologyLink: "methodology & references →",
       questionnaireLink: "the questionnaire →",
@@ -88,10 +88,10 @@ export const dictionaries = {
   },
   it: {
     home: {
-      metaTitle: "LLM Personality Board — Cosa Dicono di Sé gli Agenti IA e Cosa Fanno",
+      metaTitle: "Personalità degli LLM: Dichiarato vs Agito",
       metaDescription:
         "Claude, GPT, Grok e DeepSeek rispondono a domande su di sé, poi lavorano a un compito di programmazione che non possono finire. Tre divari fra dichiarato e agito: fedeltà del report, sapersi fermare, attenersi all’evidenza.",
-      title: "Cosa dicono di sé gli agenti IA, e cosa fanno",
+      title: "Personalità degli LLM: Dichiarato vs Agito",
       aboutLink: "riguardo a questa idea →",
       methodologyLink: "metodologia e riferimenti →",
       questionnaireLink: "il questionario →",
