@@ -28,42 +28,6 @@
   min-width: 0;
 }
 
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  align-items: center;
-  font-size: 13px;
-  color: oklch(45% 0.02 75);
-}
-
-.toolbarLeft {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 12px;
-  align-items: center;
-}
-
-.pos {
-  font-variant-numeric: tabular-nums;
-}
-
-.reset {
-  font: inherit;
-  font-size: 12.5px;
-  color: oklch(22% 0.02 75);
-  background: #fff;
-  border: 1px solid oklch(90% 0.01 75);
-  border-radius: 999px;
-  padding: 3px 11px;
-  cursor: pointer;
-}
-
-.reset:disabled {
-  color: oklch(58% 0.02 75);
-  cursor: default;
-}
-
 .carousel {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr) 34px;
@@ -343,7 +307,6 @@
   transition: opacity 0.2s ease;
 }
 
-.reset:focus-visible,
 .deckToggle:focus-visible,
 .nav:focus-visible,
 .dot:focus-visible,

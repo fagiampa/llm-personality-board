@@ -44,10 +44,6 @@ const TEXT = {
     enacted: "enacted",
     hexaco: "declared (general), HEXACO",
     notMeasured: ["not", "measured"],
-    position: (a: number, b: number, n: number) => `Models ${a}–${b} of ${n}`,
-    alpha: "Alphabetical order",
-    yours: "Your order",
-    reset: "Back to alphabetical",
     prev: "Previous card",
     next: "Next card",
     move: (n: string) => `Move ${n} (left and right arrows)`,
@@ -71,10 +67,6 @@ const TEXT = {
     enacted: "agito",
     hexaco: "dichiarato (generico), HEXACO",
     notMeasured: ["non", "misurato"],
-    position: (a: number, b: number, n: number) => `Modelli ${a}–${b} di ${n}`,
-    alpha: "Ordine alfabetico",
-    yours: "Ordine tuo",
-    reset: "Torna all’ordine alfabetico",
     prev: "Card precedente",
     next: "Card successiva",
     move: (n: string) => `Sposta ${n} (frecce sinistra e destra)`,
@@ -385,7 +377,6 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
   const [vScale, setVScale] = useState<number | null>(null);
   const [vh, setVh] = useState(0);
   const [compact, setCompact] = useState(false);
-  const [first, setFirst] = useState(1);
   const [edges, setEdges] = useState({ start: true, end: true });
   // the open deck, which of its versions sits at the crossing, and where the crossing is
   const [open, setOpen] = useState<string | null>(null);
@@ -397,8 +388,6 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
   const padApplied = useRef(0);
   const closing = useRef<ReturnType<typeof setTimeout>>();
 
-  const isAlpha = order.every((f, i) => f === alpha[i]);
-  const n = order.length;
   const versionsOf = (f: string) => families.get(f) ?? [];
   const at = (f: string) => current[f] ?? 0;
   const deckEl = (f: string) => rail.current?.querySelector<HTMLElement>(`article[data-family="${CSS.escape(f)}"]`) ?? null;
@@ -432,7 +421,6 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
     const el = rail.current;
     if (!el) return;
     setEdges({ start: el.scrollLeft <= 2, end: el.scrollLeft >= el.scrollWidth - el.clientWidth - 2 });
-    setFirst(Math.max(1, Math.min(Math.max(1, n - 2), Math.round(el.scrollLeft / step()) + 1)));
     measure();
   };
 
@@ -647,16 +635,6 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
 
   return (
     <section className={styles.board}>
-      <div className={styles.toolbar}>
-        <div className={styles.toolbarLeft}>
-          <span className={styles.pos}>{t.position(first, Math.min(n, first + 2), n)}</span>
-          <span aria-hidden="true">·</span>
-          <span>{isAlpha ? t.alpha : t.yours}</span>
-          <button type="button" className={styles.reset} disabled={isAlpha} onClick={() => setOrder(alpha)}>
-            {t.reset}
-          </button>
-        </div>
-      </div>
       <div
         ref={stage}
         className={`${styles.stage} ${compact ? styles.compact : ""} ${crossing ? styles.short : ""}`}
