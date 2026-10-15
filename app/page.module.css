@@ -429,6 +429,36 @@
   }
 }
 
+/* Title on its own line, the board's one legend just under it, right-aligned. */
+.titleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legendBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-self: flex-end;
+  gap: 6px 16px;
+  font-size: 11px;
+  color: oklch(45% 0.02 75);
+}
+
+.legendBar span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+@media (max-width: 560px) {
+  .legendBar {
+    justify-content: flex-start;
+    align-self: flex-start;
+  }
+}
+
 /* Site navigation, top right, on its own row above the title so a long
    title can't push it under itself. `.nav` is taken by the board's arrows. */
 .siteNav {

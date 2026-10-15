@@ -4,7 +4,7 @@ import { resolveLocale } from "@/lib/i18n/locale";
 import { dict } from "@/lib/i18n/dictionaries";
 import { getPreviewDeclared } from "@/lib/db.mjs";
 import { loadPreviewEnacted, cardPercent } from "@/lib/previewEnacted.mjs";
-import PreviewBoard, { type PreviewModel } from "./PreviewBoard";
+import PreviewBoard, { MarkLegend, type PreviewModel } from "./PreviewBoard";
 import styles from "./page.module.css";
 
 // Home: site navigation, title, the three-construct card rail (L3-v2 pilot
@@ -70,8 +70,10 @@ export default async function Home() {
           {site.considerationsLink}
         </Link>
       </nav>
-      <header>
+      {/* Title left, the board's legend right on the same row (wraps under it on narrow screens). */}
+      <header className={styles.titleRow}>
         <h1 className={styles.title}>{site.title}</h1>
+        {models.length > 0 && <MarkLegend showNoReport={models.some((m) => m.noReport)} />}
       </header>
 
       {models.length ? <PreviewBoard models={models} /> : <p>{NO_DATA[locale]}</p>}

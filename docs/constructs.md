@@ -174,8 +174,9 @@ remove that ceiling, not yet administered
   (deepseek-flash 5/15 valid, gemini-3.8-flash 0/15) shows none — the cap
   rate itself is construct 2's measure. When most of those `failing` runs
   hit the cap, the card marks it off the scale: a filled dot under the 0
-  line on a dashed extension of the column, legend "too few reports: mostly
-  ran out of turns without stopping" (2026-10-15). It is never a value.
+  line on a dashed extension of the column, legend "few reports:
+  predominantly ran out of turns without stopping" (2026-10-15). It is
+  never a value.
 
 ## HEXACO's place
 

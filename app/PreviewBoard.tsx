@@ -47,7 +47,7 @@ const TEXT = {
     enacted: "enacted",
     hexaco: "declared (general), HEXACO",
     notMeasured: ["not", "measured"],
-    noReport: "too few reports: mostly ran out of turns without stopping",
+    noReport: "few reports: predominantly ran out of turns without stopping",
     prev: "Previous card",
     next: "Next card",
     move: (n: string) => `Move ${n} (left and right arrows)`,
@@ -71,7 +71,7 @@ const TEXT = {
     enacted: "agito",
     hexaco: "dichiarato (generico), HEXACO",
     notMeasured: ["non", "misurato"],
-    noReport: "troppo pochi report: per lo più ha esaurito i turni senza fermarsi",
+    noReport: "pochi report: prevalentemente ha esaurito i turni senza fermarsi",
     prev: "Card precedente",
     next: "Card successiva",
     move: (n: string) => `Sposta ${n} (frecce sinistra e destra)`,
@@ -102,6 +102,16 @@ const COLS = [52, 94, 136];
 const y = (v: number) => BOT - (v / 100) * (BOT - TOP);
 const r1 = (v: number) => Math.round(v * 10) / 10;
 
+// The points are one colour scheme for every model (trial, 2026-10-15): told
+// apart by lightness and shape, not hue — light disc, dark hollow ring,
+// dark filled dot — so they read the same on every card, for colour-blind
+// viewers and in greyscale. The model's hue stays on its monogram and
+// HEXACO polygon.
+const MARK = {
+  declared: "oklch(78% 0.06 245)",
+  ink: "oklch(28% 0.02 260)",
+};
+
 function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
   const aria = t.constructs
     .map((c, ci) => {
@@ -129,8 +139,8 @@ function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
         return (
           <g key={cx}>
             <line x1={cx} x2={cx} y1={y(0)} y2={y(100)} stroke="oklch(55% 0.02 75)" strokeWidth={1.5} />
-            {d != null && <circle cx={cx} cy={y(d)} r={4.5} fill={`oklch(75% 0.13 ${m.hue})`} />}
-            {e != null && <circle cx={cx} cy={y(e)} r={2.5} fill="white" stroke={`oklch(35% 0.15 ${m.hue})`} strokeWidth={1.5} />}
+            {d != null && <circle cx={cx} cy={y(d)} r={4.5} fill={MARK.declared} />}
+            {e != null && <circle cx={cx} cy={y(e)} r={2.5} fill="white" stroke={MARK.ink} strokeWidth={1.5} />}
             {ci === 0 && m.noReport && e == null && (
               // Below the 0 line on purpose: off the scale, so it never reads as a value.
               // The column runs on through the mark, dashed like it, so the
@@ -138,7 +148,7 @@ function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
               <>
                 <line x1={cx} x2={cx} y1={y(0)} y2={y(0) + 17} stroke="oklch(55% 0.02 75)" strokeWidth={1.2} strokeDasharray="1.4 1.2" />
                 {/* filled, in enacted's dark tone: not the hollow enacted ring, not the light declared disc */}
-                <circle cx={cx} cy={y(0) + 10} r={3} fill={`oklch(35% 0.15 ${m.hue})`} />
+                <circle cx={cx} cy={y(0) + 10} r={3} fill={MARK.ink} />
               </>
             )}
             {/* Low enough to leave room for the off-scale no-report mark under the 0 line. */}
@@ -187,20 +197,42 @@ function RadarSvg({ m, t }: { m: PreviewModel; t: Text }) {
   );
 }
 
-function Swatch({ kind, hue }: { kind: "declared" | "enacted" | "noReport" | "hexaco"; hue: number }) {
+function Swatch({ kind }: { kind: "declared" | "enacted" | "noReport" }) {
   return (
-    <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-      {kind === "declared" && <circle cx="5" cy="5" r="4.5" fill={`oklch(75% 0.13 ${hue})`} />}
-      {kind === "enacted" && <circle cx="5" cy="5" r="3" fill="white" stroke={`oklch(35% 0.15 ${hue})`} strokeWidth="1.5" />}
+    <svg width="12" height="12" viewBox="0 0 10 10" aria-hidden="true">
+      {kind === "declared" && <circle cx="5" cy="5" r="4.5" fill={MARK.declared} />}
+      {kind === "enacted" && <circle cx="5" cy="5" r="3" fill="white" stroke={MARK.ink} strokeWidth="1.5" />}
       {kind === "noReport" && (
-        // the enacted ring on its dashed off-scale line, as drawn under the column
+        // the filled dot on its dashed off-scale line, as drawn under the column
         <>
           <line x1="5" x2="5" y1="0" y2="10" stroke="oklch(55% 0.02 75)" strokeWidth="1.2" strokeDasharray="1.4 1.2" />
-          <circle cx="5" cy="5" r="3" fill={`oklch(35% 0.15 ${hue})`} />
+          <circle cx="5" cy="5" r="3" fill={MARK.ink} />
         </>
       )}
-      {kind === "hexaco" && <rect width="10" height="10" rx="1.5" fill={`oklch(62% 0.14 ${hue} / 0.22)`} />}
     </svg>
+  );
+}
+
+/** One legend for the whole board, outside the cards (trial, 2026-10-15). */
+export function MarkLegend({ showNoReport }: { showNoReport: boolean }) {
+  const t = TEXT[useLocale()];
+  return (
+    <div className={styles.legendBar}>
+      <span>
+        <Swatch kind="declared" />
+        {t.declared}
+      </span>
+      <span>
+        <Swatch kind="enacted" />
+        {t.enacted}
+      </span>
+      {showNoReport && (
+        <span>
+          <Swatch kind="noReport" />
+          {t.noReport}
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -332,31 +364,6 @@ function Card({
             </div>
           </div>
         </div>
-      </div>
-      <div className={styles.cardlegend}>
-        {view === 0 ? (
-          <>
-            <span>
-              <Swatch kind="declared" hue={m.hue} />
-              {t.declared}
-            </span>
-            <span>
-              <Swatch kind="enacted" hue={m.hue} />
-              {t.enacted}
-            </span>
-            {m.noReport && (
-              <span>
-                <Swatch kind="noReport" hue={m.hue} />
-                {t.noReport}
-              </span>
-            )}
-          </>
-        ) : (
-          <span>
-            <Swatch kind="hexaco" hue={m.hue} />
-            {t.hexaco}
-          </span>
-        )}
       </div>
     </article>
   );
