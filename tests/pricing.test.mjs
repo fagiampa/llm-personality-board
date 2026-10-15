@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { estimateCostUsd, usageFromAnthropic, usageFromChatCompletion, usageFromResponses, usageFromGemini } from "../lib/pricing.mjs";
+import { PRICES_PER_MTOK, estimateCostUsd, usageFromAnthropic, usageFromChatCompletion, usageFromResponses, usageFromGemini } from "../lib/pricing.mjs";
 
 test("estimateCostUsd: list price per million tokens, null when no verified price", () => {
   assert.equal(estimateCostUsd("grok-4.6", { inputTokens: 1_000_000, outputTokens: 1_000_000 }), 8);
@@ -18,8 +18,14 @@ test("estimateCostUsd: cache reads and writes at their own price, full input pri
   // Haiku 4.5: 1M in of which 800k cache reads ($0.10) and 100k writes ($1.25), 100k uncached ($1).
   const usage = { inputTokens: 1_000_000, outputTokens: 0, cacheReadTokens: 800_000, cacheWriteTokens: 100_000 };
   assert.ok(Math.abs(estimateCostUsd("claude-haiku-4-5", usage) - (0.1 + 0.08 + 0.125)) < 1e-9);
-  // gemini-3.8-flash has no verified cached price: cached tokens cost full input.
-  assert.equal(estimateCostUsd("gemini-3.8-flash", { inputTokens: 1_000_000, outputTokens: 0, cacheReadTokens: 500_000 }), 0.75);
+  // A model with no verified cached price: cached tokens cost full input.
+  // (Every real entry has one since 2026-10-15, so a throwaway entry stands in.)
+  PRICES_PER_MTOK["test-no-cache-price"] = { input: 0.75, output: 3.75, source: "test" };
+  try {
+    assert.equal(estimateCostUsd("test-no-cache-price", { inputTokens: 1_000_000, outputTokens: 0, cacheReadTokens: 500_000 }), 0.75);
+  } finally {
+    delete PRICES_PER_MTOK["test-no-cache-price"];
+  }
 });
 
 test("usage extractors: one shape, inputTokens always includes cached tokens", () => {
