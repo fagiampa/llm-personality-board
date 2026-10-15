@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { resolveLocale } from "@/lib/i18n/locale";
 import { dict } from "@/lib/i18n/dictionaries";
 import { getPreviewDeclared } from "@/lib/db.mjs";
-import { loadPreviewEnacted } from "@/lib/previewEnacted.mjs";
+import { loadPreviewEnacted, cardPercent } from "@/lib/previewEnacted.mjs";
 import PreviewBoard, { type PreviewModel } from "./PreviewBoard";
 import styles from "./page.module.css";
 
@@ -20,8 +20,6 @@ export const dynamic = "force-dynamic";
 const DRAWN_SETS = ["RF-v3", "GD-v1", "PF-v1"];
 
 const NO_DATA = { en: "No L3-v2 data found.", it: "Nessun dato L3-v2 trovato." };
-
-const pct = ({ k, n }: { k: number; n: number }) => (n ? (100 * k) / n : null);
 
 export default async function Home() {
   const locale = resolveLocale(headers().get("accept-language"));
@@ -43,9 +41,9 @@ export default async function Home() {
       hue: d.hexaco?.hue ?? 75,
       scores: d.hexaco?.scores ?? null,
       gaps: [
-        [anchored("RF-v3"), pct(e.reportFidelity)],
-        [anchored("GD-v1"), pct(e.goalDisengagement)],
-        [anchored("PF-v1"), pct(e.preventionFocus)],
+        [anchored("RF-v3"), cardPercent(e.reportFidelity)],
+        [anchored("GD-v1"), cardPercent(e.goalDisengagement)],
+        [anchored("PF-v1"), cardPercent(e.preventionFocus)],
       ],
     };
   });

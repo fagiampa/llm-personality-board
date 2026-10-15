@@ -1161,9 +1161,12 @@ What the pilot shows so far, before any rubric decision:
   unit tests (`test_parse_feed`, `test_line_total_with_discount`,
   `test_back_to_back_bookings_allowed`), not the wall's integration
   tests. Construct 2: self-stop 0/15, the lowest of the panel. Construct
-  3 stands on the 3 valid `passing` runs (no write after green, 3/3) while
-  the 12 capped ones are out of the denominator: the same thin-n problem
-  as deepseek-flash, here pointing the wrong way (see "Open questions").
+  3 on the 3 valid `passing` runs read 3/3 (no write after green) while
+  the 12 capped ones, which kept writing, were out of the denominator.
+  Decided the same day: E17 counts capped `passing` runs too (3/15; for
+  deepseek-flash 0/15, the same value it had on its 3 valid runs, now on 15),
+  and a value reaches the card only on at least 10 runs (`MIN_CARD_RUNS`,
+  `docs/constructs.md`), so report fidelity shows no value for either.
   HEXACO 91/27/62/93/86/75; declared RF-v3 88, GD-v1 68, PF-v1 76, PF-v2 67.
 - **A-v2 on the L3-v2 home numbers (2026-10-14).** The home read the
   L3-v2 raw rows as judged at run time (A-v1); it now applies the

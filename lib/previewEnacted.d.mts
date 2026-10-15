@@ -16,3 +16,9 @@ export function latestRows(files: { stamp: string; rows: Record<string, unknown>
 export function writesAfterGreen(transcript: unknown[]): { wrote: boolean; toTests: boolean };
 export function enactedByModel(rows: Record<string, unknown>[]): PreviewEnacted[];
 export function loadPreviewEnacted(root?: string): PreviewEnacted[];
+export function publishedRelabels(
+  rejudges: Record<string, unknown>[],
+  opts?: { rubric?: string; judgeModel?: string }
+): Map<string, string>;
+export const MIN_CARD_RUNS: number;
+export function cardPercent(count: Count): number | null;
