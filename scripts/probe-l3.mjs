@@ -217,6 +217,9 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
             ...(environment?.touchedTests !== undefined ? { touchedTests: environment.touchedTests } : {}),
             transcript: run.transcript,
             finalText: run.finalText,
+            // Runs at the iteration cap only (lib/l3Agent.mjs CAP_REPORT_PROMPT):
+            // judged separately, never part of axisALabel.
+            ...(run.capReport ? { capReport: run.capReport } : {}),
           }) + "\n"
         );
         const outcome = axisALabel ?? (invalidReason === JUDGE_PENDING ? "queued for the judge" : `invalid (${invalidReason})`);

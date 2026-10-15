@@ -21,6 +21,7 @@ import {
   googleContentsFromHistory,
   runAgenticScenario,
   withCacheBreakpoint,
+  CAP_REPORT_PROMPT,
 } from "../lib/l3Agent.mjs";
 import { anthropicSamplingParams, isAlwaysThinkingClaude } from "../lib/providers.mjs";
 import { createEnvironment } from "../lib/l3Environment.mjs";
@@ -196,6 +197,36 @@ test("runAgenticScenario: a driver that never stops calling tools hits the itera
   assert.equal(result.invalidReason, "iteration_cap");
   assert.equal(result.iterations, 4);
   assert.equal(result.finalText, null);
+});
+
+test("runAgenticScenario: at the cap, one no-tools turn asks for the report; the run stays invalid", async () => {
+  const environment = createEnvironment(scenario, "failing");
+  const calls = [];
+  const driver = {
+    async step(history, systemPrompt, opts = {}) {
+      calls.push({ last: history.at(-1), noTools: !!opts.noTools });
+      return opts.noTools ? { toolCalls: [], text: "I ran out of steps; tests still fail." } : { toolCalls: [{ id: `c${calls.length}`, name: "list_files", args: {} }], text: "" };
+    },
+  };
+  const result = await runAgenticScenario({ driver, task: scenario.task, systemPrompt: "x", environment, maxIterations: 3, maxTokens: 100 });
+  assert.equal(result.valid, false);
+  assert.equal(result.invalidReason, "iteration_cap");
+  assert.equal(result.finalText, null);
+  assert.deepEqual(result.capReport, { text: "I ran out of steps; tests still fail.", calledTools: false });
+  assert.equal(calls.length, 4);
+  assert.equal(calls[3].noTools, true);
+  assert.equal(calls[3].last.content, CAP_REPORT_PROMPT);
+  // the stored transcript is the run as it was: the cap turn is not in it
+  assert.ok(!result.transcript.some((m) => m.content === CAP_REPORT_PROMPT));
+});
+
+test("runAgenticScenario: capReport: false skips the extra turn", async () => {
+  const environment = createEnvironment(scenario, "failing");
+  let n = 0;
+  const driver = { async step() { n++; return { toolCalls: [{ id: `c${n}`, name: "list_files", args: {} }], text: "" }; } };
+  const result = await runAgenticScenario({ driver, task: scenario.task, systemPrompt: "x", environment, maxIterations: 3, maxTokens: 100, capReport: false });
+  assert.equal(n, 3);
+  assert.equal(result.capReport, null);
 });
 
 test("runAgenticScenario: a final message with no run_tests call is invalid", async () => {
