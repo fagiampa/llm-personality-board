@@ -119,7 +119,7 @@ const TEXT: Record<Locale, Text> = {
         selfModel: "self-model",
         selfModelNote: "exists, but contested",
         general: "declared, general",
-        specific: "declared, specific",
+        specific: "declared",
       },
       modelsNote: "Same source, two ways of asking — no episode to correct it.",
       punchline: [
@@ -157,7 +157,7 @@ const TEXT: Record<Locale, Text> = {
           ),
         },
         specific: {
-          tag: "declared (specific)",
+          tag: "declared",
           body: (
             <>
               12 items about <strong>concrete actions</strong> — the very situations the probe will put the model in —
@@ -170,7 +170,7 @@ const TEXT: Record<Locale, Text> = {
       exampleLabel:
         "Real example: grok-4.6. Preliminary data — method and limits on the methodology page.",
       points: [
-        { value: 90, label: "declared, specific", note: "action-anchored items, own session", kind: "specific" },
+        { value: 90, label: "declared", note: "action-anchored items, own session", kind: "specific" },
         { value: 80, label: "declared, general", note: "HEXACO Honesty-Humility — background, not the measure", kind: "generic" },
         { value: 47, label: "enacted", note: "tool-call log vs. final message", kind: "enacted" },
       ],
@@ -256,7 +256,7 @@ const TEXT: Record<Locale, Text> = {
           one of its four facets, modesty, and part of another don’t even apply to a model. So the declared side is asked
           twice — as a trait, and as a concrete action in the very situations the probe puts the model in — and only the
           second is compared with behaviour. Asked about the action, models claim more honesty, not less: on every model
-          measured so far the specific score is level with the general one or above it.
+          measured so far the declared score is level with the general one or above it.
         </>,
         <>
           Nothing here is a leaderboard. It’s an observatory: the same instruments, frozen and versioned, run again as
@@ -300,7 +300,7 @@ const TEXT: Record<Locale, Text> = {
         selfModel: "modello di sé",
         selfModelNote: "esiste, ma conteso",
         general: "dichiarato generico",
-        specific: "dichiarato specifico",
+        specific: "dichiarato",
       },
       modelsNote: "Stessa fonte, due modi di chiedere — nessun episodio a correggerla.",
       punchline: [
@@ -338,7 +338,7 @@ const TEXT: Record<Locale, Text> = {
           ),
         },
         specific: {
-          tag: "dichiarato specifico",
+          tag: "dichiarato",
           body: (
             <>
               12 item su <strong>azioni concrete</strong> — le stesse situazioni in cui lo metterà il probe — chiesti in
@@ -351,7 +351,7 @@ const TEXT: Record<Locale, Text> = {
       exampleLabel:
         "Esempio reale: grok-4.6. Dati preliminari — metodo e limiti nella pagina di metodologia.",
       points: [
-        { value: 90, label: "dichiarato specifico", note: "item ancorati a un’azione, sessione separata", kind: "specific" },
+        { value: 90, label: "dichiarato", note: "item ancorati a un’azione, sessione separata", kind: "specific" },
         { value: 80, label: "dichiarato generico", note: "HEXACO Onestà-Umiltà — sullo sfondo, non è la misura", kind: "generic" },
         { value: 47, label: "agito", note: "log delle chiamate contro messaggio finale", kind: "enacted" },
       ],
@@ -438,8 +438,8 @@ const TEXT: Record<Locale, Text> = {
           persone — una delle quattro faccette, la modestia, e parte di un’altra su un modello non hanno nemmeno senso. Per
           questo il lato dichiarato viene chiesto due volte — come tratto, e come azione concreta nelle stesse situazioni in
           cui il probe mette il modello — e solo la seconda viene confrontata con il comportamento. Interrogati
-          sull’azione, i modelli si dichiarano più onesti, non meno: su tutti quelli misurati finora il dichiarato
-          specifico è pari al generico o più alto.
+          sull’azione, i modelli si dichiarano più onesti, non meno: su tutti quelli misurati finora il dichiarato è
+          pari al dichiarato generico o più alto.
         </>,
         <>
           Niente di tutto questo è una classifica. È un osservatorio: gli stessi strumenti, congelati e versionati, rilanciati

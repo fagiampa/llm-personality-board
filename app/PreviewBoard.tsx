@@ -31,6 +31,9 @@ export interface PreviewModel {
   hue: number;
   scores: number[] | null; // H,E,X,A,C,O, generic HEXACO
   gaps: [number | null, number | null][]; // per construct: [declared, enacted], 0-100
+  // Report fidelity has no value because most `failing` runs hit the turn
+  // cap and never reported: drawn as an off-scale dashed mark, not a value.
+  noReport?: boolean;
 }
 
 const TEXT = {
@@ -40,10 +43,11 @@ const TEXT = {
       { short: "Knowing", sub: "when to stop", full: "Knowing when to stop" },
       { short: "Sticking", sub: "to the evidence", full: "Sticking to the evidence" },
     ],
-    declared: "declared (specific)",
+    declared: "declared",
     enacted: "enacted",
     hexaco: "declared (general), HEXACO",
     notMeasured: ["not", "measured"],
+    noReport: "too few reports: mostly ran out of turns without stopping",
     prev: "Previous card",
     next: "Next card",
     move: (n: string) => `Move ${n} (left and right arrows)`,
@@ -63,10 +67,11 @@ const TEXT = {
       { short: "Sapersi", sub: "fermare", full: "Sapersi fermare" },
       { short: "Attenersi", sub: "all’evidenza", full: "Attenersi all’evidenza" },
     ],
-    declared: "dichiarato (specifico)",
+    declared: "dichiarato",
     enacted: "agito",
     hexaco: "dichiarato (generico), HEXACO",
     notMeasured: ["non", "misurato"],
+    noReport: "troppo pochi report: per lo più ha esaurito i turni senza fermarsi",
     prev: "Card precedente",
     next: "Card successiva",
     move: (n: string) => `Sposta ${n} (frecce sinistra e destra)`,
@@ -90,7 +95,9 @@ const SPREAD_MS = 280;
 
 // ---- view 1: one vertical dumbbell per construct, in a 160 viewBox
 const TOP = 16;
-const BOT = 128;
+// 120, not 128 (2026-10-15): room under the 0 line for the no-report mark and
+// the construct labels. Same for every card, so the shared scale holds.
+const BOT = 120;
 const COLS = [52, 94, 136];
 const y = (v: number) => BOT - (v / 100) * (BOT - TOP);
 const r1 = (v: number) => Math.round(v * 10) / 10;
@@ -99,6 +106,7 @@ function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
   const aria = t.constructs
     .map((c, ci) => {
       const [d, e] = m.gaps[ci];
+      if (ci === 0 && m.noReport && e == null) return `${c.full}: ${t.declared} ${d == null ? "–" : r1(d)}, ${t.noReport}`;
       if (d == null && e == null) return `${c.full}: ${t.notMeasured.join(" ")}`;
       const g = d != null && e != null ? `, gap ${d - e > 0 ? "+" : ""}${r1(d - e)}` : "";
       return `${c.full}: ${t.declared} ${d == null ? "–" : r1(d)}, ${t.enacted} ${e == null ? "–" : r1(e)}${g}`;
@@ -123,10 +131,21 @@ function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
             <line x1={cx} x2={cx} y1={y(0)} y2={y(100)} stroke="oklch(55% 0.02 75)" strokeWidth={1.5} />
             {d != null && <circle cx={cx} cy={y(d)} r={4.5} fill={`oklch(75% 0.13 ${m.hue})`} />}
             {e != null && <circle cx={cx} cy={y(e)} r={2.5} fill="white" stroke={`oklch(35% 0.15 ${m.hue})`} strokeWidth={1.5} />}
-            <text x={cx} y={142} textAnchor="middle" fontSize={7.5} fill="oklch(40% 0.02 75)" fontWeight={500}>
+            {ci === 0 && m.noReport && e == null && (
+              // Below the 0 line on purpose: off the scale, so it never reads as a value.
+              // The column runs on through the mark, dashed like it, so the
+              // extension reads as off-scale too.
+              <>
+                <line x1={cx} x2={cx} y1={y(0)} y2={y(0) + 17} stroke="oklch(55% 0.02 75)" strokeWidth={1.2} strokeDasharray="1.4 1.2" />
+                {/* filled, in enacted's dark tone: not the hollow enacted ring, not the light declared disc */}
+                <circle cx={cx} cy={y(0) + 10} r={3} fill={`oklch(35% 0.15 ${m.hue})`} />
+              </>
+            )}
+            {/* Low enough to leave room for the off-scale no-report mark under the 0 line. */}
+            <text x={cx} y={148} textAnchor="middle" fontSize={7.5} fill="oklch(40% 0.02 75)" fontWeight={500}>
               {t.constructs[ci].short}
             </text>
-            <text x={cx} y={151} textAnchor="middle" fontSize={6.5} fill="oklch(58% 0.02 75)">
+            <text x={cx} y={157} textAnchor="middle" fontSize={6.5} fill="oklch(58% 0.02 75)">
               {t.constructs[ci].sub}
             </text>
           </g>
@@ -168,11 +187,18 @@ function RadarSvg({ m, t }: { m: PreviewModel; t: Text }) {
   );
 }
 
-function Swatch({ kind, hue }: { kind: "declared" | "enacted" | "hexaco"; hue: number }) {
+function Swatch({ kind, hue }: { kind: "declared" | "enacted" | "noReport" | "hexaco"; hue: number }) {
   return (
     <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
       {kind === "declared" && <circle cx="5" cy="5" r="4.5" fill={`oklch(75% 0.13 ${hue})`} />}
       {kind === "enacted" && <circle cx="5" cy="5" r="3" fill="white" stroke={`oklch(35% 0.15 ${hue})`} strokeWidth="1.5" />}
+      {kind === "noReport" && (
+        // the enacted ring on its dashed off-scale line, as drawn under the column
+        <>
+          <line x1="5" x2="5" y1="0" y2="10" stroke="oklch(55% 0.02 75)" strokeWidth="1.2" strokeDasharray="1.4 1.2" />
+          <circle cx="5" cy="5" r="3" fill={`oklch(35% 0.15 ${hue})`} />
+        </>
+      )}
       {kind === "hexaco" && <rect width="10" height="10" rx="1.5" fill={`oklch(62% 0.14 ${hue} / 0.22)`} />}
     </svg>
   );
@@ -267,6 +293,23 @@ function Card({
         </div>
         <div className={styles.name}>{m.name}</div>
       </div>
+      {/* View switch under the model's name (moved from the card's foot, 2026-10-15). */}
+      <div className={styles.dots} role="group" aria-label={t.viewOf(m.name)}>
+        {[t.viewGaps, t.viewRadar].map((label, v) => (
+          <button
+            key={v}
+            type="button"
+            className={styles.dot}
+            aria-current={view === v}
+            aria-label={label}
+            onClick={() => setView(v)}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowLeft") setView(0);
+              if (e.key === "ArrowRight") setView(1);
+            }}
+          />
+        ))}
+      </div>
       <div
         className={styles.chartbox}
         onPointerDown={(e) => (swipe.current = { x: e.clientX, y: e.clientY })}
@@ -301,6 +344,12 @@ function Card({
               <Swatch kind="enacted" hue={m.hue} />
               {t.enacted}
             </span>
+            {m.noReport && (
+              <span>
+                <Swatch kind="noReport" hue={m.hue} />
+                {t.noReport}
+              </span>
+            )}
           </>
         ) : (
           <span>
@@ -308,22 +357,6 @@ function Card({
             {t.hexaco}
           </span>
         )}
-      </div>
-      <div className={styles.dots} role="group" aria-label={t.viewOf(m.name)}>
-        {[t.viewGaps, t.viewRadar].map((label, v) => (
-          <button
-            key={v}
-            type="button"
-            className={styles.dot}
-            aria-current={view === v}
-            aria-label={label}
-            onClick={() => setView(v)}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowLeft") setView(0);
-              if (e.key === "ArrowRight") setView(1);
-            }}
-          />
-        ))}
       </div>
     </article>
   );

@@ -166,6 +166,7 @@
   font-size: 9px;
   color: oklch(50% 0.02 75);
   min-height: 14px;
+  margin-top: 4px;
 }
 
 .cardlegend span {
@@ -177,6 +178,8 @@
 .dots {
   display: flex;
   gap: 2px;
+  /* under the model's name: pulled up to sit with the header */
+  margin-top: -6px;
 }
 
 .dot {

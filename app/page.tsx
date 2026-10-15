@@ -45,6 +45,12 @@ export default async function Home() {
         [anchored("GD-v1"), cardPercent(e.goalDisengagement)],
         [anchored("PF-v1"), cardPercent(e.preventionFocus)],
       ],
+      // Report fidelity hidden because most failing runs hit the turn cap
+      // (no final message): goalDisengagement.n - .k are the capped runs,
+      // reportFidelity.n the runs that reported.
+      noReport:
+        cardPercent(e.reportFidelity) == null &&
+        e.goalDisengagement.n - e.goalDisengagement.k > e.reportFidelity.n,
     };
   });
 

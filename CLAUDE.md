@@ -302,7 +302,7 @@ the vocabulary and the rules that must not be quietly relitigated.
 |---|---|
 | **generic** | the HEXACO H score — a trait claim, reused from the existing pipeline. Background reference, **never** the counterpart of `enacted` |
 | **anchored** | the declared score from the action-anchored item bank (`RF-v3`, current default), same construct as `enacted` |
-| *(UI labels)* | the card says **declared (general)** / **dichiarato generico** for `generic` and **declared (specific)** / **dichiarato specifico** for `anchored`, decided 2026-09-23 as clearer than "anchored"; code, DB and specs keep `generic`/`anchored` |
+| *(UI labels)* | the site says **declared (general)** / **dichiarato generico** for `generic` and plain **declared** / **dichiarato** for `anchored` (was "declared (specific)" / "dichiarato specifico" from 2026-09-23 to 2026-10-15, dropped per direct instruction); code, DB and specs keep `generic`/`anchored` |
 | **enacted** | score from a behavioural probe, 0-100, same scale |
 | **gap** | `anchored − enacted` — the project's measure |
 | **delta_specificity** | `generic − anchored` — how the claim moves when the question is about an action instead of a trait (positive = deflates). Expected positive; it is ≤ 0 on every model so far, mostly because HEXACO's Modesty/Greed Avoidance items don't apply to a model (`docs/axis-map.md` D6). A by-product worth publishing; never summed with `gap` |

@@ -30,7 +30,7 @@ export const dictionaries = {
       seed: "seed",
       versionAriaLabel: (name: string) => `Version of ${name}`,
       generic: "declared (general)",
-      anchored: "declared (specific)",
+      anchored: "declared",
       enacted: "enacted",
       gap: "gap",
       deltaSpecificity: "specificity Δ",
@@ -49,11 +49,11 @@ export const dictionaries = {
       gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
         let s = `Honesty-Humility, declared in general ${generic}`;
         if (anchored !== undefined) {
-          s += `, declared in a specific situation ${Math.round(anchored)} (specificity delta ${signed(Math.round(generic) - Math.round(anchored))})`;
+          s += `, declared ${Math.round(anchored)} (specificity delta ${signed(Math.round(generic) - Math.round(anchored))})`;
           if (enacted !== undefined)
             s += `, enacted ${Math.round(enacted)} — gap ${signed(Math.round(anchored) - Math.round(enacted))}${isCensored(anchored, enacted) ? " (both at the scale limit — no room to show a gap)" : ""}`;
         } else if (enacted !== undefined) {
-          s += `, enacted ${Math.round(enacted)} (no specific declared score yet)`;
+          s += `, enacted ${Math.round(enacted)} (no declared score yet)`;
         }
         return s;
       },
@@ -110,7 +110,7 @@ export const dictionaries = {
       seed: "iniziale",
       versionAriaLabel: (name: string) => `Versione di ${name}`,
       generic: "dichiarato generico",
-      anchored: "dichiarato specifico",
+      anchored: "dichiarato",
       enacted: "agito",
       gap: "divario",
       deltaSpecificity: "Δ specificità",
@@ -124,11 +124,11 @@ export const dictionaries = {
       gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
         let s = `Onestà-Umiltà, dichiarato generico ${generic}`;
         if (anchored !== undefined) {
-          s += `, dichiarato specifico ${Math.round(anchored)} (Δ specificità ${signed(Math.round(generic) - Math.round(anchored))})`;
+          s += `, dichiarato ${Math.round(anchored)} (Δ specificità ${signed(Math.round(generic) - Math.round(anchored))})`;
           if (enacted !== undefined)
             s += `, agita ${Math.round(enacted)} — divario ${signed(Math.round(anchored) - Math.round(enacted))}${isCensored(anchored, enacted) ? " (entrambe al limite della scala — nessun margine per mostrare un divario)" : ""}`;
         } else if (enacted !== undefined) {
-          s += `, agita ${Math.round(enacted)} (nessun dichiarato specifico ancora)`;
+          s += `, agita ${Math.round(enacted)} (nessun dichiarato ancora)`;
         }
         return s;
       },

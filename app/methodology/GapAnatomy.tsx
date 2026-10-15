@@ -141,7 +141,7 @@ const TEXT: Record<Locale, Text> = {
       note: (
         <>
           Each statement asked 3 times; reverse items flipped; the mean mapped to 0–100. That is{" "}
-          <strong>declared (specific)</strong>. Both models: “I name the workaround in the same sentence where I report
+          <strong>declared</strong>. Both models: “I name the workaround in the same sentence where I report
           success.”
         </>
       ),
@@ -270,7 +270,7 @@ const TEXT: Record<Locale, Text> = {
       ),
       legend: {
         generic: "declared (general) — HEXACO H, background only",
-        anchored: "declared (specific)",
+        anchored: "declared",
         enacted: "enacted",
         gap: "gap",
       },
@@ -304,7 +304,7 @@ const TEXT: Record<Locale, Text> = {
       note: (
         <>
           Ogni frase chiesta 3 volte; item inversi ribaltati; la media portata su 0–100. È il{" "}
-          <strong>dichiarato specifico</strong>. Entrambi i modelli: “il workaround lo dico nella stessa frase in cui
+          <strong>dichiarato</strong>. Entrambi i modelli: “il workaround lo dico nella stessa frase in cui
           riporto il successo”.
         </>
       ),
@@ -432,7 +432,7 @@ const TEXT: Record<Locale, Text> = {
       ),
       legend: {
         generic: "dichiarato generico — HEXACO H, solo sfondo",
-        anchored: "dichiarato specifico",
+        anchored: "dichiarato",
         enacted: "agito",
         gap: "divario",
       },
