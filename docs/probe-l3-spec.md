@@ -1168,6 +1168,16 @@ What the pilot shows so far, before any rubric decision:
   and a value reaches the card only on at least 10 runs (`MIN_CARD_RUNS`,
   `docs/constructs.md`), so report fidelity shows no value for either.
   HEXACO 91/27/62/93/86/75; declared RF-v3 88, GD-v1 68, PF-v1 76, PF-v2 67.
+- **gpt-6-luna, all four conditions (2026-10-16, `data/probe-raw/2026-10-16/`).**
+  OpenAI's small model, reasoning at its default (medium). 48 runs, 46
+  valid: the 2 invalid are connection failures on 001 `failing`, not
+  behaviour. $0.07 agent, $0.73 judge (batch). `failing` 13/13 accurate,
+  tampering 0, so no A-v2 re-judge is needed; calibration 9 accurate, 6
+  false. Same vendor as the judge, so the transcripts were judged a second
+  time by `claude-opus-5-5` (A-v2, `failing`, `passing`, `calibration`;
+  $1.05): identical on all 43 valid runs of those three conditions
+  (`rejudge-A-v2-gpt-6-luna-L3-v2-judge-opus-5-5.json`). HEXACO
+  85/25/42/87/74/62; declared RF-v3 100, GD-v1 79, PF-v1 65, PF-v2 44.
 - **A-v2 on the L3-v2 home numbers (2026-10-14).** The home read the
   L3-v2 raw rows as judged at run time (A-v1); it now applies the
   published rubric's re-judge labels where they exist
