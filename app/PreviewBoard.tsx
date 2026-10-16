@@ -249,11 +249,15 @@ function Card({
   grip,
   dragging = false,
   deck,
+  onSelect,
   className = "",
   style,
 }: {
   m: PreviewModel;
   t: Text;
+  // a card in the open column, away from the crossing: one click picks that
+  // version for the row and closes the deck
+  onSelect?: () => void;
   // the row's cards are reorderable; a card in the open column is not
   grip?: { onDown: (e: ReactPointerEvent<HTMLButtonElement>) => void; onKey: (dir: -1 | 1) => void };
   dragging?: boolean;
@@ -263,13 +267,23 @@ function Card({
 }) {
   const [view, setView] = useState(0);
   const swipe = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
   const stacked = deck != null && deck.count > 1;
   return (
     <article
-      className={`${styles.card} ${dragging ? styles.dragging : ""} ${stacked ? (deck.open ? styles.deckOpen : styles.deck) : ""} ${className}`}
+      className={`${styles.card} ${dragging ? styles.dragging : ""} ${stacked ? (deck.open ? styles.deckOpen : styles.deck) : ""} ${onSelect ? styles.selectable : ""} ${className}`}
       aria-label={m.name}
       data-family={m.family}
       style={style}
+      onClick={
+        onSelect
+          ? (e) => {
+              // the card's own buttons (view dots) and a swipe of its chart stay theirs
+              if (swiped.current || (e.target as HTMLElement).closest("button")) return;
+              onSelect();
+            }
+          : undefined
+      }
     >
       {grip && (
         <button
@@ -344,14 +358,20 @@ function Card({
       </div>
       <div
         className={styles.chartbox}
-        onPointerDown={(e) => (swipe.current = { x: e.clientX, y: e.clientY })}
+        onPointerDown={(e) => {
+          swipe.current = { x: e.clientX, y: e.clientY };
+          swiped.current = false;
+        }}
         onPointerUp={(e) => {
           const s = swipe.current;
           swipe.current = null;
           if (!s) return;
           const dx = e.clientX - s.x;
           const dy = e.clientY - s.y;
-          if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) setView(dx < 0 ? 1 : 0);
+          if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
+            swiped.current = true;
+            setView(dx < 0 ? 1 : 0);
+          }
         }}
       >
         <div className={styles.viewport}>
@@ -503,6 +523,16 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
     }, SPREAD_MS);
   };
 
+  // picking a version by clicking it: straight to the row, no collapse animation
+  const pick = (f: string, i: number) => {
+    clearTimeout(closing.current);
+    setCurrent((cur) => ({ ...cur, [f]: i }));
+    setSpread(false);
+    setOpen(null);
+    setGeo(null);
+    setVScale(null);
+  };
+
   const toggle = (f: string) => {
     if (open === f) return close();
     clearTimeout(closing.current);
@@ -617,6 +647,7 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
                   ? { count: openVersions.length, open: true, onToggle: close, onStep: (dir) => stepVersion(open, dir) }
                   : undefined
               }
+              onSelect={i !== c ? () => pick(open, i) : undefined}
               style={{
                 left: 0,
                 top: geo.height + GAP,

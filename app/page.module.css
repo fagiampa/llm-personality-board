@@ -299,6 +299,17 @@
   visibility: hidden;
 }
 
+/* a version away from the crossing: clicking it picks it and closes the deck */
+.selectable {
+  cursor: pointer;
+}
+
+.selectable:hover {
+  box-shadow:
+    0 0 0 1px oklch(70% 0.01 75),
+    0 8px 22px oklch(20% 0.02 75 / 0.14);
+}
+
 .vnav {
   position: absolute;
   z-index: 2;
