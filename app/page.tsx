@@ -5,12 +5,13 @@ import { dict } from "@/lib/i18n/dictionaries";
 import { getPreviewDeclared } from "@/lib/db.mjs";
 import { loadPreviewEnacted, cardPercent } from "@/lib/previewEnacted.mjs";
 import PreviewBoard, { MarkLegend, type PreviewModel } from "./PreviewBoard";
+import ConstructGuide from "./ConstructGuide";
 import styles from "./page.module.css";
 
 // Home: site navigation, title, the three-construct card rail (L3-v2 pilot
 // data, was the internal /preview until 2026-10-13, which now redirects
-// here), and the site footer from the root layout — nothing else, since
-// 2026-10-14. Declared from the DB, enacted from the raw L3-v2 files
+// here), what the three constructs mean (ConstructGuide, since 2026-10-16),
+// and the site footer from the root layout. Declared from the DB, enacted from the raw L3-v2 files
 // (lib/previewEnacted.mjs).
 
 export const dynamic = "force-dynamic";
@@ -77,6 +78,8 @@ export default async function Home() {
       </header>
 
       {models.length ? <PreviewBoard models={models} /> : <p>{NO_DATA[locale]}</p>}
+
+      <ConstructGuide locale={locale} />
     </main>
   );
 }

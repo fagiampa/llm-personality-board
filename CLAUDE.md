@@ -14,7 +14,10 @@ considerations) and a bilingual (EN/IT) UI.
 2026-10-14 the home holds only the site nav, the title ("LLM Personality:
 Declared vs Enacted" / "Personalità degli LLM: Dichiarato vs Agito"), the
 card rail and the site footer — no lede, no pilot note, no numbers table,
-per direct instruction. The HEXACO grid
+per direct instruction. Since 2026-10-16, also per direct instruction, the
+rail is followed by `app/ConstructGuide.tsx`: what the three construct
+labels mean, how each is measured, one example each from the L3-v2
+scenarios (EN/IT, no model numbers). The HEXACO grid
 described below (`ModelGrid`/`ModelCard`) is no longer rendered; its code
 and `getHomeData` are still there.
 

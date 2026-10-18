@@ -470,6 +470,100 @@
   }
 }
 
+/* Under the rail: what the three construct labels mean, one column each
+   (stacked on narrow screens). */
+.guide {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 22px;
+  border-top: 1px solid oklch(90% 0.01 75);
+}
+
+.guideTitle {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 18px;
+  margin: 0;
+}
+
+.guideIntro {
+  margin: 0;
+  max-width: 72ch;
+  color: oklch(35% 0.02 75);
+}
+
+.guideGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.guideItem {
+  background: #fff;
+  border: 1px solid oklch(90% 0.01 75);
+  border-radius: 4px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guideItem p {
+  margin: 0;
+}
+
+.guideName {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0;
+}
+
+.guideQuestion {
+  font-weight: 500;
+  color: oklch(25% 0.02 75);
+}
+
+.guideExample {
+  margin-top: auto;
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: oklch(97% 0.006 75);
+  font-size: 13px;
+}
+
+.guideYes,
+.guideNo {
+  display: inline-block;
+  min-width: 2.4em;
+  margin-right: 4px;
+  padding: 0 5px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.guideYes {
+  background: oklch(92% 0.05 155);
+  color: oklch(35% 0.08 155);
+}
+
+.guideNo {
+  background: oklch(92% 0.04 25);
+  color: oklch(40% 0.1 25);
+}
+
+@media (max-width: 860px) {
+  .guideGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* Site navigation, top right, on its own row above the title so a long
    title can't push it under itself. `.nav` is taken by the board's arrows. */
 .siteNav {
