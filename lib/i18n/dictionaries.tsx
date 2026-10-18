@@ -15,7 +15,6 @@ export const dictionaries = {
       questionnaireLink: "the HEXACO questionnaire →",
     },
     footer: {
-      openSource: "Code and data are open source (AGPL-3.0).",
       support: "Support the project via Lightning:",
       copy: "copy",
       copied: "copied",
@@ -93,7 +92,6 @@ export const dictionaries = {
       questionnaireLink: "il questionario HEXACO →",
     },
     footer: {
-      openSource: "Codice e dati sono open source (AGPL-3.0).",
       support: "Sostieni il progetto via Lightning:",
       copy: "copia",
       copied: "copiato",

@@ -13,4 +13,5 @@ export const SITE_NAME = "LLM Personality Board";
 // Donations, Lightning Network (LUD-16 address). Shown in the site footer and README.
 export const LIGHTNING_ADDRESS = "tennicodabar@getalby.com";
 
+// Not linked from the site while the repository is private (a 404 for visitors).
 export const GITHUB_URL = "https://github.com/fagiampa/llm-personality-board";

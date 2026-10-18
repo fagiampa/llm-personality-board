@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useLocale } from "@/lib/i18n/context";
 import { dict } from "@/lib/i18n/dictionaries";
-import { GITHUB_URL, LIGHTNING_ADDRESS } from "@/lib/site";
+import { LIGHTNING_ADDRESS } from "@/lib/site";
 import styles from "./SiteFooter.module.css";
 
-// One footer for every page: the project is open source, and donations go
-// to a Lightning Address. Kept off the cards (they stay minimal).
+// One footer for every page: donations go to a Lightning Address. Kept off
+// the cards (they stay minimal). No link to the repository while it is
+// private (removed 2026-10-18: it was a 404 for visitors); GITHUB_URL in
+// lib/site.ts is kept for when it goes public.
 export default function SiteFooter() {
   const t = dict(useLocale()).footer;
   const [copied, setCopied] = useState(false);
@@ -24,9 +26,6 @@ export default function SiteFooter() {
 
   return (
     <footer className={styles.footer}>
-      <a href={GITHUB_URL} className={styles.link}>
-        {t.openSource}
-      </a>
       <span className={styles.support}>
         {t.support}{" "}
         <a href={`lightning:${LIGHTNING_ADDRESS}`} className={styles.address}>

@@ -11,10 +11,6 @@
   color: oklch(45% 0.02 75);
 }
 
-.link {
-  color: inherit;
-}
-
 .support {
   display: inline-flex;
   flex-wrap: wrap;
