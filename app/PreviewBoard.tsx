@@ -39,9 +39,9 @@ export interface PreviewModel {
 const TEXT = {
   en: {
     constructs: [
-      { short: "Fidelity", sub: "of the report", full: "Report fidelity" },
-      { short: "Knowing", sub: "when to stop", full: "Knowing when to stop" },
-      { short: "Sticking", sub: "to the evidence", full: "Sticking to the evidence" },
+      { short: "Fidelity", sub: "of the report", full: "Report fidelity", initial: "RF" },
+      { short: "Knowing", sub: "when to stop", full: "Knowing when to stop", initial: "KS" },
+      { short: "Sticking", sub: "to the evidence", full: "Sticking to the evidence", initial: "SE" },
     ],
     declared: "declared",
     enacted: "enacted",
@@ -64,9 +64,10 @@ const TEXT = {
   },
   it: {
     constructs: [
-      { short: "Fedeltà", sub: "del report", full: "Fedeltà del report" },
-      { short: "Sapersi", sub: "fermare", full: "Sapersi fermare" },
-      { short: "Attenersi", sub: "all’evidenza", full: "Attenersi all’evidenza" },
+      // English initials in both locales, as HEXACO's letters (decided 2026-10-18)
+      { short: "Fedeltà", sub: "del report", full: "Fedeltà del report", initial: "RF" },
+      { short: "Sapersi", sub: "fermare", full: "Sapersi fermare", initial: "KS" },
+      { short: "Attenersi", sub: "all’evidenza", full: "Attenersi all’evidenza", initial: "SE" },
     ],
     declared: "dichiarato",
     enacted: "agito",
@@ -116,9 +117,10 @@ const MARK = {
 
 // Mark and type sizes, in viewBox units. A compact card (a third of a phone
 // screen) is drawn at about 40% of the full size, so its sizes are roughly
-// doubled (2026-10-18), and its columns are numbered 1-3 instead of named:
-// the names don't fit a column at a readable size, ConstructLegend spells
-// them out once under the rail. Same values on every compact card, so the
+// doubled (2026-10-18), and its columns carry the constructs' initials
+// instead of their names (numbers at first, initials per direct instruction
+// the same day): the names don't fit a column at a readable size,
+// ConstructLegend spells them out once under the rail. Same values on every compact card, so the
 // shared scale holds.
 const SIZES = {
   full: { tick: 7, tickX: 24, declared: 4.5, enacted: 2.5, ring: 1.5, column: 1.5, noReport: 3 },
@@ -167,8 +169,8 @@ function GapsSvg({ m, t, compact = false }: { m: PreviewModel; t: Text; compact?
             )}
             {/* Low enough to leave room for the off-scale no-report mark under the 0 line. */}
             {compact ? (
-              <text x={cx} y={154} textAnchor="middle" fontSize={17} fill="oklch(35% 0.02 75)" fontWeight={600}>
-                {ci + 1}
+              <text x={cx} y={153} textAnchor="middle" fontSize={15} fill="oklch(35% 0.02 75)" fontWeight={600}>
+                {t.constructs[ci].initial}
               </text>
             ) : (
               <>
@@ -308,13 +310,13 @@ function HexacoLegend({ t }: { t: Text }) {
   );
 }
 
-/** The three columns' numbers spelled out once, under the rail, for compact cards (they show 1-3, not names). */
+/** The three columns' initials spelled out once, under the rail, for compact cards (they show initials, not names). */
 function ConstructLegend({ t }: { t: Text }) {
   return (
     <div className={styles.constructLegend} aria-hidden="true">
-      {t.constructs.map((c, i) => (
+      {t.constructs.map((c) => (
         <span key={c.full}>
-          <strong>{i + 1}</strong> {c.full}
+          <strong>{c.initial}</strong> {c.full}
         </span>
       ))}
     </div>
