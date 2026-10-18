@@ -172,8 +172,9 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
             </p>
             <GapAnatomy locale="en" />
             <p>
-              Still to verify, not to assume: that the score is a property of the model and not of the scenario. The
-              check is to spread the probes across distant domains and see whether the ordering of models holds.
+              Still to verify: that the score says something about the model and not only about these three scenarios,
+              which are all of the same kind. The check is to add scenarios from different fields: if the models keep the
+              same relative order, the score belongs to the model.
             </p>
           </>
         ),
@@ -507,8 +508,9 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
             </p>
             <GapAnatomy locale="it" />
             <p>
-              Ancora da verificare, non da assumere: che il punteggio sia una proprietà del modello e non dello scenario.
-              Si controlla distribuendo le prove su domini lontani e guardando se l’ordinamento dei modelli regge.
+              Ancora da verificare: che il punteggio dica qualcosa del modello e non solo di questi tre scenari, che
+              sono tutti dello stesso tipo. Si verifica aggiungendo scenari di ambiti diversi: se i modelli restano nello
+              stesso ordine relativo, il punteggio è del modello.
             </p>
           </>
         ),
