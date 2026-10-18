@@ -45,7 +45,8 @@ const TEXT = {
     ],
     declared: "declared",
     enacted: "enacted",
-    hexaco: "declared (general), HEXACO",
+    hexaco: "HEXACO profile",
+    domains: ["Honesty-Humility", "Emotionality", "Extraversion", "Agreeableness", "Conscientiousness", "Openness"],
     notMeasured: ["not", "measured"],
     noReport: "few reports: predominantly ran out of turns without stopping",
     prev: "Previous card",
@@ -69,7 +70,8 @@ const TEXT = {
     ],
     declared: "dichiarato",
     enacted: "agito",
-    hexaco: "dichiarato (generico), HEXACO",
+    hexaco: "profilo HEXACO",
+    domains: ["Onestà-Umiltà", "Emotività", "Estroversione", "Gradevolezza", "Coscienziosità", "Apertura"],
     notMeasured: ["non", "misurato"],
     noReport: "pochi report: prevalentemente ha esaurito i turni senza fermarsi",
     prev: "Card precedente",
@@ -175,19 +177,27 @@ export function GapsChart({ m, className }: { m: PreviewModel; className?: strin
   );
 }
 
-// ---- view 2: the HEXACO radar, no points on H
+// ---- view 2: the HEXACO radar, no points on H. Smaller than the full 160
+// box (2026-10-18) to leave room for a legend of the six letters under it,
+// inside the SVG, so both views keep the card at the same height.
 const ANGLES = [-90, -30, 30, 90, 150, 210];
 const CODES = ["H", "E", "X", "A", "C", "O"];
-const LABELS: Record<string, [number, number]> = { H: [80, 11], E: [139, 47], X: [139, 118], A: [80, 153], C: [21, 118], O: [21, 47] };
+const RCX = 80;
+const RCY = 64;
+const RR = 46;
 const pt = (deg: number, v: number) => {
-  const r = (60 * v) / 100;
+  const r = (RR * v) / 100;
   const a = (deg * Math.PI) / 180;
-  return [80 + r * Math.cos(a), 80 + r * Math.sin(a)];
+  return [RCX + r * Math.cos(a), RCY + r * Math.sin(a)];
 };
 const poly = (vals: number[]) => ANGLES.map((d, i) => pt(d, vals[i]).map((n) => n.toFixed(1)).join(",")).join(" ");
+// Legend: rows H|E, X|A, C|O, so it reads in the radar's order; the left
+// column holds the longest names.
+const LEGEND_X = [8, 88];
+const LEGEND_Y = [137, 147, 157];
 
 function RadarSvg({ m, t }: { m: PreviewModel; t: Text }) {
-  const aria = m.scores ? `${m.name}. ${t.hexaco}: ` + CODES.map((c, i) => `${c} ${m.scores![i]}`).join(", ") : `${m.name}. ${t.noHexaco}`;
+  const aria = m.scores ? `${m.name}. ${t.hexaco}: ` + CODES.map((c, i) => `${t.domains[i]} ${m.scores![i]}`).join(", ") : `${m.name}. ${t.noHexaco}`;
   return (
     <svg viewBox="0 0 160 160" role="img" aria-label={aria}>
       {[100, 75, 50].map((k, i) => (
@@ -195,14 +205,28 @@ function RadarSvg({ m, t }: { m: PreviewModel; t: Text }) {
       ))}
       {ANGLES.map((d) => {
         const [x2, y2] = pt(d, 100);
-        return <line key={d} x1={80} y1={80} x2={x2} y2={y2} stroke="oklch(88% 0.01 75)" strokeWidth={1} />;
+        return <line key={d} x1={RCX} y1={RCY} x2={x2} y2={y2} stroke="oklch(88% 0.01 75)" strokeWidth={1} />;
       })}
       {m.scores && <polygon points={poly(m.scores)} fill={`oklch(62% 0.14 ${m.hue} / 0.22)`} />}
-      {CODES.map((c) => (
-        <text key={c} x={LABELS[c][0]} y={LABELS[c][1]} textAnchor="middle" fontSize={9} fill="oklch(45% 0.02 75)">
-          {c}
-        </text>
-      ))}
+      {CODES.map((c, i) => {
+        const [x, yy] = pt(ANGLES[i], 122);
+        return (
+          <text key={c} x={x} y={yy + 3} textAnchor="middle" fontSize={8.5} fill="oklch(45% 0.02 75)">
+            {c}
+          </text>
+        );
+      })}
+      {/* hidden on compact cards, where it would be too small to read: the board shows HexacoLegend instead */}
+      <g aria-hidden="true" className={styles.radarLegend}>
+        {CODES.map((c, i) => (
+          <text key={c} x={LEGEND_X[i % 2]} y={LEGEND_Y[Math.floor(i / 2)]} fontSize={6.5} fill="oklch(52% 0.02 75)">
+            <tspan fontWeight={600} fill="oklch(40% 0.02 75)">
+              {c}
+            </tspan>{" "}
+            {t.domains[i]}
+          </text>
+        ))}
+      </g>
     </svg>
   );
 }
@@ -246,6 +270,19 @@ export function MarkLegend({ showNoReport }: { showNoReport: boolean }) {
   );
 }
 
+/** The six letters spelled out once, under the rail, for compact cards showing the HEXACO view. */
+function HexacoLegend({ t }: { t: Text }) {
+  return (
+    <div className={styles.hexLegend} aria-hidden="true">
+      {CODES.map((c, i) => (
+        <span key={c}>
+          <strong>{c}</strong> {t.domains[i]}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 interface Deck {
   count: number;
   open: boolean;
@@ -262,9 +299,12 @@ function Card({
   onSelect,
   className = "",
   style,
+  onView,
 }: {
   m: PreviewModel;
   t: Text;
+  // tells the board which view the card shows (0 gaps, 1 HEXACO); 0 again when it unmounts
+  onView?: (view: number) => void;
   // a card in the open column, away from the crossing: one click picks that
   // version for the row and closes the deck
   onSelect?: () => void;
@@ -276,6 +316,12 @@ function Card({
   style?: CSSProperties;
 }) {
   const [view, setView] = useState(0);
+  const onViewRef = useRef(onView);
+  onViewRef.current = onView;
+  useEffect(() => {
+    onViewRef.current?.(view);
+  }, [view]);
+  useEffect(() => () => onViewRef.current?.(0), []);
   const swipe = useRef<{ x: number; y: number } | null>(null);
   const swiped = useRef(false);
   const stacked = deck != null && deck.count > 1;
@@ -430,6 +476,8 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
   const [vScale, setVScale] = useState<number | null>(null);
   const [vh, setVh] = useState(0);
   const [compact, setCompact] = useState(false);
+  // row cards (by family) currently on the HEXACO view, for HexacoLegend
+  const [radarOn, setRadarOn] = useState<Record<string, boolean>>({});
   const [edges, setEdges] = useState({ start: true, end: true });
   // the open deck, which of its versions sits at the crossing, and where the crossing is
   const [open, setOpen] = useState<string | null>(null);
@@ -727,6 +775,7 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
                   className={open === f && crossing && geo ? styles.under : open && open !== f ? styles.dim : ""}
                   grip={{ onDown: startDrag(f), onKey: (dir) => move(f, dir) }}
                   deck={{ count: vs.length, open: open === f, onToggle: () => toggle(f), onStep: (dir) => stepVersion(f, dir) }}
+                  onView={(v) => setRadarOn((r) => (!!r[f] === (v === 1) ? r : { ...r, [f]: v === 1 }))}
                 />
               );
             })}
@@ -737,6 +786,7 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
         </div>
         {column}
       </div>
+      {compact && Object.values(radarOn).some(Boolean) && <HexacoLegend t={t} />}
     </section>
   );
 }

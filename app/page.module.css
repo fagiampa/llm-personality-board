@@ -396,6 +396,26 @@
   display: none;
 }
 
+/* the HEXACO letters' legend inside the radar is unreadable at compact size:
+   hidden there, shown once under the rail instead (.hexLegend) */
+.compact .radarLegend {
+  display: none;
+}
+
+.hexLegend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  gap: 2px 18px;
+  justify-content: center;
+  font-size: 11.5px;
+  color: oklch(45% 0.02 75);
+}
+
+.hexLegend strong {
+  font-weight: 600;
+  color: oklch(30% 0.02 75);
+}
+
 .compact .deckToggle {
   top: 3px;
   right: 3px;
