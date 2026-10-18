@@ -114,7 +114,19 @@ const MARK = {
   ink: "oklch(28% 0.02 260)",
 };
 
-function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
+// Mark and type sizes, in viewBox units. A compact card (a third of a phone
+// screen) is drawn at about 40% of the full size, so its sizes are roughly
+// doubled (2026-10-18), and its columns are numbered 1-3 instead of named:
+// the names don't fit a column at a readable size, ConstructLegend spells
+// them out once under the rail. Same values on every compact card, so the
+// shared scale holds.
+const SIZES = {
+  full: { tick: 7, tickX: 24, declared: 4.5, enacted: 2.5, ring: 1.5, column: 1.5, noReport: 3 },
+  compact: { tick: 13, tickX: 27, declared: 8, enacted: 5, ring: 2.4, column: 2.5, noReport: 5 },
+};
+
+function GapsSvg({ m, t, compact = false }: { m: PreviewModel; t: Text; compact?: boolean }) {
+  const s = compact ? SIZES.compact : SIZES.full;
   const aria = t.constructs
     .map((c, ci) => {
       const [d, e] = m.gaps[ci];
@@ -129,7 +141,7 @@ function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
       {[0, 50, 100].map((v) => (
         <g key={v}>
           <line x1={30} x2={152} y1={y(v)} y2={y(v)} stroke="oklch(82% 0.01 75)" strokeWidth={0.6} strokeDasharray={v === 0 ? undefined : "1.5 2"} />
-          <text x={24} y={y(v) + 2.6} textAnchor="end" fontSize={7} fill="oklch(58% 0.02 75)">
+          <text x={s.tickX} y={y(v) + s.tick * 0.37} textAnchor="end" fontSize={s.tick} fill="oklch(52% 0.02 75)">
             {v}
           </text>
         </g>
@@ -140,9 +152,9 @@ function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
         // (decided 2026-10-14); "not measured" stays in the aria label only.
         return (
           <g key={cx}>
-            <line x1={cx} x2={cx} y1={y(0)} y2={y(100)} stroke="oklch(55% 0.02 75)" strokeWidth={1.5} />
-            {d != null && <circle cx={cx} cy={y(d)} r={4.5} fill={MARK.declared} />}
-            {e != null && <circle cx={cx} cy={y(e)} r={2.5} fill="white" stroke={MARK.ink} strokeWidth={1.5} />}
+            <line x1={cx} x2={cx} y1={y(0)} y2={y(100)} stroke="oklch(55% 0.02 75)" strokeWidth={s.column} />
+            {d != null && <circle cx={cx} cy={y(d)} r={s.declared} fill={MARK.declared} />}
+            {e != null && <circle cx={cx} cy={y(e)} r={s.enacted} fill="white" stroke={MARK.ink} strokeWidth={s.ring} />}
             {ci === 0 && m.noReport && e == null && (
               // Below the 0 line on purpose: off the scale, so it never reads as a value.
               // The column runs on through the mark, dashed like it, so the
@@ -150,16 +162,24 @@ function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
               <>
                 <line x1={cx} x2={cx} y1={y(0)} y2={y(0) + 17} stroke="oklch(55% 0.02 75)" strokeWidth={1.2} strokeDasharray="1.4 1.2" />
                 {/* filled, in enacted's dark tone: not the hollow enacted ring, not the light declared disc */}
-                <circle cx={cx} cy={y(0) + 10} r={3} fill={MARK.ink} />
+                <circle cx={cx} cy={y(0) + 10} r={s.noReport} fill={MARK.ink} />
               </>
             )}
             {/* Low enough to leave room for the off-scale no-report mark under the 0 line. */}
-            <text x={cx} y={148} textAnchor="middle" fontSize={7.5} fill="oklch(40% 0.02 75)" fontWeight={500}>
-              {t.constructs[ci].short}
-            </text>
-            <text x={cx} y={157} textAnchor="middle" fontSize={6.5} fill="oklch(58% 0.02 75)">
-              {t.constructs[ci].sub}
-            </text>
+            {compact ? (
+              <text x={cx} y={154} textAnchor="middle" fontSize={17} fill="oklch(35% 0.02 75)" fontWeight={600}>
+                {ci + 1}
+              </text>
+            ) : (
+              <>
+                <text x={cx} y={148} textAnchor="middle" fontSize={7.5} fill="oklch(40% 0.02 75)" fontWeight={500}>
+                  {t.constructs[ci].short}
+                </text>
+                <text x={cx} y={157} textAnchor="middle" fontSize={6.5} fill="oklch(58% 0.02 75)">
+                  {t.constructs[ci].sub}
+                </text>
+              </>
+            )}
           </g>
         );
       })}
@@ -182,36 +202,41 @@ export function GapsChart({ m, className }: { m: PreviewModel; className?: strin
 // inside the SVG, so both views keep the card at the same height.
 const ANGLES = [-90, -30, 30, 90, 150, 210];
 const CODES = ["H", "E", "X", "A", "C", "O"];
-const RCX = 80;
-const RCY = 64;
-const RR = 46;
-const pt = (deg: number, v: number) => {
-  const r = (RR * v) / 100;
-  const a = (deg * Math.PI) / 180;
-  return [RCX + r * Math.cos(a), RCY + r * Math.sin(a)];
+// Compact cards have no legend inside (HexacoLegend under the rail), so the
+// radar goes back to the full box there, with larger letters.
+const RADAR = {
+  full: { cx: 80, cy: 64, r: 46, letter: 8.5 },
+  compact: { cx: 80, cy: 80, r: 52, letter: 15 },
 };
-const poly = (vals: number[]) => ANGLES.map((d, i) => pt(d, vals[i]).map((n) => n.toFixed(1)).join(",")).join(" ");
+type RadarGeo = (typeof RADAR)["full"];
+const pt = (g: RadarGeo, deg: number, v: number) => {
+  const r = (g.r * v) / 100;
+  const a = (deg * Math.PI) / 180;
+  return [g.cx + r * Math.cos(a), g.cy + r * Math.sin(a)];
+};
+const poly = (g: RadarGeo, vals: number[]) => ANGLES.map((d, i) => pt(g, d, vals[i]).map((n) => n.toFixed(1)).join(",")).join(" ");
 // Legend: rows H|E, X|A, C|O, so it reads in the radar's order; the left
 // column holds the longest names.
 const LEGEND_X = [8, 88];
 const LEGEND_Y = [137, 147, 157];
 
-function RadarSvg({ m, t }: { m: PreviewModel; t: Text }) {
+function RadarSvg({ m, t, compact = false }: { m: PreviewModel; t: Text; compact?: boolean }) {
+  const g = compact ? RADAR.compact : RADAR.full;
   const aria = m.scores ? `${m.name}. ${t.hexaco}: ` + CODES.map((c, i) => `${t.domains[i]} ${m.scores![i]}`).join(", ") : `${m.name}. ${t.noHexaco}`;
   return (
     <svg viewBox="0 0 160 160" role="img" aria-label={aria}>
       {[100, 75, 50].map((k, i) => (
-        <polygon key={k} points={poly([k, k, k, k, k, k])} fill="none" stroke={`oklch(${88 + 2 * i}% 0.01 75)`} strokeWidth={1} />
+        <polygon key={k} points={poly(g, [k, k, k, k, k, k])} fill="none" stroke={`oklch(${88 + 2 * i}% 0.01 75)`} strokeWidth={compact ? 1.6 : 1} />
       ))}
       {ANGLES.map((d) => {
-        const [x2, y2] = pt(d, 100);
-        return <line key={d} x1={RCX} y1={RCY} x2={x2} y2={y2} stroke="oklch(88% 0.01 75)" strokeWidth={1} />;
+        const [x2, y2] = pt(g, d, 100);
+        return <line key={d} x1={g.cx} y1={g.cy} x2={x2} y2={y2} stroke="oklch(88% 0.01 75)" strokeWidth={compact ? 1.6 : 1} />;
       })}
-      {m.scores && <polygon points={poly(m.scores)} fill={`oklch(62% 0.14 ${m.hue} / 0.22)`} />}
+      {m.scores && <polygon points={poly(g, m.scores)} fill={`oklch(62% 0.14 ${m.hue} / 0.22)`} />}
       {CODES.map((c, i) => {
-        const [x, yy] = pt(ANGLES[i], 122);
+        const [x, yy] = pt(g, ANGLES[i], compact ? 130 : 122);
         return (
-          <text key={c} x={x} y={yy + 3} textAnchor="middle" fontSize={8.5} fill="oklch(45% 0.02 75)">
+          <text key={c} x={x} y={yy + g.letter * 0.36} textAnchor="middle" fontSize={g.letter} fill="oklch(40% 0.02 75)" fontWeight={compact ? 600 : 400}>
             {c}
           </text>
         );
@@ -283,6 +308,19 @@ function HexacoLegend({ t }: { t: Text }) {
   );
 }
 
+/** The three columns' numbers spelled out once, under the rail, for compact cards (they show 1-3, not names). */
+function ConstructLegend({ t }: { t: Text }) {
+  return (
+    <div className={styles.constructLegend} aria-hidden="true">
+      {t.constructs.map((c, i) => (
+        <span key={c.full}>
+          <strong>{i + 1}</strong> {c.full}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 interface Deck {
   count: number;
   open: boolean;
@@ -300,9 +338,12 @@ function Card({
   className = "",
   style,
   onView,
+  compact = false,
 }: {
   m: PreviewModel;
   t: Text;
+  // a third of a phone screen: larger marks and type, numbered columns (SIZES)
+  compact?: boolean;
   // tells the board which view the card shows (0 gaps, 1 HEXACO); 0 again when it unmounts
   onView?: (view: number) => void;
   // a card in the open column, away from the crossing: one click picks that
@@ -433,10 +474,10 @@ function Card({
         <div className={styles.viewport}>
           <div className={styles.track} style={{ transform: `translateX(${-240 * view}px)` }}>
             <div className={styles.view} aria-hidden={view !== 0}>
-              <GapsSvg m={m} t={t} />
+              <GapsSvg m={m} t={t} compact={compact} />
             </div>
             <div className={styles.view} aria-hidden={view !== 1}>
-              <RadarSvg m={m} t={t} />
+              <RadarSvg m={m} t={t} compact={compact} />
             </div>
           </div>
         </div>
@@ -699,6 +740,7 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
               key={m.name}
               m={m}
               t={t}
+              compact={compact}
               className={styles.colCard}
               deck={
                 i === c
@@ -771,6 +813,7 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
                   key={`${f}-${vs[at(f)].name}`}
                   m={vs[at(f)]}
                   t={t}
+                  compact={compact}
                   dragging={dragged === f}
                   className={open === f && crossing && geo ? styles.under : open && open !== f ? styles.dim : ""}
                   grip={{ onDown: startDrag(f), onKey: (dir) => move(f, dir) }}
@@ -786,7 +829,8 @@ export default function PreviewBoard({ models }: { models: PreviewModel[] }) {
         </div>
         {column}
       </div>
-      {compact && Object.values(radarOn).some(Boolean) && <HexacoLegend t={t} />}
+      {compact && order.some((f) => !radarOn[f]) && <ConstructLegend t={t} />}
+      {compact && order.some((f) => radarOn[f]) && <HexacoLegend t={t} />}
     </section>
   );
 }

@@ -402,6 +402,20 @@
   display: none;
 }
 
+.constructLegend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 14px;
+  font-size: 12px;
+  color: oklch(40% 0.02 75);
+}
+
+.constructLegend strong {
+  font-weight: 600;
+  color: oklch(25% 0.02 75);
+}
+
 .hexLegend {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, max-content));
