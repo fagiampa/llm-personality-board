@@ -11,8 +11,8 @@ export const dictionaries = {
       title: "LLM Personality: Declared vs Enacted",
       aboutLink: "about this idea →",
       methodologyLink: "methodology & references →",
-      questionnaireLink: "the questionnaire →",
-      considerationsLink: "further considerations →",
+      declaredLink: "the declared questions →",
+      questionnaireLink: "the HEXACO questionnaire →",
     },
     footer: {
       openSource: "Code and data are open source (AGPL-3.0).",
@@ -89,8 +89,8 @@ export const dictionaries = {
       title: "Personalità degli LLM: Dichiarato vs Agito",
       aboutLink: "riguardo a questa idea →",
       methodologyLink: "metodologia e riferimenti →",
-      questionnaireLink: "il questionario →",
-      considerationsLink: "ulteriori considerazioni →",
+      declaredLink: "le domande del dichiarato →",
+      questionnaireLink: "il questionario HEXACO →",
     },
     footer: {
       openSource: "Codice e dati sono open source (AGPL-3.0).",

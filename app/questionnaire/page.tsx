@@ -88,7 +88,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
     metaTitle: "The Questionnaire — 240 HEXACO Items Administered to AI Models",
     metaDescription:
       "The full IPIP-HEXACO item bank (240 statements, six domains) sent to each model via API, in the exact English wording used for scoring.",
-    back: "← Back to the grid",
+    back: "← Back to the cards",
     title: "The Questionnaire",
     intro: (
       <>
@@ -105,7 +105,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
     metaTitle: "Il Questionario — 240 Item HEXACO Somministrati ai Modelli IA",
     metaDescription:
       "L'intera banca di item IPIP-HEXACO (240 affermazioni, sei domini) inviata a ogni modello via API, nella formulazione inglese esatta usata per il punteggio.",
-    back: "← Torna alla griglia",
+    back: "← Torna alle card",
     title: "Il Questionario",
     intro: (
       <>

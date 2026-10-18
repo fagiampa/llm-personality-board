@@ -64,11 +64,12 @@ export default async function Home() {
         <Link href="/methodology" className={styles.siteLink}>
           {site.methodologyLink}
         </Link>
+        <Link href="/declared" className={styles.siteLink}>
+          {site.declaredLink}
+        </Link>
+        {/* /considerations is unlinked since 2026-10-18 (to be revised, per direct instruction); the page still exists */}
         <Link href="/questionnaire" className={styles.siteLink}>
           {site.questionnaireLink}
-        </Link>
-        <Link href="/considerations" className={styles.siteLink}>
-          {site.considerationsLink}
         </Link>
       </nav>
       {/* Title left, the board's legend right on the same row (wraps under it on narrow screens). */}

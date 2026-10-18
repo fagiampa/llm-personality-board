@@ -561,7 +561,8 @@ research.
 /app/methodology/GapAnatomy.tsx  # infographic: declared vs enacted end to end on L3-v1-002, real data only (sources in its header comment)
 /app/methodology/                # methodology page (EN + IT)
 /app/questionnaire/              # full 240-item list, grouped by domain/facet (items always shown in English)
-/app/considerations/             # "further considerations" page (EN + IT)
+/app/declared/                   # the declared banks the cards draw (RF-v3, GD-v1, PF-v1), by facet, in English (since 2026-10-18)
+/app/considerations/             # "further considerations" page (EN + IT) — unlinked from the home since 2026-10-18, to be revised
 /app/api/models, /versions, /assessment, /probe, /probe-l3, /declared/route.ts
 /lib/hexaco.ts                   # shared types (ModelScore, ProbeScore, L3ProbeScore, AnchoredScore, HEXACO labels)
 /lib/db.mjs, /lib/db.d.mts       # SQLite persistence (sql.js) + its types

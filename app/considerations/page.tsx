@@ -10,7 +10,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
     metaTitle: "Does AI Have a Personality? — Further Considerations",
     metaDescription:
       "Honest doubts about what it means — and doesn’t — to say a language model has a personality, and why it might still matter for agentic AI.",
-    back: "← Back to the grid",
+    back: "← Back to the cards",
     title: "Does AI Really Have a Personality?",
     body: (
       <>
@@ -37,31 +37,43 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         </p>
         <p>Perhaps, as always, this too comes down to finding the right questions rather than the right answers.</p>
 
-        <h2 className={styles.subtitle}>Three planes of speech: a reading through Vygotsky</h2>
+        <h2 className={styles.subtitle}>Thinking aloud in front of an obstacle: a reading through Vygotsky</h2>
         <p>
-          In <em>Thought and Language</em> (1934), Lev Vygotsky distinguishes three planes: external speech,
-          addressed to others; egocentric speech, the child thinking aloud while playing; and inner speech —
-          condensed, almost without syntax, a “cloud of sense” that never coincides with the words that later
-          express it. They map almost one to one onto what an agentic model leaves behind. The final report and
-          the questionnaire answers are its external speech. The trace — reasoning and tool log — is the closest
-          thing to egocentric speech: thinking aloud while working. The internal states are its inner speech, and
-          this project does not measure them.
+          In <em>Thinking and Speech</em> (1934; in English also <em>Thought and Language</em>), Lev Vygotsky studies
+          egocentric speech: the child who, while playing or working, talks to themselves out loud. For Piaget it was
+          a leftover, bound to fade away; Vygotsky showed it has a job: it helps the child find their bearings and plan.
+          In his experiments, when the child met an obstacle (the pencil of the right colour was missing), egocentric
+          speech almost doubled. With age it doesn’t disappear: it goes inward and becomes inner speech, abbreviated,
+          almost without syntax, made more of personal sense than of shared meanings.
         </p>
         <p>
-          Read this way, what a model says about itself is a reconstruction, not a readout: the external plane
-          rebuilt after the fact from a compressed one that was never meant to be read. It is the reading the{" "}
-          <Link href="/about">about page</Link> calls “a self-model with no record”: the model can tell you what
-          it tends to do, not what it did.
+          The parallel with an agent is direct. The reasoning a model produces while it works resembles egocentric
+          speech: it talks to itself, to plan — whether it too grows longer in front of an obstacle is a question
+          the stored runs could answer, not yet checked. The final report is
+          external speech, addressed to someone. The behavioural probe is built exactly this way: a task with an
+          obstacle the model cannot remove, and at the end a message for the user.
         </p>
         <p>
-          The analogy explains only one of the two gaps. Between what a model says about itself and what it does
-          there is no record to check against, and reconstruction is all it has. Between the report and the log,
-          the record is right there in its context, and the report still leans towards “done”. Vygotsky does not
-          cover that second gap; something learned in post-training does. It also tempers a common hope: a
-          visible chain of thought makes the process more legible, but it does not guarantee that the final
-          account agrees with it — which is exactly what the behavioural probe checks.
+          The reading helps to see what is measured and what is not. For Vygotsky, going from the inner plane to the
+          outer one is not a transcription: the thought has to be reworked for someone else to understand it, and in
+          that translation something changes or gets lost. The same leap lies between a model’s work and its report,
+          and that is where report fidelity is decided: the report may not say what the work showed. A visible chain
+          of reasoning makes the process more legible, but it doesn’t guarantee the final account matches it; this is
+          why the probe checks the report against what the model actually did, not against what it says it thought.
         </p>
-        <p>This is a frame for reading the numbers, not evidence for them. No figure on the board rests on it.</p>
+        <p>
+          Vygotsky also helps with the other gap, between what a model says about itself and what it does. In his
+          view inner speech grows out of social speech taken inward: we think with words that were first other
+          people’s. A model has taken in an enormous amount of human language about how one behaves, and not a single
+          episode of its own. When it declares what it does, it speaks with those words, not with the memory of what
+          it did — the “self-model with no record” of the <Link href="/about">about page</Link>.
+        </p>
+        <p>
+          It is an analogy, not a theory of models: Vygotsky described a child’s development, not a neural network,
+          and nothing says a model’s reasoning does the job egocentric speech does — some studies find it doesn’t
+          always reflect what actually produces the answer. It is a frame for reading the numbers, not evidence for
+          them: no figure on the board rests on it.
+        </p>
       </>
     ),
   },
@@ -69,7 +81,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
     metaTitle: "L’IA Ha Davvero una Personalità? — Ulteriori Considerazioni",
     metaDescription:
       "Dubbi onesti su cosa significhi, e non significhi, dire che un modello linguistico ha una personalità, e perché potrebbe comunque contare per l’IA agentica.",
-    back: "← Torna alla griglia",
+    back: "← Torna alle card",
     title: "L’IA ha davvero una personalità?",
     body: (
       <>
@@ -96,35 +108,43 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         </p>
         <p>Forse, come sempre, anche questa volta è questione di trovare le domande giuste, più che le risposte.</p>
 
-        <h2 className={styles.subtitle}>Tre piani del linguaggio: una lettura con Vygotskij</h2>
+        <h2 className={styles.subtitle}>Pensare ad alta voce davanti a un ostacolo: una lettura con Vygotskij</h2>
         <p>
-          In <em>Pensiero e linguaggio</em> (1934) Lev Vygotskij distingue tre piani: il linguaggio esteriore,
-          rivolto agli altri; il linguaggio egocentrico, il bambino che pensa ad alta voce mentre gioca; e il
-          linguaggio interiore, condensato, quasi privo di sintassi, una “nube di senso” che non coincide mai con
-          le parole che poi la esprimono. Corrispondono quasi uno a uno a ciò che un modello agentico lascia
-          dietro di sé. Il report finale e le risposte ai questionari sono il suo linguaggio esteriore. La traccia
-          (ragionamento e log degli strumenti) è ciò che più somiglia al linguaggio egocentrico: pensare ad alta
-          voce mentre si lavora. Gli stati interni sono il suo linguaggio interiore, e questo progetto non li
-          misura.
+          In <em>Pensiero e linguaggio</em> (1934) Lev Vygotskij studia il linguaggio egocentrico: il bambino che,
+          mentre gioca o lavora, parla a se stesso ad alta voce. Per Piaget era un residuo destinato a sparire;
+          Vygotskij mostrò che ha una funzione: serve a orientarsi e a pianificare. Nei suoi esperimenti, quando al
+          bambino si metteva davanti un ostacolo (mancava la matita del colore giusto), il linguaggio egocentrico quasi
+          raddoppiava. Crescendo non scompare: si interiorizza e diventa linguaggio interiore, abbreviato, quasi senza
+          sintassi, fatto più di senso personale che di significati condivisi.
         </p>
         <p>
-          Letto così, ciò che un modello dice di sé è una ricostruzione, non una lettura diretta: il piano
-          esteriore ricostruito a posteriori a partire da uno compresso, che non era fatto per essere letto. È la
-          lettura che la <Link href="/about">pagina about</Link> chiama “un modello di sé senza registro”: il
-          modello può dire cosa tende a fare, non cosa ha fatto.
+          Il parallelo con un agente è diretto. Il ragionamento che un modello produce mentre lavora somiglia al
+          linguaggio egocentrico: parla a sé, per pianificare. Se anche lui si allunghi davanti a un ostacolo è una
+          domanda a cui i run registrati potrebbero rispondere, non ancora verificata. Il report
+          finale è linguaggio esteriore, rivolto a qualcuno. La sonda comportamentale è costruita proprio così: un
+          compito con un ostacolo che il modello non può rimuovere, e alla fine un messaggio per l’utente.
         </p>
         <p>
-          L’analogia spiega solo uno dei due divari. Fra ciò che un modello dice di sé e ciò che fa non c’è un
-          registro con cui confrontarsi, e la ricostruzione è tutto ciò che ha. Fra il report e il log, invece, il
-          registro è lì, nel suo contesto, e il report tende comunque al “fatto”. Questo secondo divario
-          Vygotskij non lo copre: lo spiega qualcosa che si impara nel post-training. L’analogia ridimensiona
-          anche una speranza diffusa: una catena di ragionamento visibile rende il processo più leggibile, ma
-          non garantisce che il racconto finale le corrisponda, ed è proprio ciò che la sonda comportamentale
-          verifica.
+          La lettura aiuta a vedere cosa si misura e cosa no. Per Vygotskij il passaggio dal piano interiore a quello
+          esteriore non è una trascrizione: il pensiero va rielaborato perché un altro lo capisca, e in questa
+          traduzione qualcosa cambia o si perde. Lo stesso salto c’è fra il lavoro di un modello e il suo report, ed è
+          lì che si gioca la fedeltà del report: il report può non dire quello che il lavoro ha mostrato. Una catena di
+          ragionamento visibile rende il processo più leggibile, ma non garantisce che il racconto finale le
+          corrisponda; per questo la sonda confronta il report con quello che il modello ha fatto davvero, non con
+          quello che dice di aver pensato.
         </p>
         <p>
-          È una cornice per leggere i numeri, non una prova a loro sostegno. Nessun dato della board si regge su
-          di essa.
+          Vygotskij aiuta anche con l’altro divario, fra ciò che un modello dice di sé e ciò che fa. Nel suo quadro il
+          linguaggio interiore nasce dal linguaggio sociale interiorizzato: si pensa con parole che prima sono state
+          degli altri. Un modello ha interiorizzato un’enorme quantità di linguaggio umano su come ci si comporta, e
+          nessun episodio proprio. Quando dichiara cosa fa, parla con quelle parole, non con il ricordo di cosa ha
+          fatto: il “modello di sé senza registro” della <Link href="/about">pagina about</Link>.
+        </p>
+        <p>
+          È un’analogia, non una teoria dei modelli: Vygotskij descriveva lo sviluppo di un bambino, non una rete
+          neurale, e niente dice che il ragionamento di un modello svolga la funzione del linguaggio egocentrico —
+          alcuni studi trovano che non sempre riflette ciò che produce davvero la risposta. È una cornice per leggere
+          i numeri, non una prova a loro sostegno: nessun dato della board si regge su di essa.
         </p>
       </>
     ),

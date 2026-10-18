@@ -10,8 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/", changeFrequency: "daily", priority: 1 },
     { path: "/about", changeFrequency: "monthly", priority: 0.5 },
     { path: "/methodology", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/declared", changeFrequency: "monthly", priority: 0.6 },
     { path: "/questionnaire", changeFrequency: "monthly", priority: 0.6 },
-    { path: "/considerations", changeFrequency: "monthly", priority: 0.5 },
   ];
 
   return routes.map((route) => ({
