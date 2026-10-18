@@ -633,7 +633,6 @@
   background: oklch(62% 0.17 35);
 }
 
-.dbGeneric,
 .dbAnchored,
 .dbEnacted {
   position: absolute;
@@ -641,13 +640,6 @@
   transform: translate(-50%, -50%);
   border-radius: 50%;
   box-sizing: border-box;
-}
-
-.dbGeneric {
-  width: 3px;
-  height: 14px;
-  border-radius: 1px;
-  background: oklch(62% 0.02 75);
 }
 
 .dbAnchored {
@@ -707,12 +699,6 @@
   display: inline-block;
   box-sizing: border-box;
   flex-shrink: 0;
-}
-
-.dbGenericMark {
-  width: 3px;
-  height: 12px;
-  background: oklch(62% 0.02 75);
 }
 
 .dbAnchoredMark {

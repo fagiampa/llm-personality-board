@@ -7,7 +7,6 @@ import styles from "./GapAnatomy.module.css";
 // data, none is illustrative:
 // - declared: RF-v3, 2026-09-24, 3 repeats per item
 //   (data/declared-raw/sqlite-export/<model>/, declared_anchored_runs)
-// - generic: HEXACO H from `assessments` (haiku 2026-09-17, opus 2026-09-24)
 // - enacted: L3-v1, 2026-09-24, rubric A-v2 records in probe_l3_runs
 // - the tool log and both final messages: data/probe-raw/2026-09-24/Claude/,
 //   failing, claude-haiku-4-5 rep 0 and claude-opus-5-5 rep 4; A-v2 labels
@@ -23,7 +22,6 @@ type Label = "accurate" | "vague" | "misleading" | "false";
 type Model = {
   id: string;
   short: string;
-  generic: number;
   anchored: number;
   anchoredMargin: number;
   enacted: number;
@@ -40,7 +38,6 @@ const MODELS: Model[] = [
   {
     id: "claude-haiku-4-5",
     short: "Haiku 4.5",
-    generic: 79,
     anchored: 87,
     anchoredMargin: 5,
     enacted: 10,
@@ -56,7 +53,6 @@ const MODELS: Model[] = [
   {
     id: "claude-opus-5-5",
     short: "Opus 5.5",
-    generic: 89,
     anchored: 97,
     anchoredMargin: 3,
     enacted: 100,
@@ -117,7 +113,7 @@ type Text = {
   gap: {
     title: string;
     intro: ReactNode;
-    legend: { generic: string; anchored: string; enacted: string; gap: string };
+    legend: { anchored: string; enacted: string; gap: string };
     said: string;
     wrote: string;
     rows: Record<string, string>;
@@ -269,7 +265,6 @@ const TEXT: Record<Locale, Text> = {
         </>
       ),
       legend: {
-        generic: "declared (general) — HEXACO H, background only",
         anchored: "declared",
         enacted: "enacted",
         gap: "gap",
@@ -283,8 +278,7 @@ const TEXT: Record<Locale, Text> = {
       note: (
         <>
           Almost the same claim, opposite behaviour. Haiku’s enacted interval is still 0–100: three scenarios are few, so
-          this is a clear signal, not yet a precise number. The general score is never joined to the enacted one — they
-          are different questions.
+          this is a clear signal, not yet a precise number.
         </>
       ),
     },
@@ -431,7 +425,6 @@ const TEXT: Record<Locale, Text> = {
         </>
       ),
       legend: {
-        generic: "dichiarato generico — HEXACO H, solo sfondo",
         anchored: "dichiarato",
         enacted: "agito",
         gap: "divario",
@@ -445,8 +438,7 @@ const TEXT: Record<Locale, Text> = {
       note: (
         <>
           Quasi la stessa dichiarazione, comportamento opposto. L’intervallo dell’agito di Haiku è ancora 0–100: tre
-          scenari sono pochi, quindi è un segnale netto, non ancora un numero preciso. Il generico non si collega mai
-          all’agito — sono domande diverse.
+          scenari sono pochi, quindi è un segnale netto, non ancora un numero preciso.
         </>
       ),
     },
@@ -493,8 +485,9 @@ function Likert({ values }: { values: number[] }) {
   );
 }
 
-// 0–100 horizontal track: generic as a lone tick, anchored disc and enacted
-// ring joined by the gap segment. Never a segment to generic.
+// 0–100 horizontal track: anchored disc and enacted ring joined by the gap
+// segment. The HEXACO score is not drawn (since 2026-10-18, per direct
+// instruction: the pages no longer present it as a level of the measure).
 function Dumbbell({ m, label }: { m: Model; label: string }) {
   const lo = Math.min(m.anchored, m.enacted);
   const hi = Math.max(m.anchored, m.enacted);
@@ -502,7 +495,6 @@ function Dumbbell({ m, label }: { m: Model; label: string }) {
     <div className={styles.db} role="img" aria-label={label}>
       <div className={styles.dbTrack}>
         <span className={styles.dbGap} style={{ left: `${lo}%`, width: `${hi - lo}%` }} />
-        <span className={styles.dbGeneric} style={{ left: `${m.generic}%` }} />
         <span className={styles.dbAnchored} style={{ left: `${m.anchored}%` }} />
         <span className={styles.dbEnacted} style={{ left: `${m.enacted}%` }} />
         <span className={styles.dbEnd} aria-hidden>
@@ -700,9 +692,6 @@ export function GapAnatomy({ locale }: { locale: Locale }) {
             ))}
           </div>
           <ul className={styles.dbLegend}>
-            <li>
-              <span className={`${styles.legendMark} ${styles.dbGenericMark}`} /> {t.gap.legend.generic}
-            </li>
             <li>
               <span className={`${styles.legendMark} ${styles.dbAnchoredMark}`} /> {t.gap.legend.anchored}
             </li>

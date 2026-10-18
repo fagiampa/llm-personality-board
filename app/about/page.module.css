@@ -228,12 +228,6 @@
   flex-direction: column;
 }
 
-.flowOutStack {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 .darkCard {
   background: oklch(18% 0.01 75);
   border-radius: 10px;
@@ -267,17 +261,45 @@
   margin-top: 10px;
 }
 
-/* The worked example: the same RadarChart the cards use, at the cards size, plus a legend. */
+/* The worked example: the card's own first view (GapsChart), at the cards size, plus a legend. */
 .ruler {
   display: flex;
-  align-items: stretch;
-  gap: 8px;
+  align-items: center;
+  gap: 16px;
 }
 
-.rulerSvg {
-  height: 240px;
+.exampleChart {
   width: 240px;
+  height: 240px;
   flex-shrink: 0;
+  background: #fff;
+  border: 1px solid oklch(90% 0.01 75);
+  border-radius: 4px;
+}
+
+.exampleChart svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.limitList {
+  display: grid;
+  gap: 10px;
+}
+
+.cBlock .constructList {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: oklch(30% 0.02 75);
+}
+
+.itemGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .rulerLegend {
@@ -304,14 +326,6 @@
   grid-column: 2;
   font-size: 11.5px;
   color: oklch(50% 0.02 75);
-}
-
-.rulerDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  box-sizing: border-box;
-  justify-self: center;
 }
 
 .softCard {
@@ -367,46 +381,6 @@
 
 .ladderCurrent .ladderStatus {
   color: oklch(50% 0.12 75);
-}
-
-/* L3 probe in outline (how block): a vertical flow with one yes/no fork. */
-.probeFlow {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  text-align: center;
-}
-
-.probeFlow .cBox {
-  max-width: 420px;
-}
-
-.down {
-  font-size: 14px;
-  line-height: 1;
-  color: oklch(55% 0.02 75);
-}
-
-.cBlock .probeQ {
-  font-weight: 600;
-  font-size: 13px;
-  color: oklch(22% 0.02 75);
-  margin-top: 2px;
-}
-
-.branch {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  width: 100%;
-  max-width: 420px;
-}
-
-.branch .cBox:last-child {
-  background: oklch(96.5% 0.04 60);
-  border-color: oklch(80% 0.08 60);
-  color: oklch(30% 0.06 60);
 }
 
 .whereGrid {
@@ -470,9 +444,20 @@
   border-radius: 3px;
 }
 
+@media (max-width: 640px) {
+  .itemGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 480px) {
   .whereGrid {
     grid-template-columns: 1fr;
+  }
+
+  .ruler {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .ladder li {

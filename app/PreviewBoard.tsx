@@ -165,6 +165,16 @@ function GapsSvg({ m, t }: { m: PreviewModel; t: Text }) {
   );
 }
 
+/** The card's first view on its own, for long-form pages (/about's worked example). */
+export function GapsChart({ m, className }: { m: PreviewModel; className?: string }) {
+  const t = TEXT[useLocale()];
+  return (
+    <div className={className}>
+      <GapsSvg m={m} t={t} />
+    </div>
+  );
+}
+
 // ---- view 2: the HEXACO radar, no points on H
 const ANGLES = [-90, -30, 30, 90, 150, 210];
 const CODES = ["H", "E", "X", "A", "C", "O"];

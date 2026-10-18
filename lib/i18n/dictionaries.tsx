@@ -59,29 +59,24 @@ export const dictionaries = {
       },
     },
     about: {
-      metaTitle: "About LLM Personality Board — Why Test AI Personality",
+      metaTitle: "About LLM Personality Board — Declared vs Enacted",
       metaDescription:
-        "The idea and the person behind LLM Personality Board: administering a real psychometric test to language models to see if they have a stable character.",
-      back: "← Back to the grid",
+        "The idea and the person behind LLM Personality Board: from a personality questionnaire given to language models to three behaviours, declared and enacted, measured while they work.",
+      back: "← Back to the cards",
       name: "il tennico",
       tagline: "Philosophy of science graduate, software developer for over 20 years.",
       sectionTitle: "About this idea",
       body: [
         <>
-          <strong>LLM Personality Board</strong> treats large language models like people taking a personality
-          test: the same HEXACO questionnaire — six dimensions, Honesty-Humility, Emotionality, Extraversion,
-          Agreeableness, Conscientiousness, Openness — is administered directly to the models via API, the
-          answers are aggregated into a per-dimension score, and the result lands in a
-          grid of cards with radar charts, comparable model by model and version by version. On the Honesty-Humility
-          axis each card also shows what the model declares about concrete work situations and what it actually does
-          in an agentic task — the gap between the two is what this project measures.
+          <strong>LLM Personality Board</strong> watches how language models behave when they work on their own, and
+          sets it against what they say about themselves. For three behaviours that matter when an agent works
+          unsupervised — report fidelity, knowing when to stop, sticking to the evidence — each card shows what the model
+          declares and what it enacts. The distance between the two is what this project measures, model by model and
+          version by version.
         </>,
         <>
-          The idea started from a simple question: do language models have a recognizable, stable
-          &quot;character&quot; over time, or is it just an artifact of whatever prompt happens to be in play?
-          Administering the same standardized psychometric instrument to different models — and to the same
-          model family over time, version after version — is a way to start answering that with numbers instead
-          of impressions.
+          It started somewhere else: giving models a real personality test, to see whether they have a recognizable,
+          stable character. What follows is the way from there to here.
         </>,
       ],
     },
@@ -134,30 +129,24 @@ export const dictionaries = {
       },
     },
     about: {
-      metaTitle: "Riguardo a LLM Personality Board — Perché Testare la Personalità dell'IA",
+      metaTitle: "Riguardo a LLM Personality Board — Dichiarato vs Agito",
       metaDescription:
-        "L'idea e la persona dietro LLM Personality Board: somministrare un vero test psicometrico ai modelli linguistici per vedere se hanno un carattere stabile.",
-      back: "← Torna alla griglia",
+        "L’idea e la persona dietro LLM Personality Board: da un questionario di personalità dato ai modelli linguistici a tre comportamenti, dichiarati e agiti, misurati mentre lavorano.",
+      back: "← Torna alle card",
       name: "il tennico",
       tagline: "Laureato in filosofia della scienza, sviluppatore software da oltre 20 anni.",
       sectionTitle: "Riguardo a questa idea",
       body: [
         <>
-          <strong>LLM Personality Board</strong> tratta i modelli linguistici come persone che sostengono un test
-          di personalità: lo stesso questionario HEXACO — sei dimensioni, Onestà-Umiltà, Emotività,
-          Estroversione, Gradevolezza, Coscienziosità, Apertura — viene somministrato direttamente ai modelli via
-          API, le risposte vengono aggregate in un punteggio per dimensione, e il
-          risultato finisce in una griglia di card con radar chart, confrontabili modello per modello e versione
-          per versione. Sull’asse Onestà-Umiltà ogni card mostra anche cosa il modello dichiara su situazioni di
-          lavoro concrete e cosa fa davvero in un compito agentico: il divario fra i due è quello che questo progetto
-          misura.
+          <strong>LLM Personality Board</strong> osserva come si comportano i modelli linguistici quando lavorano da
+          soli, e lo mette a confronto con quello che dicono di sé. Per tre comportamenti che contano quando un agente
+          lavora senza supervisione — fedeltà del report, sapersi fermare, attenersi all’evidenza — ogni card mostra cosa
+          il modello dichiara e cosa agisce. La distanza fra i due è quello che il progetto misura, modello per modello e
+          versione per versione.
         </>,
         <>
-          L&apos;idea nasce da una domanda semplice: i modelli linguistici hanno un &quot;carattere&quot;
-          riconoscibile e stabile nel tempo, o è solo un artefatto del prompt del momento? Somministrare lo
-          stesso strumento psicometrico standardizzato a modelli diversi — e alla stessa famiglia di modelli nel
-          tempo, versione dopo versione — è un modo per iniziare a rispondere con dei numeri invece che con delle
-          impressioni.
+          Il punto di partenza era un altro: dare ai modelli un vero test di personalità, per vedere se hanno un
+          carattere riconoscibile e stabile. Qui sotto la strada da lì a qui.
         </>,
       ],
     },

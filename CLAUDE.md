@@ -17,7 +17,11 @@ card rail and the site footer — no lede, no pilot note, no numbers table,
 per direct instruction. Since 2026-10-16, also per direct instruction, the
 rail is followed by `app/ConstructGuide.tsx`: what the three construct
 labels mean, how each is measured, one example each from the L3-v2
-scenarios (EN/IT, no model numbers). The HEXACO grid
+scenarios (EN/IT, no model numbers). Since 2026-10-18 `/about` and
+`/methodology` follow the home and no longer present `generic` as a level
+of the measure (per direct instruction): HEXACO is told as the starting
+point (its limits on a model, the different kind of memory), and its
+profile is the card's second view. The HEXACO grid
 described below (`ModelGrid`/`ModelCard`) is no longer rendered; its code
 and `getHomeData` are still there.
 
