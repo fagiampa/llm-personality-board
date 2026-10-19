@@ -13,10 +13,7 @@ export const dictionaries = {
       questionnaireLink: "the HEXACO questionnaire →",
     },
     footer: {
-      support: "Support the project via Lightning:",
-      copy: "copy",
-      copied: "copied",
-      copyAriaLabel: "Copy the Lightning address",
+      openSource: "Code and data are open source (AGPL-3.0).",
     },
     about: {
       metaTitle: "About LLM Personality Board — Declared vs Enacted",
@@ -53,10 +50,7 @@ export const dictionaries = {
       questionnaireLink: "il questionario HEXACO →",
     },
     footer: {
-      support: "Sostieni il progetto via Lightning:",
-      copy: "copia",
-      copied: "copiato",
-      copyAriaLabel: "Copia l’indirizzo Lightning",
+      openSource: "Codice e dati sono open source (AGPL-3.0).",
     },
     about: {
       metaTitle: "Riguardo a LLM Personality Board — Dichiarato vs Agito",
