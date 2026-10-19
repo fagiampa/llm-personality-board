@@ -62,3 +62,8 @@ test("the longest base id wins: a dated Opus 5.5 id is not read as Opus 5", () =
   assert.deepEqual(reasoningRecord("claude-opus-5-5-20260901"), { level: "medium", isDefault: true });
   assert.deepEqual(reasoningRecord("claude-opus-5"), { level: "high", isDefault: true });
 });
+
+test("Haiku 5.5 thinks by default at medium, unlike Haiku 4.5", () => {
+  assert.deepEqual(anthropicReasoningParams("claude-haiku-5-5"), { output_config: { effort: "medium" } });
+  assert.deepEqual(reasoningRecord("claude-haiku-4-5"), { level: "off", isDefault: true });
+});

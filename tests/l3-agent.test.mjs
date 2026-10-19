@@ -82,9 +82,10 @@ test("anthropicMessagesFromHistory: resends an assistant turn's raw blocks verba
   assert.equal(messages.filter((m) => m.role === "user").length, 2);
 });
 
-test("anthropicSamplingParams: no temperature for models that reject sampling params, unchanged for Haiku", () => {
+test("anthropicSamplingParams: no temperature for models that reject sampling params, unchanged for Haiku 4.5", () => {
   assert.equal(anthropicSamplingParams("claude-fable-5-1", { maxTokens: 4096, temperature: 1 }).temperature, undefined);
   assert.equal(anthropicSamplingParams("claude-opus-5", { maxTokens: 4096, temperature: 1 }).temperature, undefined);
+  assert.equal(anthropicSamplingParams("claude-haiku-5-5", { maxTokens: 4096, temperature: 1 }).temperature, undefined);
   assert.deepEqual(anthropicSamplingParams("claude-haiku-4-5", { maxTokens: 4096, temperature: 1 }), { max_tokens: 4096, temperature: 1 });
   assert.equal(isAlwaysThinkingClaude("claude-sonnet-4-6"), false);
 });
