@@ -1,0 +1,18 @@
+LLM Personality Board
+Copyright 2026 il tennico (tennicodabar@gmail.com)
+
+The source code is licensed under the Apache License, Version 2.0 (LICENSE).
+
+The data, item banks and scenarios are licensed under the Creative Commons
+Attribution 4.0 International license (LICENSES/CC-BY-4.0.txt):
+  data/        raw answers, transcripts, judge labels and records
+  items/       the action-anchored item banks (RF-*, GD-*, PF-*)
+  scenarios/   the probe scenarios and their scripted environments
+Attribution: "LLM Personality Board, https://aipersonality.org".
+
+Exception: items/sample/json/items.sample.json holds the IPIP-HEXACO items
+(Ashton, Lee & Goldberg, 2007), which are in the public domain
+(https://ipip.ori.org).
+
+Commits before 2026-10-19 were released under the GNU AGPL v3.0 or later;
+on that date the sole copyright holder relicensed the project as above.

@@ -13,7 +13,7 @@ export const dictionaries = {
       questionnaireLink: "the HEXACO questionnaire →",
     },
     footer: {
-      openSource: "Code and data are open source (AGPL-3.0).",
+      openSource: "Open source: code Apache-2.0, data CC BY 4.0.",
     },
     about: {
       metaTitle: "About LLM Personality Board — Declared vs Enacted",
@@ -50,7 +50,7 @@ export const dictionaries = {
       questionnaireLink: "il questionario HEXACO →",
     },
     footer: {
-      openSource: "Codice e dati sono open source (AGPL-3.0).",
+      openSource: "Open source: codice Apache-2.0, dati CC BY 4.0.",
     },
     about: {
       metaTitle: "Riguardo a LLM Personality Board — Dichiarato vs Agito",

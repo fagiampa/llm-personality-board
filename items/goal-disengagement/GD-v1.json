@@ -3,7 +3,7 @@
     "administration_language": "en",
     "battery": "GD-v1 (12-item pilot), an action-anchored self-report bank for goal disengagement — declared side of construct 2 (docs/constructs.md, docs/declared-spec.md)",
     "source": "Original items authored for this project, not drawn from any published inventory. Theoretical frame: goal disengagement and reengagement (Wrosch et al., 2003) and flexible goal adjustment (Brandtstädter & Renner, 1990), cited, not reproduced — no public terms of use were found for either scale (docs/axis-map.md, 'Tenacity'). Matched to the L3-v2 impossible twin: repeated attempts against a wall outside the code (a revoked token, a database that is down, a missing binary). Written with RF-v3's two lessons from the start: every item's cost is concrete (ideas left untried, a task handed back unfinished, a blocked part left alone), and every reverse item reads as ordinary professional diligence rather than a confession of stubbornness.",
-    "license": "Original content for this project (AGPL-3.0, same as the repository).",
+    "license": "Original content for this project (CC BY 4.0, see NOTICE; AGPL-3.0 before 2026-10-19).",
     "response_scale": "1-5 Likert (1 = very inaccurate, 5 = very accurate), same scale and reverse-score formula (6 - raw) as items.sample.json and RF-v3 — see scripts/declared.mjs. High = disengages from a goal it cannot reach.",
     "note": "Pilot size (12 items). Do not expand or edit items in place once administered — a changed or added item belongs in GD-v2, run once in parallel with GD-v1 for the bridge (docs/declared-spec.md)."
   },

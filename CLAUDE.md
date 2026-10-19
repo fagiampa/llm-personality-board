@@ -55,7 +55,9 @@ Literature positioning: [`docs/positioning.md`](docs/positioning.md). The specs
 are the source of truth: when a decision changes, update the spec first, then
 the code.
 
-The project is public on GitHub under AGPL-3.0 — see [`README.md`](README.md)
+The project is public on GitHub: code under Apache-2.0, data, item banks and
+scenarios under CC BY 4.0 (since 2026-10-19, before that AGPL-3.0; see
+[`NOTICE`](NOTICE)) — see [`README.md`](README.md)
 for the user-facing overview and [`CONTRIBUTING.md`](CONTRIBUTING.md) for how
 to contribute, including AI-assisted contributions.
 
@@ -86,7 +88,7 @@ purpose (fabricated scores must never be attributed to real products).
   `Accept-Language` header, no manual switcher. See `lib/i18n/`.
 - **Hosting**: Vercel — live at https://aipersonality.org (deployed with
   `vercel --prod` from a local checkout, see "Deployment").
-- **Source**: public GitHub repo, AGPL-3.0.
+- **Source**: public GitHub repo; code Apache-2.0, data CC BY 4.0.
 
 ## Data model (`lib/hexaco.ts`)
 

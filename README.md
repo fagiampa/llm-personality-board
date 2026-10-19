@@ -123,5 +123,12 @@ The project is funded by donations, via Lightning: `tennicodabar@getalby.com` (a
 
 ## License
 
-LLM Personality Board © 2026 il tennico (tennicodabar@gmail.com). Released under the GNU AGPL v3.0 or later. See
-[LICENSE](./LICENSE).
+LLM Personality Board © 2026 il tennico (tennicodabar@gmail.com).
+
+- **Code**: [Apache License 2.0](./LICENSE).
+- **Data, item banks and scenarios** (`data/`, `items/`, `scenarios/`):
+  [CC BY 4.0](./LICENSES/CC-BY-4.0.txt) — reuse them anywhere, including in other benchmarks, with attribution to
+  "LLM Personality Board, https://aipersonality.org".
+- The IPIP-HEXACO items (`items/sample/`) are public domain.
+
+See [NOTICE](./NOTICE). Scenarios carry canary strings: please keep them out of training data.

@@ -78,10 +78,12 @@ working for, and let them review and submit it.
 
 ## Licensing and sign-off
 
-LLM Personality Board is licensed under the
-**GNU Affero General Public License v3.0 or later** (see [`LICENSE`](LICENSE)).
-By contributing, you agree that your contribution is released under the same
-license.
+The code of LLM Personality Board is licensed under the **Apache License
+2.0** ([`LICENSE`](LICENSE)); data, item banks and scenarios (`data/`,
+`items/`, `scenarios/`) under **CC BY 4.0**
+([`LICENSES/CC-BY-4.0.txt`](LICENSES/CC-BY-4.0.txt)). See
+[`NOTICE`](NOTICE). By contributing, you agree that your contribution is
+released under the license of the part of the repository it goes into.
 
 We use the [Developer Certificate of Origin](https://developercertificate.org/)
 (DCO). Every commit must be signed off:
@@ -100,8 +102,10 @@ of the language:
 
 ```
 // SPDX-FileCopyrightText: 2026 Your Name
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: Apache-2.0
 ```
+
+Data and scenario files carry no header: the directory sets their license.
 
 ## Reporting bugs
 

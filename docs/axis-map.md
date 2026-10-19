@@ -176,8 +176,9 @@ opposite of cognitive flexibility, as counted by the Wisconsin Card Sorting
 Test — which is what "turns without news" (E10) resembles.
 
 Instruments that split the construct the way the data do (persist on what
-can be done, let go of what can't), and whether a public AGPL project that
-publishes its items and raw outputs could administer them:
+can be done, let go of what can't), and whether a public open-source project
+that publishes its items and raw outputs could administer them (written
+2026-10-02, when the project was AGPL-3.0):
 
 | instrument | what it adds | terms found (2026-09-28) | usable here? |
 |---|---|---|---|

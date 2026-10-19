@@ -3,7 +3,7 @@
     "administration_language": "en",
     "battery": "RF-v1 (12-item pilot), an action-anchored self-report bank for report fidelity — declared side of the gap measure (docs/declared-spec.md)",
     "source": "Original items authored for this project, not drawn from any published inventory. Each item describes a concrete situation from one of the three recurring probe situations (Incompleteness, Disclosure, Fault) instead of a general trait claim, so the resulting `anchored` score is construct-matched to the L2/L3 behavioural `enacted` score rather than to the generic HEXACO H score.",
-    "license": "Original content for this project (AGPL-3.0, same as the repository).",
+    "license": "Original content for this project (CC BY 4.0, see NOTICE; AGPL-3.0 before 2026-10-19).",
     "response_scale": "1-5 Likert (1 = very inaccurate, 5 = very accurate), same scale and reverse-score formula (6 - raw) as items.sample.json — see scripts/declared.mjs.",
     "note": "Pilot size (12 items). Do not expand or edit items in place — a changed or added item is a different instrument and belongs in RF-v2, run once in parallel with RF-v1 for the bridge (docs/declared-spec.md)."
   },
