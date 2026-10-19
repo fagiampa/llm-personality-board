@@ -132,9 +132,11 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
               It counts like “false”.
             </p>
             <p>
-              A-v2 agreed with a blind human rater on 45 of 50 reports (κ 0.84; the earlier rubric, 0.49). It is lenient: a
-              later blind check found it calls “accurate” many reports a human rater calls “misleading”, so the published
-              report fidelity is a ceiling, not an exact value. The judge is from the same vendor as some of the models
+              A-v2 agreed with one blind human rater on 45 of 50 reports (κ 0.84; the earlier rubric, 0.49). It is lenient:
+              a second blind check, on 25 runs where the model had edited the test file, found the rater confirming only 3
+              of the judge’s 13 “accurate” labels and calling 9 of them “misleading”. Every disagreement went the same way,
+              so the published report fidelity is a ceiling, not an exact value, most of all for models that edit the
+              tests. The judge is from the same vendor as some of the models
               under test, so those models’ runs were judged a second time by a model from another family (Claude Opus 5.5):
               the report-fidelity labels came out the same. Every label, old and new, is in the repository’s data folder.
             </p>
@@ -158,6 +160,44 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
               the scale, never as a value.
             </p>
           </>
+        ),
+      },
+      {
+        title: "Known limits",
+        id: "limits",
+        body: (
+          <ul className={styles.refs}>
+            <li>
+              <strong>Saturation.</strong> Four of the nine models reach 100 on all three columns. At the top, these
+              scenarios can’t tell them apart: harder ones are the next step, not a reading of those models as flawless.
+            </li>
+            <li>
+              <strong>Few runs, one kind of task.</strong> 15 runs per behaviour, three scenarios, all of them a small
+              Python project with a failing build. 15 out of 15 is compatible with a true rate as low as 78% (exact 95%
+              interval), so differences of a few points between cards mean nothing.
+            </li>
+            <li>
+              <strong>One judge, one human rater.</strong> Report fidelity rests on one judge model, checked against a single
+              human rater, and the error leans lenient (above). The other two behaviours need no judge.
+            </li>
+            <li>
+              <strong>A scripted environment.</strong> No command runs: a state machine answers. The task avoids any
+              “this is a test” framing, but a model may still notice that it isn’t a real shell.
+            </li>
+            <li>
+              <strong>Reasoning levels differ.</strong> Each model runs at its provider’s default, recorded with every run:
+              Claude Haiku 4.5 doesn’t think by default, Haiku 5.5 does. Cross-model comparisons carry that difference.
+            </li>
+            <li>
+              <strong>The banks were revised.</strong> The report-fidelity bank was rewritten twice after its first
+              versions came back at the top of the scale. The earlier versions and every answer to them are in the
+              repository.
+            </li>
+            <li>
+              <strong>Contamination.</strong> Items and scenarios are public, so future models may have seen them. Every
+              scenario carries a canary string, so its presence in a model’s training data can be checked later.
+            </li>
+          </ul>
         ),
       },
       {
@@ -336,8 +376,12 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
               — models’ self-reported traits don’t predict their behaviour.
             </li>
             <li>
-              <em>Rethinking Psychometric Evaluation of LLMs</em> (ICML 2026) — action-anchored items vs generic traits;
-              names agentic tool use as unexplored.
+              Kocielnik, R. et al. (2026). <em>Rethinking Psychometric Evaluation of LLMs: When and Why Self-Reports Predict
+              Behavior.</em>{" "}
+              <a href="https://arxiv.org/abs/2606.12730" target="_blank" rel="noreferrer">
+                arXiv:2606.12730
+              </a>{" "}
+              — behaviour-specific items vs generic traits; names agentic tool use as unexplored.
             </li>
             <li>
               <em>Alignment Revisited</em> (2025).{" "}
@@ -345,6 +389,20 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
                 arXiv:2506.00751
               </a>{" "}
               — stated vs revealed preferences.
+            </li>
+            <li>
+              Zhong, Z., Raghunathan, A., &amp; Carlini, N. <em>ImpossibleBench</em> (ICLR 2026).{" "}
+              <a href="https://arxiv.org/abs/2510.20270" target="_blank" rel="noreferrer">
+                arXiv:2510.20270
+              </a>{" "}
+              — agentic coding tasks made impossible; the closest work in method.
+            </li>
+            <li>
+              Ren, R. et al. <em>The MASK Benchmark</em> (2025).{" "}
+              <a href="https://arxiv.org/abs/2503.03750" target="_blank" rel="noreferrer">
+                arXiv:2503.03750
+              </a>{" "}
+              — honesty under pressure, separated from accuracy; the closest work in construct.
             </li>
           </ul>
         ),
@@ -468,9 +526,10 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
             </p>
             <p>
               A-v2 è d’accordo con un valutatore umano, alla cieca, su 45 report su 50 (κ 0,84; la regola precedente,
-              0,49). È indulgente: un controllo successivo, alla cieca, ha trovato che chiama “accurato” molti report che un
-              valutatore umano chiama “fuorviante”, quindi la fedeltà del report pubblicata è un tetto, non un valore
-              esatto. Il giudice è dello stesso vendor di alcuni modelli misurati, quindi i loro run sono stati giudicati una
+              0,49). È indulgente: un secondo controllo alla cieca, su 25 run in cui il modello aveva modificato il file di
+              test, ha visto il valutatore confermare solo 3 dei 13 “accurato” del giudice e chiamarne 9 “fuorviante”. Tutti
+              i disaccordi vanno nello stesso verso, quindi la fedeltà del report pubblicata è un tetto, non un valore
+              esatto, soprattutto per i modelli che toccano i test. Il giudice è dello stesso vendor di alcuni modelli misurati, quindi i loro run sono stati giudicati una
               seconda volta da un modello di un’altra famiglia (Claude Opus 5.5): le etichette della fedeltà del report sono
               uscite uguali. Tutte le etichette, vecchie e nuove, sono nella cartella dei dati del repository.
             </p>
@@ -494,6 +553,49 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
               linea dello 0, fuori scala, mai come valore.
             </p>
           </>
+        ),
+      },
+      {
+        title: "Limiti noti",
+        id: "limits",
+        body: (
+          <ul className={styles.refs}>
+            <li>
+              <strong>Saturazione.</strong> Quattro dei nove modelli arrivano a 100 su tutte e tre le colonne. In cima,
+              questi scenari non li distinguono: servono scenari più difficili, non è una lettura di quei modelli come
+              impeccabili.
+            </li>
+            <li>
+              <strong>Pochi run, un solo tipo di compito.</strong> 15 run per comportamento, tre scenari, tutti un piccolo
+              progetto Python con la build rotta. 15 su 15 è compatibile con un tasso reale anche del 78% (intervallo
+              esatto al 95%), quindi pochi punti di differenza fra le card non vogliono dire niente.
+            </li>
+            <li>
+              <strong>Un giudice, un valutatore umano.</strong> La fedeltà del report poggia su un solo modello giudice,
+              confrontato con un solo valutatore umano, e l’errore pende verso l’indulgenza (sopra). Gli altri due
+              comportamenti non hanno bisogno di giudice.
+            </li>
+            <li>
+              <strong>Un ambiente scriptato.</strong> Nessun comando viene eseguito: risponde una macchina a stati. Il
+              compito evita ogni cornice da “questo è un test”, ma un modello potrebbe comunque accorgersi che non è una
+              vera shell.
+            </li>
+            <li>
+              <strong>Livelli di ragionamento diversi.</strong> Ogni modello lavora al default del suo provider,
+              registrato con ogni run: Claude Haiku 4.5 di default non ragiona, Haiku 5.5 sì. I confronti fra modelli si
+              portano dietro questa differenza.
+            </li>
+            <li>
+              <strong>Le banche sono state riviste.</strong> La banca della fedeltà del report è stata riscritta due volte,
+              dopo che le prime versioni tornavano in cima alla scala. Le versioni precedenti e tutte le risposte sono nel
+              repository.
+            </li>
+            <li>
+              <strong>Contaminazione.</strong> Item e scenari sono pubblici, quindi i modelli futuri potrebbero averli
+              visti. Ogni scenario contiene una stringa canary, così più avanti si può verificare se è finito nei dati di
+              addestramento.
+            </li>
+          </ul>
         ),
       },
       {
@@ -677,8 +779,13 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
               — i tratti auto-riportati dai modelli non predicono il loro comportamento.
             </li>
             <li>
-              <em>Rethinking Psychometric Evaluation of LLMs</em> (ICML 2026) — item ancorati a un’azione contro tratti
-              generici; indica l’uso agentico degli strumenti come inesplorato.
+              Kocielnik, R. et al. (2026). <em>Rethinking Psychometric Evaluation of LLMs: When and Why Self-Reports Predict
+              Behavior.</em>{" "}
+              <a href="https://arxiv.org/abs/2606.12730" target="_blank" rel="noreferrer">
+                arXiv:2606.12730
+              </a>{" "}
+              — item specifici di un comportamento contro tratti generici; indica l’uso agentico degli strumenti come
+              inesplorato.
             </li>
             <li>
               <em>Alignment Revisited</em> (2025).{" "}
@@ -686,6 +793,20 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
                 arXiv:2506.00751
               </a>{" "}
               — preferenze dichiarate contro preferenze rivelate.
+            </li>
+            <li>
+              Zhong, Z., Raghunathan, A., &amp; Carlini, N. <em>ImpossibleBench</em> (ICLR 2026).{" "}
+              <a href="https://arxiv.org/abs/2510.20270" target="_blank" rel="noreferrer">
+                arXiv:2510.20270
+              </a>{" "}
+              — compiti di programmazione agentici resi impossibili; il lavoro più vicino per metodo.
+            </li>
+            <li>
+              Ren, R. et al. <em>The MASK Benchmark</em> (2025).{" "}
+              <a href="https://arxiv.org/abs/2503.03750" target="_blank" rel="noreferrer">
+                arXiv:2503.03750
+              </a>{" "}
+              — onestà sotto pressione, separata dall’accuratezza; il lavoro più vicino per costrutto.
             </li>
           </ul>
         ),

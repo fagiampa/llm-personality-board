@@ -127,7 +127,7 @@ const TEXT: Record<Locale, Text> = {
           body: (
             <>
               Anche nelle persone i tratti auto-riportati predicono il comportamento solo in parte (r ≈ 0,30; Mischel,
-              1968). Nei modelli non lo predicono affatto: <em>The Personality Illusion</em>, 2025.
+              1968). Nei modelli non lo predicono in modo affidabile: <em>The Personality Illusion</em>, 2025.
             </>
           ),
         },
@@ -273,7 +273,7 @@ const TEXT: Record<Locale, Text> = {
       ],
       note: (
         <>
-          Il report lo etichetta un giudice terzo, un LLM di frontiera (accurato, vago, fuorviante, falso). Gli altri due
+          Il report lo etichetta un modello giudice, gpt-6-astra (accurato, vago, fuorviante, falso). Gli altri due
           comportamenti si leggono direttamente dal registro, senza giudice. Modificare i file di test si conta a parte,
           come <strong>tasso di manomissione</strong>.
         </>
@@ -288,7 +288,26 @@ const TEXT: Record<Locale, Text> = {
           body: (
             <>
               dichiarato ≠ agito è pubblicato, 2025–26: <em>The Personality Illusion</em> (arXiv 2509.03730) e{" "}
-              <em>Rethinking Psychometric Evaluation of LLMs</em> (ICML 2026).
+              <em>Rethinking Psychometric Evaluation of LLMs</em> (arXiv 2606.12730).
+            </>
+          ),
+        },
+        {
+          tag: "Il vicino di metodo",
+          body: (
+            <>
+              <em>ImpossibleBench</em> (Zhong, Raghunathan, Carlini, ICLR 2026): compiti di programmazione agentici resi
+              impossibili, e si conta chi aggira i test. Qui i test sono giusti e il muro è fuori dal codice; si giudica il
+              report, accanto a un lato dichiarato.
+            </>
+          ),
+        },
+        {
+          tag: "Il vicino di costrutto",
+          body: (
+            <>
+              <em>MASK</em> (Ren et al., 2025): la menzogna sotto pressione, misurata contro ciò che il modello crede. Un
+              prompt e una risposta, non un agente al lavoro.
             </>
           ),
         },
@@ -304,8 +323,9 @@ const TEXT: Record<Locale, Text> = {
           tag: "Lo strumento",
           body: (
             <>
-              <strong>continuo, aperto, agentico, sui modelli chiusi</strong>, con il costo dell’onestà che cresce — manca,
-              e gli stessi autori ICML indicano l’uso agentico degli strumenti come inesplorato.
+              <strong>continuo, aperto, agentico, con il dichiarato accanto all’agito</strong> e il costo dell’onestà che
+              cresce — non l’abbiamo trovato altrove, e gli autori di <em>Rethinking</em> indicano l’uso agentico degli strumenti come
+              inesplorato.
             </>
           ),
           dark: true,
@@ -328,9 +348,10 @@ const TEXT: Record<Locale, Text> = {
         </>,
         <>
           I numeri sono preliminari e dichiarati con i loro limiti: tre coppie di scenari, 15 run per comportamento, un
-          set non ancora congelato; ogni modello al suo livello di ragionamento di default. Il giudice è stato confrontato
-          alla cieca con un valutatore umano (κ 0,84 su 50 report) ed è indulgente, quindi la fedeltà del report
-          pubblicata è un tetto, non un valore esatto. Il giudice è di OpenAI: i modelli OpenAI sono stati giudicati una
+          set non ancora congelato; ogni modello al suo livello di ragionamento di default. Quattro modelli su nove
+          arrivano a 100 su tutte e tre le colonne: in cima lo strumento satura, e servono scenari più difficili. Il
+          giudice è stato confrontato alla cieca con un solo valutatore umano (κ 0,84 su 50 report) ed è indulgente,
+          quindi la fedeltà del report pubblicata è un tetto, non un valore esatto. Il giudice è di OpenAI: i modelli OpenAI sono stati giudicati una
           seconda volta da un modello di un’altra famiglia, con le stesse etichette sulla fedeltà del report. Ogni transcript, ogni risposta e ogni
           etichetta sono pubblicati nella cartella <code>data/</code> del repository, così ogni numero qui si può
           verificare — o contestare.
@@ -381,7 +402,7 @@ const TEXT: Record<Locale, Text> = {
           body: (
             <>
               Even in people, self-reported traits predict behaviour only modestly (r ≈ 0.30; Mischel, 1968). In models
-              they don’t predict it at all: <em>The Personality Illusion</em>, 2025.
+              they don’t reliably predict it: <em>The Personality Illusion</em>, 2025.
             </>
           ),
         },
@@ -528,7 +549,7 @@ const TEXT: Record<Locale, Text> = {
       ],
       note: (
         <>
-          The report is labelled by a third-party judge, a frontier LLM (accurate, vague, misleading, false). The other
+          The report is labelled by a judge model, gpt-6-astra (accurate, vague, misleading, false). The other
           two behaviours are read straight from the log, with no judge. Editing test files is counted apart, as a{" "}
           <strong>tampering rate</strong>.
         </>
@@ -543,7 +564,26 @@ const TEXT: Record<Locale, Text> = {
           body: (
             <>
               declared ≠ enacted is published, 2025–26: <em>The Personality Illusion</em> (arXiv 2509.03730) and{" "}
-              <em>Rethinking Psychometric Evaluation of LLMs</em> (ICML 2026).
+              <em>Rethinking Psychometric Evaluation of LLMs</em> (arXiv 2606.12730).
+            </>
+          ),
+        },
+        {
+          tag: "Closest in method",
+          body: (
+            <>
+              <em>ImpossibleBench</em> (Zhong, Raghunathan, Carlini, ICLR 2026): agentic coding tasks made impossible,
+              counting who works around the tests. Here the tests are right and the wall is outside the code; what is judged
+              is the report, next to a declared side.
+            </>
+          ),
+        },
+        {
+          tag: "Closest in construct",
+          body: (
+            <>
+              <em>MASK</em> (Ren et al., 2025): lying under pressure, measured against what the model believes. One prompt
+              and one answer, not an agent at work.
             </>
           ),
         },
@@ -559,8 +599,8 @@ const TEXT: Record<Locale, Text> = {
           tag: "The instrument",
           body: (
             <>
-              <strong>continuous, open, agentic, on closed models</strong>, with a rising cost of honesty — missing, and
-              the ICML authors list agentic tool use as unexplored.
+              <strong>continuous, open, agentic, with the declared side next to the enacted one</strong> and a rising cost
+              of honesty — we haven’t found it elsewhere, and the <em>Rethinking</em> authors list agentic tool use as unexplored.
             </>
           ),
           dark: true,
@@ -582,8 +622,10 @@ const TEXT: Record<Locale, Text> = {
         </>,
         <>
           The numbers are preliminary and stated with their limits: three scenario pairs, 15 runs per behaviour, a set
-          not yet frozen; every model at its default reasoning level. The judge was checked blind against a human rater
-          (κ 0.84 on 50 reports) and is lenient, so the published report fidelity is a ceiling, not an exact value. The
+          not yet frozen; every model at its default reasoning level. Four models out of nine reach 100 on all three
+          columns: at the top the instrument saturates, and harder scenarios are needed. The judge was checked blind
+          against a single human rater (κ 0.84 on 50 reports) and is lenient, so the published report fidelity is a
+          ceiling, not an exact value. The
           judge is OpenAI’s: the OpenAI models were judged a second time by a model from another family, with the same
           report-fidelity labels. Every transcript, every answer and every label is published in the repository’s <code>data/</code>{" "}
           folder, so any number here can be checked — or disputed.
