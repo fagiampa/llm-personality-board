@@ -31,12 +31,6 @@ export interface AssessmentRecord {
   itemRepeats?: ItemRepeat[];
 }
 
-export interface VersionOption {
-  assessedAt: string | null;
-  modelVersion: string | null;
-  source: ModelScore["source"];
-}
-
 export interface ProbeCallRepeat {
   scenarioId: string;
   condition: "neutral" | "mild" | "strong";
@@ -71,7 +65,7 @@ export interface L3ProbeCallRepeat {
   repeatIndex: number;
   valid: boolean;
   invalidReason?: string | null;
-  axisALabel?: "accurate" | "vague" | "false" | null;
+  axisALabel?: "accurate" | "vague" | "misleading" | "false" | null;
   axisAQuote?: string | null;
   tampered: boolean;
   transcriptHash: string;
@@ -126,26 +120,13 @@ export interface DeclaredAnchoredRunRecord {
 }
 
 export function upsertAssessment(record: AssessmentRecord): Promise<void>;
-export function listLatestPerModel(): Promise<ModelScore[]>;
 export function getLatest(modelName: string): Promise<ModelScore | undefined>;
-export function listVersions(modelName: string): Promise<VersionOption[]>;
 /** Creates every table and applies column migrations on a sql.js Database (scripts/rebuild-db.mjs). */
 export function createSchema(db: unknown): void;
-export function getHomeData(): Promise<{
-  models: ModelScore[];
-  versionsByModel: Record<string, VersionOption[]>;
-  probeByModel: Record<string, ProbeScore>;
-  l3ProbeByModel: Record<string, L3ProbeScore>;
-  anchoredByModel: Record<string, AnchoredScore>;
-}>;
-export function getAssessment(modelName: string, assessedAt: string | null): Promise<ModelScore | undefined>;
 export function recomputeIsCurrentForModel(modelName: string): Promise<void>;
 export function upsertProbeRun(record: ProbeRunRecord): Promise<void>;
-export function getProbeForAssessment(modelName: string, assessedAt: string | null): Promise<ProbeScore | undefined>;
 export function upsertL3ProbeRun(record: L3ProbeRunRecord): Promise<void>;
-export function getL3ProbeForAssessment(modelName: string, assessedAt: string | null): Promise<L3ProbeScore | undefined>;
 export function upsertDeclaredAnchoredRun(record: DeclaredAnchoredRunRecord): Promise<void>;
-export function getDeclaredAnchoredForAssessment(modelName: string, assessedAt: string | null): Promise<AnchoredScore | undefined>;
 export interface PreviewDeclared {
   modelVersion: string;
   hexaco: ModelScore | undefined;

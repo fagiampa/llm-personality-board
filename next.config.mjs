@@ -10,10 +10,9 @@ const nextConfig = {
     // build-output file tracer doesn't see that reference on its own and
     // leaves the .wasm out of the deployed function bundle ("ENOENT ...
     // sql-wasm.wasm" in production). This forces it to be included.
+    // The home is the one page that reads the DB; it also reads the raw L3-v2
+    // files and the re-judge files at request time (lib/previewEnacted.mjs).
     outputFileTracingIncludes: {
-      "/api/**/*": ["./node_modules/sql.js/dist/*.wasm"],
-      // The home also reads the raw L3-v2 files and the re-judge files at
-      // request time (lib/previewEnacted.mjs).
       "/": [
         "./node_modules/sql.js/dist/*.wasm",
         "./data/probe-raw/**/L3-v2-*Z.jsonl",

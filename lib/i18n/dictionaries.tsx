@@ -1,13 +1,11 @@
 import { Locale } from "./locale";
-import type { ReasoningConfig } from "../hexaco";
-import { signed, isCensored } from "../gap";
 
 export const dictionaries = {
   en: {
     home: {
       metaTitle: "LLM Personality: Declared vs Enacted",
       metaDescription:
-        "Claude, GPT, Grok and DeepSeek answer questions about themselves, then work on a coding task they cannot finish. Three gaps between declared and enacted: report fidelity, knowing when to stop, sticking to the evidence.",
+        "Claude, Gemini, GPT, Grok and DeepSeek rate statements about how they work, then do the work: small coding tasks, some impossible, some already done. Three gaps between declared and enacted: report fidelity, knowing when to stop, sticking to the evidence.",
       title: "LLM Personality: Declared vs Enacted",
       aboutLink: "about this idea →",
       methodologyLink: "methodology & references →",
@@ -19,43 +17,6 @@ export const dictionaries = {
       copy: "copy",
       copied: "copied",
       copyAriaLabel: "Copy the Lightning address",
-    },
-    card: {
-      // Badge: has this version had a complete L3 run (every scenario of the
-      // current set)? Not recency — which version shows by default is a
-      // separate thing (ModelScore.isCurrent).
-      complete: "complete",
-      todo: "to do",
-      seed: "seed",
-      versionAriaLabel: (name: string) => `Version of ${name}`,
-      generic: "declared (general)",
-      anchored: "declared",
-      enacted: "enacted",
-      gap: "gap",
-      deltaSpecificity: "specificity Δ",
-      // docs/declared-spec.md's three-level record: generic always exists;
-      // anchored/enacted may not yet, so the sentence only claims what it
-      // actually has — never a gap between generic and enacted directly.
-      // Which reasoning level the model ran at (lib/reasoningConfig.mjs).
-      // `undefined` = a run from before this was recorded.
-      reasoningLabel: "reasoning",
-      reasoning: (r: ReasoningConfig | undefined) =>
-        r === undefined
-          ? "not recorded"
-          : r.level === null
-            ? "provider default (level not documented)"
-            : `${r.level} (${r.isDefault ? "provider default" : "not the provider default"})`,
-      gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
-        let s = `Honesty-Humility, declared in general ${generic}`;
-        if (anchored !== undefined) {
-          s += `, declared ${Math.round(anchored)} (specificity delta ${signed(Math.round(generic) - Math.round(anchored))})`;
-          if (enacted !== undefined)
-            s += `, enacted ${Math.round(enacted)} — gap ${signed(Math.round(anchored) - Math.round(enacted))}${isCensored(anchored, enacted) ? " (both at the scale limit — no room to show a gap)" : ""}`;
-        } else if (enacted !== undefined) {
-          s += `, enacted ${Math.round(enacted)} (no declared score yet)`;
-        }
-        return s;
-      },
     },
     about: {
       metaTitle: "About LLM Personality Board — Declared vs Enacted",
@@ -84,7 +45,7 @@ export const dictionaries = {
     home: {
       metaTitle: "Personalità degli LLM: Dichiarato vs Agito",
       metaDescription:
-        "Claude, GPT, Grok e DeepSeek rispondono a domande su di sé, poi lavorano a un compito di programmazione che non possono finire. Tre divari fra dichiarato e agito: fedeltà del report, sapersi fermare, attenersi all’evidenza.",
+        "Claude, Gemini, GPT, Grok e DeepSeek valutano affermazioni su come lavorano, poi fanno il lavoro: piccoli compiti di programmazione, alcuni impossibili, alcuni già risolti. Tre divari fra dichiarato e agito: fedeltà del report, sapersi fermare, attenersi all’evidenza.",
       title: "Personalità degli LLM: Dichiarato vs Agito",
       aboutLink: "riguardo a questa idea →",
       methodologyLink: "metodologia e riferimenti →",
@@ -96,35 +57,6 @@ export const dictionaries = {
       copy: "copia",
       copied: "copiato",
       copyAriaLabel: "Copia l’indirizzo Lightning",
-    },
-    card: {
-      complete: "completo",
-      todo: "da fare",
-      seed: "iniziale",
-      versionAriaLabel: (name: string) => `Versione di ${name}`,
-      generic: "dichiarato generico",
-      anchored: "dichiarato",
-      enacted: "agito",
-      gap: "divario",
-      deltaSpecificity: "Δ specificità",
-      reasoningLabel: "ragionamento",
-      reasoning: (r: ReasoningConfig | undefined) =>
-        r === undefined
-          ? "non registrato"
-          : r.level === null
-            ? "default del provider (livello non documentato)"
-            : `${r.level === "off" ? "spento" : r.level} (${r.isDefault ? "default del provider" : "non è il default del provider"})`,
-      gapAriaLabel: (generic: number, anchored: number | undefined, enacted: number | undefined) => {
-        let s = `Onestà-Umiltà, dichiarato generico ${generic}`;
-        if (anchored !== undefined) {
-          s += `, dichiarato ${Math.round(anchored)} (Δ specificità ${signed(Math.round(generic) - Math.round(anchored))})`;
-          if (enacted !== undefined)
-            s += `, agita ${Math.round(enacted)} — divario ${signed(Math.round(anchored) - Math.round(enacted))}${isCensored(anchored, enacted) ? " (entrambe al limite della scala — nessun margine per mostrare un divario)" : ""}`;
-        } else if (enacted !== undefined) {
-          s += `, agita ${Math.round(enacted)} (nessun dichiarato ancora)`;
-        }
-        return s;
-      },
     },
     about: {
       metaTitle: "Riguardo a LLM Personality Board — Dichiarato vs Agito",
