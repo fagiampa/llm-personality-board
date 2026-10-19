@@ -22,22 +22,20 @@ contribution, including those made with the help of AI tools.
 git clone https://github.com/fagiampa/llm-personality-board.git
 cd llm-personality-board
 npm install
-cp .env.example .env   # fill in API keys only if you want to run npm run assess
+npm run db:rebuild     # builds data/psychochat.sqlite from the data in the repo
 npm run dev            # http://localhost:3000
 ```
 
-The app reads from the SQLite DB already committed at
-`data/psychochat.sqlite` — you don't need any API keys just to run the site
-locally. Keys in `.env` are only needed for `npm run assess` (administering
-the questionnaire to a live model) or `npm run translate-onliners`.
+You don't need any API keys to run the site locally. Keys (copy
+`.env.example` to `.env`) are only needed to run new measurements on live
+models (`npm run assess`, `declared`, `probe-l3`).
 
-There's no automated test suite yet (contributions adding one are welcome —
-open an issue first per "Before you start" above). Before opening a PR,
-verify your change manually: `npm run lint`, `npm run build`, and check the
-affected page(s) in the browser in both languages (the UI is bilingual
-EN/IT, driven by the browser's `Accept-Language` header — switch it in
-DevTools' Network Conditions panel to test the other language without
-changing your OS settings).
+Before opening a PR, run `npm test` (unit tests, plus a check that the
+committed data rebuilds into a consistent DB), `npm run lint` and
+`npm run build`, and check the affected page(s) in the browser in both
+languages (the UI is bilingual EN/IT, driven by the browser's
+`Accept-Language` header — switch it in DevTools' Network Conditions panel
+to test the other language without changing your OS settings).
 
 ## Pull requests
 
@@ -127,5 +125,5 @@ follow this.
 
 ## Recognition
 
-Every merged contribution is credited in the changelog. Thank you for helping
-make this project better!
+Every merged contribution keeps its author in the git history. Thank you for
+helping make this project better!

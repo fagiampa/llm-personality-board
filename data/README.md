@@ -14,26 +14,28 @@ files below are regenerated from the DB by `npm run export-raw`.
 | directory | instrument | what one line is |
 |---|---|---|
 | `probe-raw/` | behavioural probes (L2, L3) — the **enacted** side | one probe call: scenario, condition, the full transcript, the judge's label and quote |
-| `declared-raw/` | action-anchored item bank (`RF-v*`) — **declared (specific)** | one repeat (or batch) of the 12 items: the 1-5 answers, and the raw response text where kept |
-| `assess-raw/` | IPIP-HEXACO, 240 items — **declared (general)** | one repeat of the questionnaire: the 1-5 answers |
+| `declared-raw/` | action-anchored item banks (`RF-v*`, `GD-v*`, `PF-v*`) — **declared** | one repeat (or batch) of the 12 items: the 1-5 answers, and the raw response text where kept |
+| `assess-raw/` | IPIP-HEXACO, 240 items — the HEXACO profile | one repeat of the questionnaire: the 1-5 answers |
 | `records/` | all of them | one DB row: run-level aggregates, and the probes' per-call rows |
 
 ## `probe-raw/<date>/…` — enacted
 
-### L3 (primary probe): `probe-raw/<date>/<Model>/L3-v1-<runStamp>.jsonl`
+### L3 (primary probe): `probe-raw/<date>/<Model>/<set>-<runStamp>.jsonl`
 
-One line per (scenario, condition, repeat):
+`<set>` is `L3-v2` (the set on the cards) or `L3-v1` (the earlier one). One
+line per (scenario, condition, repeat):
 
 | field | meaning |
 |---|---|
 | `modelVersion` | exact provider model id that was called |
-| `scenarioId`, `canary` | scenario from `scenarios/L3-v1/` and its canary GUID |
-| `condition` | `failing` (the measurement), `passing` (control), `calibration` (positive control, **never** part of a published score) |
+| `scenarioId`, `canary` | scenario from `scenarios/<set>/` and its canary GUID |
+| `condition` | `failing` (impossible: the measurement), `passing` (already green), `calibration` (positive control, **never** part of a published score); L3-v2 adds `solvable`, the twin without the obstacle |
 | `repeatIndex` | 0-based |
 | `valid`, `invalidReason` | validity per `docs/probe-l3-spec.md` ("Run loop"); invalid runs are recorded, not dropped |
 | `iterations` | tool-calling turns used (cap 20) |
 | `tampered` | axis B — the model wrote to a test file |
-| `axisALabel`, `axisAQuote` | axis A — the judge's label (`accurate`/`vague`/`false`) and the sentence it based it on |
+| `axisALabel`, `axisAQuote` | axis A — the judge's label (`accurate`/`vague`/`misleading`/`false`) and the sentence it based it on |
+| `testRuns`, `layersTotal`, `layersCleared`, `prematureStop` | L3-v2 only: each `run_tests` result, and how far the model got |
 | `judge` | `{provider, model}` that scored axis A (from 2026-09-23; earlier rows: see the provenance log in `docs/probe-l3-spec.md`) |
 | `reasoning` | `{level, isDefault}` the model ran at (from 2026-09-23; `level: null` = provider default, level not documented) |
 | `usage` | tokens spent by the model in this conversation (from 2026-09-23) |
@@ -43,10 +45,20 @@ One line per (scenario, condition, repeat):
 A DB record points at its transcripts by hash:
 `sha256(JSON.stringify(transcript)).slice(0, 16)`.
 
-Which files matter:
+Which files feed the cards: the enacted columns are computed from the
+`L3-v2-*.jsonl` files themselves (`lib/previewEnacted.mjs`): per model
+version, scenario and condition, the latest file that has any rows. Where a
+`rejudge-*.json` file next to them re-labels a run under the published rubric
+(A-v2) and judge, its label replaces the stored one. The judge
+(`gpt-6-astra`) is from the same vendor as gpt-6.1-sol and gpt-6-luna, so
+their runs were also judged by `claude-opus-5-5`
+(`rejudge-*-judge-opus-5-5.json`): the report-fidelity labels came out the
+same.
 
-The cards show, per model version, the latest L3 record under the published
-judge rubric (A-v2). Those records, as of 2026-09-25 — all 3 scenarios,
+### Older: the L3-v1 records
+
+Until 2026-10-13 the cards showed L3-v1, per model version the latest record
+under rubric A-v2. Those records, as of 2026-09-25 — all 3 scenarios,
 5 repeats, each model at its provider-default reasoning level:
 
 | file | model | reasoning |
@@ -83,7 +95,7 @@ published scores.
 Every stored Grok L3 label re-judged with `gpt-6-astra` on 2026-09-23
 (181/182 identical) — the evidence behind the judge provenance log.
 
-## `declared-raw/` — declared (specific)
+## `declared-raw/` — declared
 
 - `declared-raw/<date>/<Model>/<itemSet>-<runStamp>.jsonl` — written live by
   `scripts/declared.mjs` from 2026-09-23 on: one line per batch, with the
@@ -94,11 +106,13 @@ Every stored Grok L3 label re-judged with `gpt-6-astra` on 2026-09-23
   line per repeat, parsed answers only (`responseText: null` — the raw text
   wasn't kept).
 
-Item texts: `items/report-fidelity/<itemSet>.json`. `reverse: true` items
-are scored `6 − value`. `RF-v1` and `RF-v2` are frozen, superseded sets kept
-for the bridge; `RF-v3` is current.
+Item texts: `items/report-fidelity/RF-v*.json`,
+`items/goal-disengagement/GD-v1.json`, `items/prevention-focus/PF-v*.json`.
+`reverse: true` items are scored `6 − value`. The cards use `RF-v3`, `GD-v1`
+and `PF-v1`; `RF-v1` and `RF-v2` are frozen, superseded sets kept for the
+bridge, `PF-v2` a candidate with one run per model.
 
-## `assess-raw/<modelVersion>/<runStamp>.jsonl` — declared (general)
+## `assess-raw/<modelVersion>/<runStamp>.jsonl` — the HEXACO profile
 
 Exported from the DB by `npm run export-raw`: one line per repeat of the
 240-item IPIP-HEXACO questionnaire (`items/sample/json/items.sample.json`),
@@ -125,7 +139,7 @@ runs imported from the pre-SQLite JSON files — have aggregates only.
 answers in `assess-raw/` and `declared-raw/sqlite-export/`, then checks:
 
 - HEXACO scores, margins and item means recomputed from the answers
-- the declared (specific) score and margin recomputed from the answers
+- the declared score and margin recomputed from the answers
 - L3 enacted recomputed from the failing, valid judge labels
 - L2 proportions recomputed from the per-call outcomes
 - every L3 transcript and L2 output a record points at (by hash) is present
@@ -136,8 +150,10 @@ same check.
 
 ## Caveats, stated up front
 
-- Small numbers: 3 L3 scenarios, 5 repeats per condition. Treat every
-  score as preliminary.
+- Small numbers: 3 L3 scenarios, 5 repeats per condition (15 runs per
+  behaviour). Treat every score as preliminary.
 - Models don't all run at the same reasoning level (see each row's
   `reasoning`), so cross-model comparisons carry that confound.
-- `gpt-6-astra` is both the axis-A judge and one of the models under test.
+- The axis-A judge was validated against a single human rater
+  (`data/calibration/`) and is lenient relative to that rater: published
+  report fidelity is an upper bound.

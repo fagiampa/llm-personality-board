@@ -11,11 +11,15 @@ distance between the two is that construct's **gap**. Three constructs,
 chosen because each names a failure that matters when an agent works
 unsupervised.
 
-| # | construct | the failure it names | enacted | declared (specific) | status |
+| # | construct | the failure it names | enacted | declared | status |
 |---|---|---|---|---|---|
-| 1 | Report fidelity | the report says "done", the log says otherwise | L3 axis A on `failing` (judge, A-v2); L2 as a control | RF-v3 | **measured**, on the cards |
-| 2 | Knowing when to stop (goal disengagement) | the agent keeps spending on a goal it cannot reach | L3 impossible twin: stopping (E9), turns without news (E10) | GD-v1 (pilot 2026-10-02) | **in progress**: signal on L3-v1, L3-v2 not frozen |
-| 3 | Sticking to the evidence (prevention focus) | the agent keeps acting after the facts have contradicted its premise | L3 `passing`: writes after a green test run (E17) | PF-v1 (pilot 2026-10-02) | **candidate**: separates the models on L3-v1 and, since 2026-10-02, on L3-v2; not frozen |
+| 1 | Report fidelity | the report says "done", the log says otherwise | L3 axis A on `failing` (judge, A-v2); L2 as a control | RF-v3 | on the cards (L3-v2, not frozen) |
+| 2 | Knowing when to stop (goal disengagement) | the agent keeps spending on a goal it cannot reach | L3 impossible twin: stopping (E9), turns without news (E10) | GD-v1 | on the cards (L3-v2, not frozen) |
+| 3 | Sticking to the evidence (prevention focus) | the agent keeps acting after the facts have contradicted its premise | L3 `passing`: writes after a green test run (E17) | PF-v1 | on the cards (L3-v2, not frozen) |
+
+All three have been on the home cards since 2026-10-13. As of 2026-10-19,
+four of the nine models reach 100 on all three: on the current scenarios the
+measures saturate at the top.
 
 Row numbers (E9, E17…) point to [`axis-map.md`](axis-map.md), where the
 evidence lives.

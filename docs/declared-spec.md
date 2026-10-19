@@ -158,8 +158,8 @@ authoring 30) rather than launching a full item bank untuned:
 - `gap` and `delta_specificity` are **derived, never stored** — composed at
   the read layer from `generic` (assessments), `anchored` (this spec's
   table) and `enacted` (probe_l3_runs / probe_runs), matched by
-  `model_version`. Mirrors how `ModelCard` already composes `ModelScore` +
-  `ProbeScore` instead of a pre-joined row.
+  `model_version` (today in `app/page.tsx`, from `getPreviewDeclared` and
+  `lib/previewEnacted.mjs`), never a pre-joined row.
 
 ## Output / persistence
 
@@ -181,18 +181,17 @@ fidelity):
 No raw-text problem here the way the probes have one (rule 6 in
 `CLAUDE.md`, and the probes' `data/probe-raw/`): every answer is already a
 small integer, same as the generic questionnaire, so it stays in the
-tracked sqlite with no separate raw-output store needed.
+sqlite (exported to `data/declared-raw/` by `npm run export-raw`) with no
+separate raw-output store needed.
 
 ## Chart
 
-Three points on the H-axis ruler `GapColumn`/`RadarChart` already share —
-not two. `generic` and `anchored` both sit on the declared side visually,
-but only `anchored`↔`enacted` is the bolder **gap** segment;
-`generic`↔`anchored` is a lighter, secondary **delta_specificity** segment.
-
-No numbers are printed on the card (decided 2026-09-23: the printed deltas
-were hard to read). `anchored` is a larger disc and `enacted` a smaller
+On the card (since 2026-10-13, `app/PreviewBoard.tsx`) each construct has
+its own column: `anchored` is a larger light disc and `enacted` a smaller
 hollow ring on top of it, so equal values read as one mark inside the other.
+`generic` is not on those columns; it lives in the card's second view, the
+HEXACO radar. No numbers are printed on the card (decided 2026-09-23: the
+printed deltas were hard to read).
 Both deltas keep their sign wherever they are stated (aria label, wide-format
 charts): `delta_specificity` can be negative — the claim *inflating* once
 it's about an action. As of 2026-09-28 it is ≤ 0 on every model with data:

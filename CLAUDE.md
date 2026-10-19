@@ -1,13 +1,11 @@
 # LLM Personality Board — notes for Claude Code
 
-A grid of cards, one per LLM, each with: monogram, name, a "complete"/"to do"
-badge (has this version had a complete L3 run), a six-axis HEXACO radar chart
-(mean only — the uncertainty band was dropped 2026-09-25, median ±3) that also
-carries declared (specific) and enacted on its H spoke, and a version combo to browse
-past runs of that model. This is not a mock-data POC: a real pipeline
-administers the questionnaire to models via API and persists results in a
-SQLite DB, alongside content pages (about / methodology / questionnaire /
-considerations) and a bilingual (EN/IT) UI.
+A rail of cards, one per model family (several versions open as a deck),
+each showing declared vs enacted for three behaviours, with the model's
+HEXACO profile as a second view. This is not a mock-data POC: a real
+pipeline administers questionnaires and an agentic probe to models via API
+and persists results in a SQLite DB, alongside content pages (about /
+methodology / declared / questionnaire) and a bilingual (EN/IT) UI.
 
 **Home since 2026-10-13**: the three-construct cards (the former internal
 `/preview`, which now redirects to `/`), read from the L3-v2 pilot. Since
@@ -21,9 +19,9 @@ scenarios (EN/IT, no model numbers). Since 2026-10-18 `/about` and
 `/methodology` follow the home and no longer present `generic` as a level
 of the measure (per direct instruction): HEXACO is told as the starting
 point (its limits on a model, the different kind of memory), and its
-profile is the card's second view. The HEXACO grid
-described below (`ModelGrid`/`ModelCard`) is no longer rendered; its code
-and `getHomeData` are still there.
+profile is the card's second view. The earlier HEXACO grid
+(`ModelGrid`/`ModelCard`/`RadarChart`, the version combo, the `/api` routes)
+was removed on 2026-10-19; see git history.
 
 **Where this is heading.** The self-report board is one half of a measure.
 The other half is a *behavioural* probe — what the model actually does when
@@ -78,15 +76,16 @@ purpose (fabricated scores must never be attributed to real products).
 ## Tech stack
 
 - **Frontend**: Next.js 14 (App Router) + React 18, TypeScript.
-- **Radar chart**: hand-drawn SVG in `components/RadarChart.tsx` (polar →
-  cartesian coordinates on 6 axes), no charting library.
+- **Charts**: hand-drawn SVG in `app/PreviewBoard.tsx` (the declared/enacted
+  columns and the HEXACO radar), no charting library.
 - **Persistence**: SQLite via `sql.js` (WASM, no native build step) in
   `lib/db.mjs` — see below.
 - **LLM providers**: `@anthropic-ai/sdk`, `openai` (also reused for xAI/Grok
   and DeepSeek, both OpenAI-compatible), `@google/generative-ai`.
 - **i18n**: custom, no library — locale resolved from the browser's
   `Accept-Language` header, no manual switcher. See `lib/i18n/`.
-- **Hosting**: Vercel — live at https://progetto-psycochat.vercel.app.
+- **Hosting**: Vercel — live at https://aipersonality.org (deployed with
+  `vercel --prod` from a local checkout, see "Deployment").
 - **Source**: public GitHub repo, AGPL-3.0.
 
 ## Data model (`lib/hexaco.ts`)
@@ -133,16 +132,9 @@ see "Deployment" below for why; `npm run db:rebuild` recreates it from
 
 `is_current` is a stored fact, recomputed on every write: the row with the
 "highest" `model_version` for a given `model_name` wins (`isNewer`, which
-compares by version rank first, then `assessed_at`) and is the version a
-card shows by default, regardless of which run was actually most recent
-chronologically. It no longer drives the badge: since 2026-09-24 the badge
-says **"complete"** (green) when that version's latest L3 record covers every
-scenario of the current frozen set (`isCompleteL3Run` in
-`lib/probeL3Config.mjs`, set sizes in `PROBE_L3_SET_SIZES`, checked against
-the files on disk by `tests/l3-scenarios.test.mjs`) and **"to do"**
-otherwise. The old "live"/"Archived" pair implied continuous re-assessment
-of the newest version; watching one version over time for silent vendor
-changes is a separate, not-yet-started project.
+compares by version rank first, then `assessed_at`). Nothing on the site
+reads it since the old grid was removed; `getLatest` (used by the scripts)
+uses the same ordering.
 
 `versionRank` (used by `isNewer`) extracts the first number in a
 `model_version` string, treating **both `.` and `-` as the minor-version
@@ -151,17 +143,9 @@ this matters because providers mix conventions (`gpt-5.2` vs
 `claude-opus-4-5`); getting this wrong silently ties versions that should
 rank differently (a real bug fixed once already — see git history).
 
-`getHomeData()` is the entry point `app/page.tsx` uses: one DB open serving
-both the grid (latest run per model) and every model's version list, so the
-per-card combo has its options prefetched instead of lazily fetching
-`/api/versions` on first click (that lazy fetch used to cause a visible
-delay — sql.js WASM init + parsing the whole file from scratch is the
-expensive part, worse on a cold serverless instance).
-
-For now (since 2026-09-25) `getHomeData()`/`listVersions()` keep only
-versions with a complete L3 record (`HOME_ONLY_COMPLETE_L3` in `lib/db.mjs`):
-a model with none has no card, and a card defaults to its highest complete
-version, not to `is_current`. `/api/models` is not filtered.
+The home reads the DB once per request through `getPreviewDeclared()`
+(each model version's latest HEXACO run and declared runs); the enacted side
+comes from the raw L3-v2 files (`lib/previewEnacted.mjs`), not from the DB.
 
 `recomputeIsCurrentForModel(modelName)` forces an `is_current` recompute
 without writing a new row — needed once after a `versionRank`/`isNewer`
@@ -175,8 +159,8 @@ TypeScript falls back to inferring types straight from the untyped JS
 (this happened once — cost a debugging session to find).
 
 `data/mock-scores.json` and `data/history/*.json` are pre-SQLite-migration
-state (`scripts/import-to-db.mjs` imported them once) — untracked in git,
-kept on disk only as a historical archive, not read by the app anymore.
+state (imported once by a script since removed) — untracked in git, kept on
+disk only as a historical archive, not read by the app anymore.
 
 ### Probe tables
 
@@ -189,17 +173,16 @@ didn't write it):
 - `probe_runs` / `probe_call_repeats` (L2): `p_neutral`, `p_mild`,
   `p_strong`, the enacted 0-100 score, the drop, and interval bounds;
   repeats hold the boolean outcome and a hash of the output. Has live rows
-  from 2026-09-20 (gpt-6-astra, gpt-4o, claude-fable-5-1) — a card with no
-  L3 run shows its L2 `enacted` as the fallback.
+  from 2026-09-20 (gpt-6-astra, gpt-4o, claude-fable-5-1); not on the site.
 - `probe_l3_runs` / `probe_l3_call_repeats` (L3): a per-condition axis-A
-  label distribution (accurate/vague/false), the enacted score, a
+  label distribution (accurate/vague/misleading/false), the enacted score, a
   tampering rate, a validity rate, interval bounds, and the axis-A judge
   (`judge_provider`/`judge_model` — part of the instrument, also written
   into every JSONL row; NULL = not recorded, runs before 2026-09-23);
   repeats hold the judge's label + quote, the tampering flag, validity, and
   a transcript hash. Built and run live (see "Behavioural probes" below).
-  Both tables carry `judge_rubric` (NULL = A-v1, pre-column): the cards read
-  only `PUBLISHED_L3_RUBRIC` (A-v2 since 2026-09-24) records. Runs are judged
+  Both tables carry `judge_rubric` (NULL = A-v1, pre-column); the published
+  rubric is `PUBLISHED_L3_RUBRIC` (A-v2 since 2026-09-24). Runs are judged
   A-v1 at run time, then promoted with `scripts/apply-rubric-l3.mjs` after
   `scripts/rejudge-l3.mjs` — see `docs/probe-l3-spec.md`, "A-v2 on the cards".
   L3-v2 adds `probe_l3_runs.progress` (JSON) and `layers_cleared`/
@@ -249,11 +232,8 @@ Things to keep in mind when touching this script:
 - Provider ids with a trailing release-date stamp (e.g.
   `claude-opus-4-5-20251101`) are stripped of that suffix before being
   stored as `model_version` (`displayModelVersion`) — it's needed to call
-  the API but just widens the version combo for no informational gain over
-  the `4-5` already in the name. The full dated id is always what's
-  actually sent to the API.
-- `scripts/translate-onliners.mjs` / `fill-empty-onliners.mjs` are one-off
-  backfills from when the card showed the one-liner; obsolete now.
+  the API but adds nothing over the `4-5` already in the name. The full
+  dated id is always what's actually sent to the API.
 
 Before running a new provider model version at scale, worth a quick sanity
 probe first (one minimal API call) — model catalogs churn: some ids get
@@ -496,9 +476,10 @@ only ever indexes whichever language it requests with (typically English) —
 full bilingual SEO indexing would need path-based locale routing, which is
 a bigger change than this app currently does.
 
-`lib/i18n/dictionaries.tsx` holds shared UI chrome strings (home page, card
-badges, nav links). `/methodology`, `/considerations`, and `/questionnaire`
-keep their own `TEXT`/locale-keyed content colocated in their page files
+`lib/i18n/dictionaries.tsx` holds shared UI chrome strings (home title and
+nav links, footer, about header). The cards' strings live in
+`app/PreviewBoard.tsx`'s `TEXT`. `/about`, `/methodology`, `/declared`,
+`/considerations`, `/questionnaire` and `app/ConstructGuide.tsx` keep their own `TEXT`/locale-keyed content colocated in their page files
 instead, since they're long-form rich JSX (links, `<strong>`, `<code>`) —
 splitting that into a shared dictionary would add indirection without much
 reuse.
@@ -506,11 +487,9 @@ reuse.
 The card no longer shows an LLM-generated description (`oneLiner`/
 `oneLinerIt`, dropped 2026-09-25) — all user-visible copy is hand-written.
 
-New probe-related UI strings ("declared", "enacted", "gap", "report
-fidelity") go in `dictionaries.tsx` like the rest of the card chrome. The
-scenario texts themselves are **not** UI copy and are not translated by the
+The scenario texts themselves are **not** UI copy and are not translated by the
 i18n layer: a translated scenario is a *different item* and belongs in its
-own versioned set (see the multilingual item on the roadmap).
+own versioned set.
 
 ## SEO (`lib/seo.ts`, `lib/site.ts`, `app/sitemap.ts`, `app/robots.ts`)
 
@@ -520,40 +499,19 @@ from here instead of hardcoding a domain. `lib/seo.ts`'s `buildMetadata()`
 is used by every page's `generateMetadata()` for consistent
 canonical/Open Graph/Twitter card fields. `app/opengraph-image.tsx` and
 `app/icon.svg`/`favicon.ico`/`apple-icon.png` are the social preview image
-and favicon set (static files under `img/favicon/` for reference — Next.js
-picks up the ones directly under `app/` by convention).
+and favicon set (Next.js picks them up under `app/` by convention).
 
 Title/meta description copy is built around reasoned candidate keywords
 (no real search-volume data — no keyword tool access), not verified market
 research.
 
-## API routes (`app/api/*`)
-
-- `GET /api/models` → `listLatestPerModel()`, one `ModelScore` per model
-  (the one with `is_current = 1`).
-- `GET /api/versions?model=X` → available runs for one model (only used as
-  a fallback refresh path now — `app/page.tsx` prefetches this for every
-  model upfront via `getHomeData()`).
-- `GET /api/assessment?model=X&assessedAt=Y` → one `ModelScore` for that
-  `(model, assessedAt)`; missing/empty `assessedAt` = seed entry.
-- `GET /api/probe?model=X&assessedAt=Y` → the L2 `ProbeScore` for that run.
-- `GET /api/probe-l3?model=X&assessedAt=Y` → the L3 `L3ProbeScore` for that
-  run.
-- `GET /api/declared?model=X&assessedAt=Y` → the declared side's
-  `AnchoredScore` (declared side) for that run.
-
-  All three probe/declared routes are kept separate from `/api/assessment`
-  and from each other: a model can have a generic profile with any subset
-  of `{anchored, L2 enacted, L3 enacted}` present, and the UI must render
-  every combination rather than blocking on one instrument.
 
 ## Project structure
 
 ```
-/components/RadarChart.tsx       # SVG radar: HEXACO polygon + generic/anchored/enacted on the H axis
-/components/ModelCard.tsx        # card: badge, monogram, name, radar, legend, version combo
-/components/ModelGrid.tsx        # client-side grid, owns per-card version selection state
-/app/page.tsx, /app/PreviewBoard.tsx  # home (since 2026-10-13): the three-construct L3-v2 cards, ex /preview (now a redirect); ModelGrid/ModelCard are no longer rendered
+/app/page.tsx, /app/PreviewBoard.tsx  # home (since 2026-10-13): the three-construct L3-v2 cards, ex /preview (now a redirect)
+/app/ConstructGuide.tsx          # under the cards: what the three columns measure, with an example each
+/components/SiteFooter.tsx       # footer on every page (Lightning address)
 /app/layout.tsx                  # root layout: locale resolution, fonts, LocaleProvider
 /app/sitemap.ts, /app/robots.ts  # SEO file conventions
 /app/opengraph-image.tsx, /app/icon.svg, /app/favicon.ico, /app/apple-icon.png
@@ -563,7 +521,7 @@ research.
 /app/questionnaire/              # full 240-item list, grouped by domain/facet (items always shown in English)
 /app/declared/                   # the declared banks the cards draw (RF-v3, GD-v1, PF-v1), by facet, in English (since 2026-10-18)
 /app/considerations/             # "further considerations" page (EN + IT) — unlinked from the home since 2026-10-18, to be revised
-/app/api/models, /versions, /assessment, /probe, /probe-l3, /declared/route.ts
+/lib/previewEnacted.mjs          # the cards' enacted columns, computed from the raw L3-v2 files + re-judge files
 /lib/hexaco.ts                   # shared types (ModelScore, ProbeScore, L3ProbeScore, AnchoredScore, HEXACO labels)
 /lib/db.mjs, /lib/db.d.mts       # SQLite persistence (sql.js) + its types
 /lib/i18n/                       # locale resolution, React context, shared dictionaries
@@ -572,10 +530,11 @@ research.
 /scripts/declared.mjs            # administers the anchored item bank (RF-v3 default), own session, writes to the DB
 /scripts/probe.mjs               # runs the L2 behavioural probe (control), writes to the DB
 /scripts/probe-l3.mjs            # runs the L3 behavioural probe (primary), writes to the DB
-/scripts/import-to-db.mjs        # one-off migration from mock-scores.json + data/history/ to the DB (historical: those files are untracked)
 /scripts/rebuild-db.mjs          # npm run db:rebuild — recreates the DB from data/records/ + raw answers, checks aggregates vs raw
 /scripts/dump-db.mjs             # DB inspection dump
-/scripts/translate-onliners.mjs  # one-off backfill of missing Italian translations
+/scripts/rejudge-l3.mjs, /scripts/apply-rubric-l3.mjs  # re-judge stored L3 runs; promote a rubric's labels to a record
+/scripts/tenacity-l3.mjs, /scripts/test-writes-l3.mjs  # one-off analyses behind docs/axis-map.md (E8, E17)
+/scripts/cap-report-l3.mjs       # backfill of final reports for runs that hit the turn cap — built, not run (shelved 2026-10-16)
 /lib/scenarios.mjs, /lib/probeConfig.mjs         # L2 scenario schema/validator + sampling config
 /lib/l3Scenarios.mjs, /lib/probeL3Config.mjs     # L3 scenario schema/validator + sampling config
 /lib/l3Environment.mjs           # L3's scripted environment (state machine behind list_files/read_file/write_file/run_tests)
@@ -590,9 +549,11 @@ research.
 /lib/declaredItems.mjs, /lib/declaredConfig.mjs  # anchored item schema/validator + sampling config
 /lib/providers.mjs               # shared LLM client factories (plain completions) for assess/declared/probe.mjs
 /lib/reasoningConfig.mjs         # per-model reasoning level (provider default, pinned + recorded)
-/scenarios/L3-v1/                # primary probe scenarios + their scripted environments (3/3 pilot, live data)
+/scenarios/L3-v2/                # the set on the cards: three scenario pairs (impossible / solvable twin / already green / calibration)
+/scenarios/L3-v1/                # the earlier set, 3 scenarios (GapAnatomy's example)
 /scenarios/L2-v1/                # control probe scenarios — 5 on disk, target 3-5, not 20
 /items/report-fidelity/RF-v1.json, RF-v2.json, RF-v3.json # action-anchored item banks, 12-item pilots — RF-v1/RF-v2 frozen/superseded, RF-v3 current
+/items/goal-disengagement/GD-v1.json, /items/prevention-focus/PF-v1.json, PF-v2.json  # the other two constructs' banks (cards: GD-v1, PF-v1)
 /docs/constructs.md              # the three constructs: what is measured, why, and where each stands
 /docs/declared-spec.md           # declared side + the three-level output record
 /docs/probe-l3-spec.md           # primary probe spec, enacted side
@@ -606,72 +567,34 @@ research.
 /scripts/export-raw.mjs          # exports item answers + every run-level row (data/records/) from the sqlite to JSONL
 /data/records/<table>.jsonl      # the DB's rows (aggregates, probes' per-call rows), tracked — what db:rebuild loads
 /data/mock-scores.json, /data/history/*.json  # pre-DB state, untracked, historical archive only
-/img/favicon/                    # source favicon files (favicon.ico/svg, apple-touch-icon.png)
+/data/calibration/               # the blind human labels behind the judge's validation (docs/probe-l3-spec.md)
 ```
 
-## Version combo (`ModelCard.tsx`)
+## Cards and the shared scale (`app/PreviewBoard.tsx`)
 
-Not a native `<select>`: a native popup can flip open upward past the
-card's top edge and paint over the radar chart above it. It's a
-custom listbox (`VersionCombo`), anchored below the trigger only, with its
-panel height clamped via JS to whatever room is actually left in the
-viewport (scrolls instead of overflowing). The caret is an inline SVG
-chevron (`.comboCaret`, 10×10px, 1.6px stroke) — a plain `▾` text glyph
-looked too small/thin to notice regardless of `font-size`, since fonts
-render it with a lot of built-in padding around the actual triangle.
-
-## Model cards and the shared scale (`ModelCard.tsx`, `RadarChart.tsx`)
-
-One card, one model, **one chart** (since 2026-09-25; before that a separate
-vertical ruler, `GapColumn`, sat beside the radar — removed, see git
-history). The radar draws the generic HEXACO profile and, **on its H spoke**,
-up to two points: `anchored` (RF-v3, once administered) and `enacted` (L3
-primary, L2 fallback, once probed). `generic` has no marker of its own: it
-is just the polygon's H vertex (no dot since 2026-09-25, per direct
-instruction). Cross-model comparison happens by placing cards next
-to each other, never by cramming several models into one chart.
-
-- Both points use the polygon's own mapping (centre = 0, vertex = 100): one
-  scale with the polygon's H vertex. The old ruler used a stretched H-to-A
-  frame that only agreed with the radar at 0 and 100 — the reason it was
-  replaced.
-- `anchored` is a large light disc (clearly larger than `enacted`, per
-  direct instruction — same size made the ring cover it at close values),
-  `enacted` a smaller dark hollow ring drawn on top, so equal values read as
-  one inside the other. Both sit on the spoke itself.
-- The profile polygon is fill only, no outline; the **H spoke is the one
-  marked line**, full length (0 at the centre, 100 at the vertex) with ticks
-  at 50 and 100 — the ruler both points are read on.
-- **No segments on the card** (the anchored↔enacted connector was removed
-  2026-09-25, per direct instruction): the gap reads as the distance between
-  disc and ring along the marked spoke. Never anything joining `generic` to
-  `enacted`; with no `anchored` yet, `enacted` is a lone ring.
-  `delta_specificity` is not drawn on the card.
-- Legend: declared (general) is a small square in the profile's own
-  surface colour (`ProfileSwatch`, same `profileFill` as the polygon), always
-  shown; then the disc and the ring when those points exist.
-- No numbers on the card; exact signed values live in the aria label
-  (`lib/gap.ts`).
+One card per model family, alphabetical by default (rule 5), reorderable by
+its grip; a family with several versions is a deck that opens as a vertical
+column crossing the row. Two views per card: one vertical column per
+construct (declared = light disc, enacted = dark hollow ring drawn on top,
+same colours on every card, the model's hue only on its monogram and
+radar), then the HEXACO radar. No numbers on the card: exact values live in
+the aria label. A value needs `MIN_CARD_RUNS` runs to be drawn; report
+fidelity with mostly capped runs gets the off-scale "no report" mark
+(`lib/previewEnacted.mjs`, `app/page.tsx`).
 
 Constraints that make the shared scale work:
 
-- **The radar is the same size in every card and at every viewport**
-  (`.radar` in `ModelCard.module.css`, fixed 240×240 px; the grid's
-  264px minimum track in `app/page.module.css` is sized to fit it). Never size it off
-  the card's width.
-- **No truncated axis**: 0 at the centre even when every value sits near the
+- **Every card is drawn at the same size and scaled by one factor shared by
+  the row** (the chart at 240 px, the columns' 0–100 in the same viewBox
+  units on every card; compact cards use one set of sizes for all). Never
+  size a chart off its own card's width.
+- **No truncated axis**: 0 at the bottom even when every value sits near the
   top.
 
 If a card rescales on its own, placing two side by side stops being a
-comparison and becomes an optical illusion. This is the first detail lost in
-a layout refactor: **if you touch card rendering, this is the regression
-test.**
-
-The price is resolution: 0→100 on H is ~90 px, so a 21-point gap is ~19 px,
-and a low enacted value sits near the centre where the axes converge. On the
-card the chart only orients; the wide-format dumbbell (post, paper,
-/methodology) is where the gap gets measured. Known cost: a double ceiling
-(both at 100) looks like perfect agreement on the card.
+comparison and becomes an optical illusion: **if you touch card rendering,
+this is the regression test.** Known cost: a double ceiling (both at 100)
+looks like perfect agreement on the card.
 
 ## Rebuilding the DB from git (`scripts/rebuild-db.mjs`, `npm run db:rebuild`)
 
@@ -714,7 +637,8 @@ deploy config:
    comment — its UMD wrapper breaks otherwise), which means the `.wasm`
    file is loaded via a plain runtime `fs` read that Vercel's build-output
    file tracer can't see on its own. Without this, every route touching
-   the DB 500s in production with `ENOENT ... sql-wasm.wasm`.
+   the DB 500s in production with `ENOENT ... sql-wasm.wasm`. The same entry
+   ships the raw L3-v2 and re-judge files the home reads at request time.
 
 **The probes are why gotcha 1 changed.** The questionnaire stores small
 integers; a probe run produces free-text outputs — hundreds of calls per
