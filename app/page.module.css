@@ -41,7 +41,7 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding-block: 4px 10px;
+  padding-block: 4px 38px;
   scrollbar-width: none;
 }
 
@@ -229,18 +229,39 @@
   background: oklch(96% 0.005 75);
 }
 
-/* a family with several versions: the cards under the top one show as two
-   edges below it; open, it is the crossing of the row and the column */
+/* a family with several versions: one sheet under the top card per extra
+   version (data-layers, up to 3), each a little narrower and darker, so the
+   thickness reads as a count; open, it is the crossing of the row and the
+   column. The rail's bottom padding leaves room for three sheets. */
 .stage {
   position: relative;
 }
 
-.deck {
+.deck[data-layers="1"] {
   box-shadow:
-    0 4px 0 -1px #fff,
-    0 4px 0 0 oklch(86% 0.01 75),
-    0 8px 0 -3px #fff,
-    0 8px 0 -2px oklch(86% 0.01 75);
+    0 9px 0 -2px oklch(90% 0.01 75),
+    0 9px 0 -1px oklch(55% 0.015 75),
+    0 13px 10px -6px oklch(20% 0.02 75 / 0.4);
+}
+
+.deck[data-layers="2"] {
+  box-shadow:
+    0 9px 0 -2px oklch(90% 0.01 75),
+    0 9px 0 -1px oklch(55% 0.015 75),
+    0 18px 0 -4px oklch(84% 0.012 75),
+    0 18px 0 -3px oklch(55% 0.015 75),
+    0 22px 10px -6px oklch(20% 0.02 75 / 0.4);
+}
+
+.deck[data-layers="3"] {
+  box-shadow:
+    0 9px 0 -2px oklch(90% 0.01 75),
+    0 9px 0 -1px oklch(55% 0.015 75),
+    0 18px 0 -4px oklch(84% 0.012 75),
+    0 18px 0 -3px oklch(55% 0.015 75),
+    0 27px 0 -6px oklch(78% 0.014 75),
+    0 27px 0 -5px oklch(55% 0.015 75),
+    0 31px 10px -6px oklch(20% 0.02 75 / 0.4);
 }
 
 .deckOpen {

@@ -373,6 +373,8 @@ function Card({
       className={`${styles.card} ${dragging ? styles.dragging : ""} ${stacked ? (deck.open ? styles.deckOpen : styles.deck) : ""} ${onSelect ? styles.selectable : ""} ${className}`}
       aria-label={m.name}
       data-family={m.family}
+      // a closed deck shows one sheet under it per extra version, up to 3
+      data-layers={stacked && !deck.open ? Math.min(deck.count - 1, 3) : undefined}
       style={style}
       onClick={
         onSelect
