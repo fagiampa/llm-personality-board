@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "LLM Personality Board — HEXACO personality profiles for AI models";
+export const alt = "LLM Personality Board — What AI agents say vs. what they do";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -14,6 +14,7 @@ const DOTS = [
   { hue: "#d17a45", label: "CL" },
   { hue: "#5b8fd9", label: "GM" },
   { hue: "#c15fa0", label: "GR" },
+  { hue: "#7b6fd0", label: "DS" },
 ];
 
 export default function Image() {
@@ -53,10 +54,10 @@ export default function Image() {
           ))}
         </div>
         <div style={{ fontSize: 64, fontWeight: 700, color: "#2c2620", letterSpacing: -1 }}>
-          LLM Personality Board
+          What AI Agents Say vs. What They Do
         </div>
         <div style={{ fontSize: 28, color: "#6b6258", marginTop: 18 }}>
-          HEXACO personality profiles for AI models
+          LLM Personality Board · report fidelity, knowing when to stop, sticking to the evidence
         </div>
       </div>
     ),

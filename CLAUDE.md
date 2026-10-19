@@ -9,8 +9,9 @@ methodology / declared / questionnaire) and a bilingual (EN/IT) UI.
 
 **Home since 2026-10-13**: the three-construct cards (the former internal
 `/preview`, which now redirects to `/`), read from the L3-v2 pilot. Since
-2026-10-14 the home holds only the site nav, the title ("LLM Personality:
-Declared vs Enacted" / "Personalità degli LLM: Dichiarato vs Agito"), the
+2026-10-14 the home holds only the site nav (since 2026-10-19 with a GitHub
+link), the title ("What AI Agents Say vs. What They Do" / "Cosa dicono gli
+agenti AI, cosa fanno" since 2026-10-19, per direct instruction), the
 card rail and the site footer — no lede, no pilot note, no numbers table,
 per direct instruction. Since 2026-10-16, also per direct instruction, the
 rail is followed by `app/ConstructGuide.tsx`: what the three construct

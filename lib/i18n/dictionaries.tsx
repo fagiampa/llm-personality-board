@@ -3,10 +3,12 @@ import { Locale } from "./locale";
 export const dictionaries = {
   en: {
     home: {
-      metaTitle: "LLM Personality: Declared vs Enacted",
+      metaTitle: "What AI Agents Say vs. What They Do",
       metaDescription:
         "Claude, Gemini, GPT, Grok and DeepSeek rate statements about how they work, then do the work: small coding tasks, some impossible, some already done. Three gaps between declared and enacted: report fidelity, knowing when to stop, sticking to the evidence.",
-      title: "LLM Personality: Declared vs Enacted",
+      title: "What AI Agents Say vs. What They Do",
+      repoLink: "GitHub",
+      repoAriaLabel: "Source code and data on GitHub",
       aboutLink: "about this idea →",
       methodologyLink: "methodology & references →",
       declaredLink: "the declared questions →",
@@ -16,7 +18,7 @@ export const dictionaries = {
       openSource: "Open source: code Apache-2.0, data CC BY 4.0.",
     },
     about: {
-      metaTitle: "About LLM Personality Board — Declared vs Enacted",
+      metaTitle: "About LLM Personality Board — What AI Agents Say vs. What They Do",
       metaDescription:
         "The idea and the person behind LLM Personality Board: from a personality questionnaire given to language models to three behaviours, declared and enacted, measured while they work.",
       back: "← Back to the cards",
@@ -40,10 +42,12 @@ export const dictionaries = {
   },
   it: {
     home: {
-      metaTitle: "Personalità degli LLM: Dichiarato vs Agito",
+      metaTitle: "Cosa dicono gli agenti AI, cosa fanno",
       metaDescription:
         "Claude, Gemini, GPT, Grok e DeepSeek valutano affermazioni su come lavorano, poi fanno il lavoro: piccoli compiti di programmazione, alcuni impossibili, alcuni già risolti. Tre divari fra dichiarato e agito: fedeltà del report, sapersi fermare, attenersi all’evidenza.",
-      title: "Personalità degli LLM: Dichiarato vs Agito",
+      title: "Cosa dicono gli agenti AI, cosa fanno",
+      repoLink: "GitHub",
+      repoAriaLabel: "Codice e dati su GitHub",
       aboutLink: "riguardo a questa idea →",
       methodologyLink: "metodologia e riferimenti →",
       declaredLink: "le domande del dichiarato →",
@@ -53,7 +57,7 @@ export const dictionaries = {
       openSource: "Open source: codice Apache-2.0, dati CC BY 4.0.",
     },
     about: {
-      metaTitle: "Riguardo a LLM Personality Board — Dichiarato vs Agito",
+      metaTitle: "Riguardo a LLM Personality Board — Cosa dicono gli agenti AI, cosa fanno",
       metaDescription:
         "L’idea e la persona dietro LLM Personality Board: da un questionario di personalità dato ai modelli linguistici a tre comportamenti, dichiarati e agiti, misurati mentre lavorano.",
       back: "← Torna alle card",

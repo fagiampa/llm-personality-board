@@ -617,6 +617,12 @@
   text-decoration: underline;
 }
 
+.repoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 @media (max-width: 560px) {
   .siteNav {
     justify-content: flex-start;
