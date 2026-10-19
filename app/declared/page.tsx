@@ -10,8 +10,8 @@ import styles from "../questionnaire/page.module.css";
 
 // The declared side's questions: the three action-anchored banks the home
 // cards draw (app/page.tsx, DRAWN_SETS), grouped by facet, in the English
-// wording administered. Added 2026-10-18 in place of the /considerations
-// link on the home, per direct instruction. Same layout as /questionnaire.
+// wording administered. Added 2026-10-18, per direct instruction. Same
+// layout as /questionnaire.
 
 interface Item {
   id: string;

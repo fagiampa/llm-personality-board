@@ -12,7 +12,7 @@ import styles from "./page.module.css";
 // HEXACO score is no longer presented as a level of the measure ("generic"):
 // it is the starting point, kept on the cards as their second view.
 // Long-form rich content stays colocated here rather than in the shared
-// dictionary, same as /methodology and /considerations (CLAUDE.md, i18n).
+// dictionary, same as /methodology (CLAUDE.md, i18n).
 
 // Worked example: grok-4.6 as the home card shows it on 2026-10-18. Declared:
 // RF-v3 2026-09-24, GD-v1 and PF-v1 2026-10-02 (declared_anchored_runs).

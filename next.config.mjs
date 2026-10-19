@@ -28,6 +28,9 @@ const nextConfig = {
     return [
       // The three-construct board was the internal /preview until 2026-10-13.
       { source: "/preview", destination: "/", permanent: false },
+      // /considerations was removed on 2026-10-19 (per direct instruction);
+      // its closing thoughts live in /about's last section.
+      { source: "/considerations", destination: "/about", permanent: false },
       {
         source: "/:path*",
         has: [{ type: "host", value: "progetto-psycochat.vercel.app" }],

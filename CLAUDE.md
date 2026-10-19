@@ -479,7 +479,7 @@ a bigger change than this app currently does.
 `lib/i18n/dictionaries.tsx` holds shared UI chrome strings (home title and
 nav links, footer, about header). The cards' strings live in
 `app/PreviewBoard.tsx`'s `TEXT`. `/about`, `/methodology`, `/declared`,
-`/considerations`, `/questionnaire` and `app/ConstructGuide.tsx` keep their own `TEXT`/locale-keyed content colocated in their page files
+`/questionnaire` and `app/ConstructGuide.tsx` keep their own `TEXT`/locale-keyed content colocated in their page files
 instead, since they're long-form rich JSX (links, `<strong>`, `<code>`) —
 splitting that into a shared dictionary would add indirection without much
 reuse.
@@ -520,7 +520,6 @@ research.
 /app/methodology/                # methodology page (EN + IT)
 /app/questionnaire/              # full 240-item list, grouped by domain/facet (items always shown in English)
 /app/declared/                   # the declared banks the cards draw (RF-v3, GD-v1, PF-v1), by facet, in English (since 2026-10-18)
-/app/considerations/             # "further considerations" page (EN + IT) — unlinked from the home since 2026-10-18, to be revised
 /lib/previewEnacted.mjs          # the cards' enacted columns, computed from the raw L3-v2 files + re-judge files
 /lib/hexaco.ts                   # shared types (ModelScore, ProbeScore, L3ProbeScore, AnchoredScore, HEXACO labels)
 /lib/db.mjs, /lib/db.d.mts       # SQLite persistence (sql.js) + its types
@@ -653,7 +652,7 @@ hosted outside the repo if size ever becomes an issue there too).
 
 `next build` (unlike `next dev`) fails on ESLint errors, including
 `react/no-unescaped-entities` in JSX prose — ran into a backlog of these in
-`/methodology` and `/considerations` blocking a deploy; fixed with
+`/methodology` and the former `/considerations` page blocking a deploy; fixed with
 typographic quotes (`’ “ ”`) instead of straight ones. Watch for this in
 new long-form content.
 

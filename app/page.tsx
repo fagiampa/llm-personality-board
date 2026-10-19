@@ -67,7 +67,6 @@ export default async function Home() {
         <Link href="/declared" className={styles.siteLink}>
           {site.declaredLink}
         </Link>
-        {/* /considerations is unlinked since 2026-10-18 (to be revised, per direct instruction); the page still exists */}
         <Link href="/questionnaire" className={styles.siteLink}>
           {site.questionnaireLink}
         </Link>
