@@ -49,8 +49,11 @@
   display: none;
 }
 
+/* three cards in view, two gaps between them, and 10px on the right for a
+   deck's sheets (3 × --sheet + 1): less than a gap, so no sliver of the next
+   card shows */
 .rail > * {
-  flex: 0 0 calc((100% - 28px) / 3);
+  flex: 0 0 calc((100% - 28px - 10px) / 3);
   scroll-snap-align: start;
   min-width: 0;
 }
@@ -232,36 +235,47 @@
 /* a family with several versions: one sheet under the top card per extra
    version (data-layers, up to 3), each a little narrower and darker, so the
    thickness reads as a count; open, it is the crossing of the row and the
-   column. The rail's bottom padding leaves room for three sheets. */
+   column. Each sheet shows under the card and, by --sheet more per sheet,
+   on its right (2026-10-20). The rail's bottom padding leaves room for three
+   sheets, and the cards' width leaves room for them on the right of the last
+   card in view, which the rail's overflow would otherwise clip. */
 .stage {
   position: relative;
 }
 
+.deck {
+  /* x offset of sheet n: n × --sheet showing, plus the 2n−1 px its border
+     shadow's spread takes back */
+  --sx1: calc(var(--sheet, 3px) + 1px);
+  --sx2: calc(var(--sheet, 3px) * 2 + 3px);
+  --sx3: calc(var(--sheet, 3px) * 3 + 5px);
+}
+
 .deck[data-layers="1"] {
   box-shadow:
-    0 9px 0 -2px oklch(90% 0.01 75),
-    0 9px 0 -1px oklch(55% 0.015 75),
-    0 13px 10px -6px oklch(20% 0.02 75 / 0.4);
+    var(--sx1) 9px 0 -2px oklch(90% 0.01 75),
+    var(--sx1) 9px 0 -1px oklch(55% 0.015 75),
+    var(--sx1) 13px 10px -6px oklch(20% 0.02 75 / 0.4);
 }
 
 .deck[data-layers="2"] {
   box-shadow:
-    0 9px 0 -2px oklch(90% 0.01 75),
-    0 9px 0 -1px oklch(55% 0.015 75),
-    0 18px 0 -4px oklch(84% 0.012 75),
-    0 18px 0 -3px oklch(55% 0.015 75),
-    0 22px 10px -6px oklch(20% 0.02 75 / 0.4);
+    var(--sx1) 9px 0 -2px oklch(90% 0.01 75),
+    var(--sx1) 9px 0 -1px oklch(55% 0.015 75),
+    var(--sx2) 18px 0 -4px oklch(84% 0.012 75),
+    var(--sx2) 18px 0 -3px oklch(55% 0.015 75),
+    var(--sx2) 22px 10px -6px oklch(20% 0.02 75 / 0.4);
 }
 
 .deck[data-layers="3"] {
   box-shadow:
-    0 9px 0 -2px oklch(90% 0.01 75),
-    0 9px 0 -1px oklch(55% 0.015 75),
-    0 18px 0 -4px oklch(84% 0.012 75),
-    0 18px 0 -3px oklch(55% 0.015 75),
-    0 27px 0 -6px oklch(78% 0.014 75),
-    0 27px 0 -5px oklch(55% 0.015 75),
-    0 31px 10px -6px oklch(20% 0.02 75 / 0.4);
+    var(--sx1) 9px 0 -2px oklch(90% 0.01 75),
+    var(--sx1) 9px 0 -1px oklch(55% 0.015 75),
+    var(--sx2) 18px 0 -4px oklch(84% 0.012 75),
+    var(--sx2) 18px 0 -3px oklch(55% 0.015 75),
+    var(--sx3) 27px 0 -6px oklch(78% 0.014 75),
+    var(--sx3) 27px 0 -5px oklch(55% 0.015 75),
+    var(--sx3) 31px 10px -6px oklch(20% 0.02 75 / 0.4);
 }
 
 .deckOpen {
@@ -473,9 +487,11 @@
   }
   .rail {
     gap: 6px;
+    --sheet: 2px;
   }
+  /* 6px on the right for the sheets, the same as a gap */
   .rail > * {
-    flex-basis: calc((100% - 12px) / 3);
+    flex-basis: calc((100% - 12px - 6px) / 3);
   }
   .nav {
     width: 26px;
