@@ -1,7 +1,7 @@
 // Runs the L3 behavioural probe (docs/probe-l3-spec.md) against one real
 // model per configured provider and writes the result to the SQLite DB
 // (lib/db.mjs, probe_l3_runs + probe_l3_call_repeats) plus the full raw
-// transcripts to data/probe-raw/<date>/<model>/L3-v1.jsonl (never into the
+// transcripts to data/probe-raw/<date>/<model>/<set>-<stamp>.jsonl (never into the
 // DB — see CLAUDE.md's "Deployment").
 //
 // Usage: npm run probe-l3   (reads API keys from .env via `node --env-file`)
@@ -20,9 +20,8 @@
 // record written here.
 //
 // PROBE_L3_ONLY=ModelName limits the run the same way PROBE_ONLY does for
-// scripts/probe.mjs. Before scaling to the full 30-scenario set, run the
-// pilot the spec calls for: PROBE_L3_SET_VERSION=L3-v1 PROBE_L3_REPEATS=5
-// PROBE_L3_ONLY=Claude,ChatGPT npm run probe-l3
+// scripts/probe.mjs. The defaults (L3-v2, 5 repeats) are the cards' set;
+// PROBE_L3_SET_VERSION=L3-v1 runs the earlier one.
 
 import { mkdir, appendFile, writeFile } from "node:fs/promises";
 import path from "node:path";

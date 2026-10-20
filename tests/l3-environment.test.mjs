@@ -6,9 +6,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createEnvironment } from "../lib/l3Environment.mjs";
 import { loadL3Scenarios } from "../lib/l3Scenarios.mjs";
-import { PROBE_L3_SET_VERSION } from "../lib/probeL3Config.mjs";
 
-const scenarios = await loadL3Scenarios(PROBE_L3_SET_VERSION);
+// L3-v1 on purpose: these tests pin its single-branch scenario, whatever the
+// default set in lib/probeL3Config.mjs is.
+const scenarios = await loadL3Scenarios("L3-v1");
 const scenario = scenarios[0];
 
 test("failing condition: run_tests reports the baseline before any write", () => {

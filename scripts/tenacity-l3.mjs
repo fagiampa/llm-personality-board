@@ -25,7 +25,11 @@ import path from "node:path";
 import initSqlJs from "sql.js";
 import { hashTranscript } from "../lib/l3Aggregate.mjs";
 import { loadL3Scenarios, testFilePathsFor } from "../lib/l3Scenarios.mjs";
-import { PROBE_L3_SET_VERSION, PUBLISHED_L3_RUBRIC, isCompleteL3Run } from "../lib/probeL3Config.mjs";
+import { PROBE_L3_SET_SIZES, PUBLISHED_L3_RUBRIC } from "../lib/probeL3Config.mjs";
+
+// An analysis of L3-v1 (axis-map E8/E9), pinned to it: the default set moved
+// to L3-v2 on 2026-10-20.
+const PROBE_L3_SET_VERSION = "L3-v1";
 import { L3_TOOLS } from "../lib/l3Agent.mjs";
 import { estimateCostUsd } from "../lib/pricing.mjs";
 
@@ -158,7 +162,7 @@ async function main() {
     const prev = shown.get(r.model_version);
     if (!prev || r.assessed_at > prev.assessed_at) shown.set(r.model_version, r);
   }
-  const records = [...shown.values()].filter((r) => isCompleteL3Run(r.probe_id, r.scenario_count)).sort((a, b) => a.model_version.localeCompare(b.model_version));
+  const records = [...shown.values()].filter((r) => r.scenario_count >= PROBE_L3_SET_SIZES[PROBE_L3_SET_VERSION]).sort((a, b) => a.model_version.localeCompare(b.model_version));
 
   const rowsByHash = new Map();
   for (const f of walk("data/probe-raw").filter((f) => f.endsWith(".jsonl") && !f.includes(".judge-batch"))) {

@@ -30,8 +30,8 @@ What each column measures, with an example, is under the cards on the site; the 
 Everything is preliminary, and the limits are stated on the site
 ([Known limits](https://aipersonality.org/methodology#limits)):
 
-- three scenarios (L3-v2, not frozen yet), 15 runs per behaviour per model: 15 out of 15 is compatible with a true
-  rate as low as 78%
+- three scenarios (L3-v2, not frozen yet), at most 15 runs per behaviour per model: 15 out of 15 is compatible with
+  a true rate as low as 78%
 - four of the nine models reach 100 on every column: at the top the instrument saturates, harder scenarios are the
   next step
 - report fidelity is labelled by one judge model (`gpt-6-astra`), checked against a single blind human rater
@@ -67,9 +67,9 @@ order matters:
 2. `npm run declared`: one action-anchored bank per run (`DECLARED_ITEM_SET_VERSION`: `RF-v3`, `GD-v1`, `PF-v1`
    are on the cards). Always in its **own session**, never in the same conversation as the task: the items describe
    the task's situations, and sharing a session is priming.
-3. `npm run probe-l3`: the agentic task. The cards use `PROBE_L3_SET_VERSION=L3-v2` with `PROBE_L3_REPEATS=5`
-   (the code defaults are still `L3-v1` and 8). The judge runs as an OpenAI batch: `npm run probe-l3:collect`
-   writes the record once the batch is done.
+3. `npm run probe-l3`: the agentic task. The defaults are the cards' set, `L3-v2`, at 5 repeats
+   (`PROBE_L3_SET_VERSION=L3-v1` runs the earlier set). The judge runs as an OpenAI batch:
+   `npm run probe-l3:collect` writes the record once the batch is done.
 
 Each script can be scoped to one model family (`ASSESS_ONLY=Claude`, `DECLARED_ONLY=…`, `PROBE_L3_ONLY=…`). After a
 run, `npm run export-raw` writes the new data under `data/`, so it can be committed and rebuilt by anyone.

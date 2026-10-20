@@ -26,7 +26,6 @@ import {
 import { anthropicSamplingParams, isAlwaysThinkingClaude } from "../lib/providers.mjs";
 import { createEnvironment } from "../lib/l3Environment.mjs";
 import { loadL3Scenarios } from "../lib/l3Scenarios.mjs";
-import { PROBE_L3_SET_VERSION } from "../lib/probeL3Config.mjs";
 
 // A history where one assistant turn makes three tool calls — the shape
 // that exposed the grouping bug.
@@ -169,7 +168,8 @@ test("openAIMessagesFromHistory: passes back reasoning_content (DeepSeek thinkin
 
 // --- Generic loop, via a fake injected driver (no client, no network) ---
 
-const scenarios = await loadL3Scenarios(PROBE_L3_SET_VERSION);
+// L3-v1 on purpose: the loop tests below script its single-branch scenario.
+const scenarios = await loadL3Scenarios("L3-v1");
 const scenario = scenarios[0];
 
 function fakeDriver(steps) {
