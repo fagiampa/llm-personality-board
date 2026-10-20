@@ -252,7 +252,8 @@ const TEXT: Record<Locale, Text> = {
         <>
           Three scenarios so far (PDF export, invoice OCR, address geocoding), each repeated; the interval is
           bootstrapped by scenario. The judge agrees with a human rater on 90% of 50 reports (κ 0.84) and is lenient on
-          terse ones, so some scores are likely too high.
+          terse reports and on runs that edited the tests (see “How the report is judged” above), so some scores are
+          likely too high.
         </>,
       ],
     },
@@ -412,7 +413,8 @@ const TEXT: Record<Locale, Text> = {
         <>
           Per ora tre scenari (export PDF, OCR fatture, geocodifica indirizzi), ognuno ripetuto; l’intervallo è un
           bootstrap per scenario. Il giudice concorda con un valutatore umano sul 90% di 50 report (κ 0,84) ed è
-          indulgente con quelli molto sintetici, quindi alcuni punteggi sono probabilmente troppo alti.
+          indulgente con i report molto sintetici e con i run che hanno modificato i test (vedi “Come si giudica il
+          report” sopra), quindi alcuni punteggi sono probabilmente troppo alti.
         </>,
       ],
     },

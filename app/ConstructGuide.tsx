@@ -25,7 +25,7 @@ const TEXT: Record<Locale, { title: string; intro: string[]; exampleLabel: strin
     intro: [
       "Ogni card mette a confronto, per tre comportamenti, ciò che il modello dice di fare e ciò che fa davvero. Il punto chiaro è il dichiarato: il modello risponde a 12 affermazioni su azioni concrete (da 1 a 5), in una sessione separata. Il cerchio scuro è l’agito: il modello lavora con degli strumenti (leggere e scrivere file, lanciare i test) su un piccolo progetto software, 15 volte per comportamento, e si guarda cosa ha fatto davvero.",
       "La scala va da 0 a 100: 100 vuol dire che il comportamento si vede ogni volta. La distanza fra i due punti è il gap. I tre comportamenti restano separati: non si sommano e non fanno una classifica.",
-      "I numeri sono preliminari. Ogni agito poggia su 15 run: 15 su 15 è compatibile con un tasso reale anche del 78% (intervallo al 95%), quindi pochi punti di differenza fra due card non vogliono dire niente. E quattro dei nove modelli arrivano a 100 su tutte e tre le colonne: in cima, questi scenari non li distinguono più. Il prossimo passo sono scenari più difficili.",
+      "I numeri sono preliminari. Ogni agito poggia su 15 run al massimo (meno quando un run si chiude senza report o si perde per un errore dell’API): 15 su 15 è compatibile con un tasso reale anche del 78% (intervallo al 95%), quindi pochi punti di differenza fra due card non vogliono dire niente. E quattro dei nove modelli arrivano a 100 su tutte e tre le colonne: in cima, questi scenari non li distinguono più. Il prossimo passo sono scenari più difficili.",
     ],
     exampleLabel: "Esempio",
     goodLabel: "Sì",
@@ -68,7 +68,7 @@ const TEXT: Record<Locale, { title: string; intro: string[]; exampleLabel: strin
     intro: [
       "For three behaviours, each card sets what the model says it does against what it actually does. The light disc is declared: the model rates 12 statements about concrete actions (1 to 5), in a separate session. The dark ring is enacted: the model works with tools (reading and writing files, running the tests) on a small software project, 15 times per behaviour, and what it actually did is checked.",
       "The scale runs from 0 to 100: 100 means the behaviour shows every time. The distance between the two points is the gap. The three behaviours stay separate: they are never added up or ranked.",
-      "The numbers are preliminary. Each enacted value rests on 15 runs: 15 out of 15 is compatible with a true rate as low as 78% (95% interval), so a few points between two cards mean nothing. And four of the nine models reach 100 on all three columns: at the top, these scenarios no longer tell them apart. Harder scenarios are the next step.",
+      "The numbers are preliminary. Each enacted value rests on at most 15 runs (fewer when a run ends without a report or is lost to an API error): 15 out of 15 is compatible with a true rate as low as 78% (95% interval), so a few points between two cards mean nothing. And four of the nine models reach 100 on all three columns: at the top, these scenarios no longer tell them apart. Harder scenarios are the next step.",
     ],
     exampleLabel: "Example",
     goodLabel: "Yes",

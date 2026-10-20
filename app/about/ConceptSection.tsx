@@ -324,8 +324,8 @@ const TEXT: Record<Locale, Text> = {
           body: (
             <>
               <strong>continuo, aperto, agentico, con il dichiarato accanto all’agito</strong> e il costo dell’onestà che
-              cresce — non l’abbiamo trovato altrove, e gli autori di <em>Rethinking</em> indicano l’uso agentico degli strumenti come
-              inesplorato.
+              cresce — non l’abbiamo trovato altrove, e gli autori di <em>Rethinking</em> lasciano aperta la questione dell’uso
+              degli strumenti su più turni.
             </>
           ),
           dark: true,
@@ -347,12 +347,12 @@ const TEXT: Record<Locale, Text> = {
           ancorati a scale fisse, mai normalizzati rispetto ai modelli che di volta in volta sono nel campione.
         </>,
         <>
-          I numeri sono preliminari e dichiarati con i loro limiti: tre coppie di scenari, 15 run per comportamento, un
+          I numeri sono preliminari e dichiarati con i loro limiti: tre coppie di scenari, al massimo 15 run per comportamento, un
           set non ancora congelato; ogni modello al suo livello di ragionamento di default. Quattro modelli su nove
           arrivano a 100 su tutte e tre le colonne: in cima lo strumento satura, e servono scenari più difficili. Il
           giudice è stato confrontato alla cieca con un solo valutatore umano (κ 0,84 su 50 report) ed è indulgente,
           quindi la fedeltà del report pubblicata è un tetto, non un valore esatto. Il giudice è di OpenAI: i modelli OpenAI sono stati giudicati una
-          seconda volta da un modello di un’altra famiglia, con le stesse etichette sulla fedeltà del report. Ogni transcript, ogni risposta e ogni
+          seconda volta da un modello di un’altra famiglia, e le etichette sulla fedeltà del report sono rimaste le stesse. Ogni transcript, ogni risposta e ogni
           etichetta sono pubblicati nella cartella <code>data/</code> del repository, così ogni numero qui si può
           verificare — o contestare.
         </>,
@@ -600,7 +600,8 @@ const TEXT: Record<Locale, Text> = {
           body: (
             <>
               <strong>continuous, open, agentic, with the declared side next to the enacted one</strong> and a rising cost
-              of honesty — we haven’t found it elsewhere, and the <em>Rethinking</em> authors list agentic tool use as unexplored.
+              of honesty — we haven’t found it elsewhere, and the <em>Rethinking</em> authors leave tool use over many turns as an open
+              question.
             </>
           ),
           dark: true,
@@ -621,12 +622,12 @@ const TEXT: Record<Locale, Text> = {
           whichever models happen to be in the sample.
         </>,
         <>
-          The numbers are preliminary and stated with their limits: three scenario pairs, 15 runs per behaviour, a set
+          The numbers are preliminary and stated with their limits: three scenario pairs, at most 15 runs per behaviour, a set
           not yet frozen; every model at its default reasoning level. Four models out of nine reach 100 on all three
           columns: at the top the instrument saturates, and harder scenarios are needed. The judge was checked blind
           against a single human rater (κ 0.84 on 50 reports) and is lenient, so the published report fidelity is a
           ceiling, not an exact value. The
-          judge is OpenAI’s: the OpenAI models were judged a second time by a model from another family, with the same
+          judge is OpenAI’s: the OpenAI models were judged a second time by a model from another family, and got the same
           report-fidelity labels. Every transcript, every answer and every label is published in the repository’s <code>data/</code>{" "}
           folder, so any number here can be checked — or disputed.
         </>,
