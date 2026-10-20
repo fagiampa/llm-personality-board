@@ -399,9 +399,9 @@ function Card({
             }
           }}
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 12 12" aria-hidden="true">
             <g fill="currentColor">
-              {[2.5, 6, 9.5].flatMap((cy) => [3, 9].map((cx) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={1.3} />))}
+              {[2.5, 6, 9.5].flatMap((cy) => [3, 9].map((cx) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={1.5} />))}
             </g>
           </svg>
         </button>
