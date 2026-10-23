@@ -84,7 +84,11 @@ purpose (fabricated scores must never be attributed to real products).
 - **Persistence**: SQLite via `sql.js` (WASM, no native build step) in
   `lib/db.mjs` — see below.
 - **LLM providers**: `@anthropic-ai/sdk`, `openai` (also reused for xAI/Grok
-  and DeepSeek, both OpenAI-compatible), `@google/generative-ai`.
+  and DeepSeek, both OpenAI-compatible), `@google/generative-ai`. Since
+  2026-10-23 also `local`: any OpenAI-compatible server (`LOCAL_BASE_URL`,
+  `LOCAL_MODEL`, `LOCAL_NAME`), in `MODEL_CONFIG` only when `LOCAL_MODEL` is
+  set; tested against a fake server in `tests/local-provider.test.mjs`, not
+  yet run against a real local model.
 - **i18n**: custom, no library — locale resolved from the browser's
   `Accept-Language` header, no manual switcher. See `lib/i18n/`.
 - **Hosting**: Vercel — live at https://aipersonality.org (deployed with

@@ -74,6 +74,14 @@ order matters:
 Each script can be scoped to one model family (`ASSESS_ONLY=Claude`, `DECLARED_ONLY=…`, `PROBE_L3_ONLY=…`). After a
 run, `npm run export-raw` writes the new data under `data/`, so it can be committed and rebuilt by anyone.
 
+**Local models.** Any OpenAI-compatible server works (llama.cpp's `llama-server --jinja`, Ollama, vLLM, LM Studio):
+set `LOCAL_BASE_URL`, `LOCAL_MODEL` and `LOCAL_NAME` (the card's name) in `.env`, then run the same three steps with
+`ASSESS_ONLY`/`DECLARED_ONLY`/`PROBE_L3_ONLY` set to that name. The server must support tool calling. The judge for
+report fidelity still runs on OpenAI (`OPENAI_API_KEY`), while knowing when to stop and sticking to the evidence are
+read from the log. To stay fully offline, `PROBE_L3_JUDGE_PROVIDER=local PROBE_L3_JUDGE_MODE=sync PROBE_L3_JUDGE_MODEL=<id>` sends the judge to
+the local server too, but report fidelity is then judged by a different instrument and can't be compared with the
+cards. No reasoning level is pinned for a local model: it runs as the server and its chat template set it up.
+
 The agentic task resends a growing conversation every turn, so costs add up on large models. Debug with the fake
 driver in `tests/l3-agent.test.mjs`, not with paid calls.
 

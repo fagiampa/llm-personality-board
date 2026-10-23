@@ -195,7 +195,9 @@ async function probeModel(config, scenarios, judgeCallModel, rawLogPath) {
         await appendFile(
           rawLogPath,
           JSON.stringify({
-            modelVersion: config.model,
+            // The same string as the record's model_version: the home joins
+            // the raw rows to the declared runs on it (app/page.tsx).
+            modelVersion: displayModelVersion(config.model),
             scenarioId: scenario.id,
             canary: scenario.canary,
             condition,
