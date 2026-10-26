@@ -184,6 +184,10 @@ async function assessModel(config, items, callBatch) {
 
       const parsed = parseBatchResponse(text, batch);
       const missing = parsed.filter((p) => p.raw === null);
+      // A run on a slow reasoning model (kimi-k3.1-pro at max: ~60 s a batch)
+      // otherwise prints nothing between start and end, and a hung call
+      // can't be told from a slow one.
+      console.log(`  [${config.name}] rep ${rep + 1} batch ${b + 1}/${batches.length}: ${batch.length - missing.length}/${batch.length} answers`);
       if (missing.length > batch.length / 2) {
         // Losing more than half a batch is a systemic issue (empty/truncated
         // response, wrong format entirely), not per-line noise — the raw
