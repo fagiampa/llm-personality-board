@@ -24,6 +24,13 @@ test("an outage longer than the retries is waited out, attempts untouched", asyn
   assert.equal(waits.length, 3);
 });
 
+test("the openai SDK's connection errors count as an outage too", async () => {
+  const { fn, calls } = failing(["Connection error.", "Request timed out.", "Connection error."]);
+  const networkWait = async () => "recovered";
+  assert.equal(await withRetries(fn, { label: "t", networkWait }), "ok");
+  assert.equal(calls(), 4);
+});
+
 test("a network that answers at once is not an outage: plain retries apply", async () => {
   const { fn } = failing(["fetch failed", "fetch failed", "fetch failed"]);
   const networkWait = async () => "up";
