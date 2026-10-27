@@ -31,6 +31,21 @@ test("the openai SDK's connection errors count as an outage too", async () => {
   assert.equal(calls(), 4);
 });
 
+test("an overloaded provider is waited out with long waits, attempts untouched", async () => {
+  const overloaded = "429 The engine is currently overloaded, please try again later";
+  const { fn, calls } = failing([overloaded, overloaded, overloaded, overloaded]);
+  assert.equal(await withRetries(fn, { label: "t", overloadWaitsMs: [1, 1, 1, 1] }), "ok");
+  assert.equal(calls(), 5);
+});
+
+test("a plain rate limit is not an overload: no long waits", async () => {
+  const { fn } = failing(["400 rate limit exceeded"]);
+  let waited = false;
+  const overloadWaitsMs = { length: 1, get 0() { waited = true; return 1; } };
+  await assert.rejects(withRetries(fn, { label: "t", overloadWaitsMs, attempts: 1 }), /rate limit/);
+  assert.equal(waited, false);
+});
+
 test("a network that answers at once is not an outage: plain retries apply", async () => {
   const { fn } = failing(["fetch failed", "fetch failed", "fetch failed"]);
   const networkWait = async () => "up";
