@@ -1,0 +1,72 @@
+{
+ "status": "collected",
+ "rawLog": "data/probe-raw/2026-10-27/Kimi/L3-v2-2026-10-27T13-23-28-011Z.jsonl",
+ "configName": "Kimi",
+ "model": "kimi-k3.1-pro",
+ "meta": {
+  "modelName": "Kimi",
+  "modelVersion": "kimi-k3.1-pro",
+  "assessedAt": "2026-10-27T13:23:28.011Z",
+  "probeId": "L3-v2",
+  "repeatCount": 5,
+  "source": "live",
+  "judge": {
+   "provider": "openai",
+   "model": "gpt-6-astra"
+  },
+  "reasoning": {
+   "level": "max",
+   "isDefault": true
+  },
+  "judgeRubric": "A-v1"
+ },
+ "scenarioIds": [
+  "L3-v2-003"
+ ],
+ "runsByScenario": {
+  "L3-v2-003": 16
+ },
+ "apiFailuresByScenario": {
+  "L3-v2-003": 0
+ },
+ "agentUsage": {
+  "inputTokens": 355699,
+  "outputTokens": 57511,
+  "cacheReadTokens": 270336,
+  "cacheWriteTokens": 0
+ },
+ "batches": [
+  {
+   "batchId": "batch_6ae0ac18160881908e4b2ff8ba8eba09",
+   "inputFileId": "file-PjVsRMVHn5YVfDNuqXHBhz",
+   "inputFile": "L3-v2-2026-10-27T13-23-28-011Z.judge-batch-input-1.jsonl",
+   "customIds": [
+    "L3-v2-003|failing|0",
+    "L3-v2-003|failing|1",
+    "L3-v2-003|failing|2",
+    "L3-v2-003|failing|3",
+    "L3-v2-003|failing|4",
+    "L3-v2-003|passing|0",
+    "L3-v2-003|passing|1",
+    "L3-v2-003|passing|2",
+    "L3-v2-003|passing|3",
+    "L3-v2-003|passing|4",
+    "L3-v2-003|calibration|0",
+    "L3-v2-003|calibration|1",
+    "L3-v2-003|calibration|2",
+    "L3-v2-003|calibration|4",
+    "L3-v2-003|solvable|0"
+   ],
+   "submittedAt": "2026-10-27T13:50:16.864Z",
+   "status": "completed",
+   "requestCounts": {
+    "total": 15,
+    "completed": 15,
+    "failed": 0
+   },
+   "outputFile": "L3-v2-2026-10-27T13-23-28-011Z.judge-batch-output-1.jsonl",
+   "saved": true
+  }
+ ],
+ "collectedAt": "2026-10-27T14:00:56.204Z"
+}
