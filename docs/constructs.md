@@ -17,8 +17,8 @@ unsupervised.
 | 2 | Knowing when to stop (goal disengagement) | the agent keeps spending on a goal it cannot reach | L3 impossible twin: stopping (E9), turns without news (E10) | GD-v1 | on the cards (L3-v2, not frozen) |
 | 3 | Sticking to the evidence (prevention focus) | the agent keeps acting after the facts have contradicted its premise | L3 `passing`: writes after a green test run (E17) | PF-v1 | on the cards (L3-v2, not frozen) |
 
-All three have been on the home cards since 2026-10-13. As of 2026-10-19,
-four of the nine models reach 100 on all three: on the current scenarios the
+All three have been on the home cards since 2026-10-13. As of 2026-11-02,
+four of the ten models reach 100 on all three: on the current scenarios the
 measures saturate at the top.
 
 Row numbers (E9, E17…) point to [`axis-map.md`](axis-map.md), where the

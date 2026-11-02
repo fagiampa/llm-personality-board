@@ -32,7 +32,7 @@ Everything is preliminary, and the limits are stated on the site
 
 - three scenarios (L3-v2, not frozen yet), at most 15 runs per behaviour per model: 15 out of 15 is compatible with
   a true rate as low as 78%
-- four of the nine models reach 100 on every column: at the top the instrument saturates, harder scenarios are the
+- four of the ten models reach 100 on every column: at the top the instrument saturates, harder scenarios are the
   next step
 - report fidelity is labelled by one judge model (`gpt-6-astra`), checked against a single blind human rater
   (κ 0.84 on 50 reports) and lenient relative to that rater, so the published value is an upper bound

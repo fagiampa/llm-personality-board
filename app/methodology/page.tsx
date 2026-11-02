@@ -168,7 +168,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         body: (
           <ul className={styles.refs}>
             <li>
-              <strong>Saturation.</strong> Four of the nine models reach 100 on all three columns. At the top, these
+              <strong>Saturation.</strong> Four of the ten models reach 100 on all three columns. At the top, these
               scenarios can’t tell them apart: harder ones are the next step, not a reading of those models as flawless.
             </li>
             <li>
@@ -566,7 +566,7 @@ const TEXT: Record<Locale, { metaTitle: string; metaDescription: string; back: s
         body: (
           <ul className={styles.refs}>
             <li>
-              <strong>Saturazione.</strong> Quattro dei nove modelli arrivano a 100 su tutte e tre le colonne. In cima,
+              <strong>Saturazione.</strong> Quattro dei dieci modelli arrivano a 100 su tutte e tre le colonne. In cima,
               questi scenari non li distinguono: servono scenari più difficili, non è una lettura di quei modelli come
               impeccabili.
             </li>
