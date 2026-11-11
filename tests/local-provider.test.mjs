@@ -4,7 +4,7 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { displayModelVersion, CLIENT_FACTORIES } from "../lib/providers.mjs";
+import { displayModelVersion, CLIENT_FACTORIES, endpointRecord } from "../lib/providers.mjs";
 import { AGENTIC_DRIVER_FACTORIES } from "../lib/l3Agent.mjs";
 
 const requests = [];
@@ -24,6 +24,19 @@ const server = createServer((req, res) => {
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 process.env.LOCAL_BASE_URL = `http://127.0.0.1:${server.address().port}/v1`;
 delete process.env.LOCAL_API_KEY;
+delete process.env.LOCAL_PROVIDER_ONLY;
+
+// Sets LOCAL_PROVIDER_ONLY for one test only, so the others see it unset.
+async function withPin(value, fn) {
+  process.env.LOCAL_PROVIDER_ONLY = value;
+  try {
+    await fn();
+  } finally {
+    delete process.env.LOCAL_PROVIDER_ONLY;
+  }
+}
+
+const PINNED = { only: ["deepinfra/bf16"], allow_fallbacks: false, require_parameters: true };
 after(() => server.close());
 
 test("displayModelVersion: local ids become safe directory names, API ids don't move", () => {
@@ -46,6 +59,7 @@ test("local client: calls LOCAL_BASE_URL with a placeholder key, never the OpenA
     assert.equal(r.auth, "Bearer not-needed");
     assert.equal(r.body.model, "qwen3:8b");
     assert.equal(r.body.reasoning_effort, undefined);
+    assert.equal(r.body.provider, undefined, "no pin set: no routing field sent");
   } finally {
     if (saved === undefined) delete process.env.OPENAI_API_KEY;
     else process.env.OPENAI_API_KEY = saved;
@@ -59,6 +73,39 @@ test("local L3 driver: sends the tools and parses the tool call", async () => {
   const r = requests.at(-1);
   assert.ok(r.body.tools.some((t) => t.function.name === "run_tests"));
   assert.equal(r.body.messages[0].role, "system");
+  assert.equal(r.body.provider, undefined, "no pin set: no routing field sent");
+});
+
+test("LOCAL_PROVIDER_ONLY: the plain client sends the pin with fallbacks off", async () => {
+  await withPin(" deepinfra/bf16 ", async () => {
+    await CLIENT_FACTORIES.local()("Rate 1-5.", "qwen/qwen3.8-27b", { maxTokens: 100 });
+    assert.deepEqual(requests.at(-1).body.provider, PINNED);
+  });
+});
+
+test("LOCAL_PROVIDER_ONLY: the L3 driver sends the same pin on every turn", async () => {
+  await withPin("deepinfra/bf16", async () => {
+    const driver = AGENTIC_DRIVER_FACTORIES.local("qwen/qwen3.8-27b", { maxTokens: 100, temperature: 1 });
+    await driver.step([{ role: "user", content: "Fix the build." }], "You are a developer.");
+    await driver.step([{ role: "user", content: "Fix the build." }], "You are a developer.");
+    assert.deepEqual(requests.at(-2).body.provider, PINNED);
+    assert.deepEqual(requests.at(-1).body.provider, PINNED);
+  });
+});
+
+test("LOCAL_PROVIDER_ONLY: comma-separated slugs, blanks dropped", async () => {
+  await withPin("z-ai/fp8, ,novita/bf16", async () => {
+    await CLIENT_FACTORIES.local()("Rate 1-5.", "z-ai/glm-5.3", { maxTokens: 100 });
+    assert.deepEqual(requests.at(-1).body.provider.only, ["z-ai/fp8", "novita/bf16"]);
+  });
+});
+
+test("endpointRecord: the pin goes into the raw rows, for local models only", async () => {
+  assert.deepEqual(endpointRecord({ provider: "local" }), {}, "nothing pinned: nothing recorded");
+  await withPin("deepinfra/bf16", async () => {
+    assert.deepEqual(endpointRecord({ provider: "local" }), { endpoint: { baseUrl: process.env.LOCAL_BASE_URL, only: ["deepinfra/bf16"] } });
+    assert.deepEqual(endpointRecord({ provider: "deepseek" }), {}, "another provider never carries a local pin");
+  });
 });
 
 test("local client: a missing LOCAL_BASE_URL fails loudly", () => {

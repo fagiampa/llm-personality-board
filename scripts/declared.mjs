@@ -28,7 +28,7 @@ import {
   DECLARED_ITEM_SET_VERSION,
   DECLARED_BATCH_SIZE as BATCH_SIZE,
 } from "../lib/declaredConfig.mjs";
-import { MODEL_CONFIG, CLIENT_FACTORIES, DELAY_MS_BY_PROVIDER, withRetries, displayModelVersion, sleep } from "../lib/providers.mjs";
+import { MODEL_CONFIG, CLIENT_FACTORIES, DELAY_MS_BY_PROVIDER, withRetries, displayModelVersion, sleep, endpointRecord, localEndpointPins } from "../lib/providers.mjs";
 
 const ONLY = process.env.DECLARED_ONLY
   ? new Set(process.env.DECLARED_ONLY.split(",").map((s) => s.trim()).filter(Boolean))
@@ -171,6 +171,7 @@ async function administerToModel(config, items, bank, callBatch, rawLogPath, ass
           answers: parsed.map(({ item, raw }) => ({ itemId: item.id, reverse: item.reverse, value: raw })),
           responseText: result.text,
           reasoning: reasoningRecord(config.model),
+          ...endpointRecord(config),
           source: "live",
         }) + "\n"
       );
@@ -241,7 +242,7 @@ async function main() {
       continue;
     }
 
-    console.log(`Administering ${DECLARED_ITEM_SET_VERSION} to ${config.name} via ${config.provider} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${items.length} items x ${REPEATS} repeats...`);
+    console.log(`Administering ${DECLARED_ITEM_SET_VERSION} to ${config.name} via ${config.provider}${config.provider === "local" && localEndpointPins().length ? ` pinned to ${localEndpointPins().join(", ")}` : ""} (${config.model}, ${describeReasoning(reasoningRecord(config.model))}) — ${items.length} items x ${REPEATS} repeats...`);
     try {
       const callBatch = CLIENT_FACTORIES[config.provider]();
       const rawDir = path.resolve(`data/declared-raw/${assessedAt.slice(0, 10)}/${config.name}`);

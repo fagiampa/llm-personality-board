@@ -88,7 +88,10 @@ purpose (fabricated scores must never be attributed to real products).
   2026-10-23 also `local`: any OpenAI-compatible server (`LOCAL_BASE_URL`,
   `LOCAL_MODEL`, `LOCAL_NAME`), in `MODEL_CONFIG` only when `LOCAL_MODEL` is
   set; tested against a fake server in `tests/local-provider.test.mjs`, not
-  yet run against a real local model.
+  yet run against a real local model. Through a router (OpenRouter),
+  `LOCAL_PROVIDER_ONLY` pins the serving endpoint (`provider[/variant]` slugs,
+  fallbacks off) and is recorded as `endpoint` in the probe-l3 and declared
+  raw rows; assess only logs it.
 - **i18n**: custom, no library — locale resolved from the browser's
   `Accept-Language` header, no manual switcher. See `lib/i18n/`.
 - **Hosting**: Vercel — live at https://aipersonality.org (deployed with

@@ -34,6 +34,7 @@ import {
   withRetries,
   displayModelVersion,
   sleep,
+  localEndpointPins,
 } from "../lib/providers.mjs";
 
 const ITEMS_PATH = "items/sample/json/items.sample.json";
@@ -298,7 +299,7 @@ async function main() {
       continue;
     }
 
-    console.log(`Assessing ${config.name} via ${config.provider} (${config.model})...`);
+    console.log(`Assessing ${config.name} via ${config.provider}${config.provider === "local" && localEndpointPins().length ? ` pinned to ${localEndpointPins().join(", ")}` : ""} (${config.model})...`);
     try {
       clients[config.provider] ??= CLIENT_FACTORIES[config.provider]();
       const {
