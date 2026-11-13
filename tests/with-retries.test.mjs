@@ -31,6 +31,12 @@ test("the openai SDK's connection errors count as an outage too", async () => {
   assert.equal(calls(), 4);
 });
 
+test("undici's 'terminated' (stream cut mid-body) is retried, not thrown at once", async () => {
+  const { fn, calls } = failing(["terminated"]);
+  assert.equal(await withRetries(fn, { label: "t", networkWait: async () => "up" }), "ok");
+  assert.equal(calls(), 2);
+});
+
 test("an overloaded provider is waited out with long waits, attempts untouched", async () => {
   const overloaded = "429 The engine is currently overloaded, please try again later";
   const { fn, calls } = failing([overloaded, overloaded, overloaded, overloaded]);
