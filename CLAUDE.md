@@ -95,7 +95,7 @@ purpose (fabricated scores must never be attributed to real products).
 - **i18n**: custom, no library — locale resolved from the browser's
   `Accept-Language` header, no manual switcher. See `lib/i18n/`.
 - **Hosting**: Vercel — live at https://aipersonality.org (deployed with
-  `vercel --prod` from a local checkout, see "Deployment").
+  `vercel --prod --force` from a local checkout, see "Deployment").
 - **Source**: public GitHub repo; code Apache-2.0, data CC BY 4.0.
 
 ## Data model (`lib/hexaco.ts`)
@@ -627,7 +627,7 @@ for the model first.
 
 ## Deployment (Vercel)
 
-Two gotchas that cost real debugging time, worth knowing before touching
+Three gotchas that cost real debugging time, worth knowing before touching
 deploy config:
 
 1. **`data/psychochat.sqlite` is gitignored but explicitly kept out of
@@ -637,7 +637,7 @@ deploy config:
    deploy without ever entering git history. Updating live data means:
    `npm run assess` (and/or `declared`/`probe`/`probe-l3`) locally →
    `npm run export-raw` (so `data/` and the DB stay in step, and a clone can
-   rebuild it) → commit → `vercel --prod`. This was a straight tracked-in-git file earlier in the
+   rebuild it) → commit → `vercel --prod --force` (gotcha 3). This was a straight tracked-in-git file earlier in the
    project; it moved to this scheme once the probes started producing much
    larger runs than the questionnaire ever did (see the note below).
 2. **`next.config.mjs`'s `outputFileTracingIncludes`** forces
@@ -648,6 +648,16 @@ deploy config:
    file tracer can't see on its own. Without this, every route touching
    the DB 500s in production with `ENOENT ... sql-wasm.wasm`. The same entry
    ships the raw L3-v2 and re-judge files the home reads at request time.
+3. **Always deploy with `vercel --prod --force`** (skips Vercel's build
+   cache). On 2026-11-14 a plain `vercel --prod` restored the previous
+   deployment's build cache and shipped mismatched output: `<html>` carried
+   the new `next/font` classes (`__variable_5e81af __variable_4b3a31`) while
+   the CSS still defined `--font-heading`/`--font-body` only under the old
+   ones (`.__variable_6b9622 .__variable_43f867`), so every page fell back to
+   the browser's default serif. After a deploy, check that each
+   `__variable_*` class on `<html>` is defined in the page's
+   `/_next/static/css/*.css`. Older deployments sit behind Vercel
+   Authentication: read them with `vercel curl`.
 
 **The probes are why gotcha 1 changed.** The questionnaire stores small
 integers; a probe run produces free-text outputs — hundreds of calls per
